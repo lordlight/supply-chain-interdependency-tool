@@ -1,5 +1,19 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Setup
+
+### Install dependencies
+
+#### Node.js
+
+Go to the [Node.js download site](https://nodejs.org/en/download/) and download the installer for your operating system. Then, install it.
+
+### Download and setup app
+
+Download the app .zip and unzip it. With it unzipped navigate to the unzipped folder using the terminal or command line.
+
+******Script to install things and set it up.
+
 ## Available Scripts
 
 In the project directory, you can run:
