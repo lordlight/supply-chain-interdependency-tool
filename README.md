@@ -2,6 +2,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Setup
 
+Note, this guide was helpful for getting started: [react based app with electron](https://getstream.io/blog/takeaways-on-building-a-react-based-app-with-electron/)
+
 ### Install dependencies
 
 #### Node.js
