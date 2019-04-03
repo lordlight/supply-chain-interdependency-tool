@@ -20,6 +20,13 @@ class Home extends Component {
                 to="/risk-visual">
                     Risk Visual
             </Typography>
+            <Typography variant="title"
+                color="inherit"
+                style={{ flexGrow: 1, textDecoration: "none" }}
+                component={Link}
+                to="/list">
+                    List
+            </Typography>
         </div>
     );
   }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Assessment, Home, RiskGraph } from "./components/";
+import { Assessment, Home, List, RiskGraph } from "./components/";
 import { Link, Route, Switch } from "react-router-dom";
 
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
@@ -40,6 +40,7 @@ class App extends Component {
           <Route exact path="/" component={Home} />
           <Route exact path="/assessment" component={Assessment} />
           <Route exact path="/risk-visual" component={RiskGraph} />
+          <Route exact path="/list" component={List} />
         </Switch>
       </MuiThemeProvider>
     )
