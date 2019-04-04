@@ -4,6 +4,8 @@ const { TouchBarButton, TouchBarLabel, TouchBarSpacer } = TouchBar;
 const path = require('path');
 const isDev = require('electron-is-dev');
 
+const fs = require('fs');
+
 let mainWindow;
 
 createWindow = () => {
@@ -123,7 +125,14 @@ generateMenu = () => {
 	Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 };
 
+loadFiles = () => {
+	console.log("#####: ", __dirname);
+	var data = JSON.parse(fs.readFileSync(__dirname + '/data/csf-1.1.json'));
+	console.log("******loaded data: ", data);
+};
+
 app.on('ready', () => {
+	loadFiles();
 	createWindow();
 	generateMenu();
 });
