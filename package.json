@@ -7,10 +7,12 @@
 	"dependencies": {
 		"@material-ui/core": "^3.9.2",
 		"@material-ui/icons": "^3.0.2",
+		"csv-parser": "^2.2.0",
 		"d3": "^5.9.2",
 		"electron-devtools-installer": "^2.2.4",
 		"electron-is-dev": "^1.0.1",
 		"electron-publisher-s3": "^20.17.2",
+		"express": "^4.16.4",
 		"react": "^16.8.5",
 		"react-dev-utils": "^8.0.0",
 		"react-dom": "^16.8.5",
@@ -21,9 +23,9 @@
 	},
 	"scripts": {
 		"dev": "yarn react-scripts start",
-		"build": "react-scripts build",
+		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js",
 		"start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-		"pack": "electron-builder --dir",
+		"pack": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite",
 		"dist": "npx build --x64 --macos --win --linux --c.extraMetadata.main=build/electron.js -p always"
 	},
 	"eslintConfig": {
@@ -38,8 +40,9 @@
 	"devDependencies": {
 		"concurrently": "^4.1.0",
 		"cross-env": "^5.2.0",
-		"electron": "^4.1.3",
+		"electron": "^4.1.4",
 		"electron-builder": "^20.39.0",
+		"electron-packager": "^13.1.1",
 		"react-scripts": "^2.1.8",
 		"version-bump-prompt": "^5.0.1"
 	},
@@ -64,7 +67,7 @@
 				"bucket": "example-releases",
 				"path": "releases"
 			},
-			"category": "public.app-category.news"
+			"category": "public.app-category.utilities"
 		},
 		"mas": {
 			"entitlements": "assets/entitlements.mas.plist",

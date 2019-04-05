@@ -2,9 +2,18 @@ const { app, BrowserWindow, shell, ipcMain, Menu, TouchBar } = require('electron
 const { TouchBarButton, TouchBarLabel, TouchBarSpacer } = TouchBar;
 
 const path = require('path');
-const isDev = require('electron-is-dev');
+let isDev = false; 
+try {
+	isDev = require('electron-is-dev');
+} catch (err){
+	console.log("isDev failed to import");
+}
 
+/*const csv = require('csv-parser');
 const fs = require('fs');
+
+const express = require('express');
+const fileApi = express();*/
 
 let mainWindow;
 
@@ -21,6 +30,8 @@ createWindow = () => {
 		height: 860,
 		width: 1280,
 	});
+
+	console.log("&&&&&&&&&&&&&&&&: ", isDev);
 
 	mainWindow.loadURL(
 		isDev
@@ -125,14 +136,23 @@ generateMenu = () => {
 	Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 };
 
-loadFiles = () => {
+/*loadFiles = () => {
 	console.log("#####: ", __dirname);
 	var data = JSON.parse(fs.readFileSync(__dirname + '/data/csf-1.1.json'));
 	console.log("******loaded data: ", data);
-};
+
+	fs.createReadStream(__dirname + '/data/2018-04-16_framework_v1.1_core1.csv')
+	  .pipe(csv())
+	  .on('data', (row) => {
+		console.log(row);
+	  })
+	  .on('end', () => {
+		console.log(" CSV file successfully processed");
+	});
+};*/
 
 app.on('ready', () => {
-	loadFiles();
+	//loadFiles();
 	createWindow();
 	generateMenu();
 });
@@ -146,6 +166,8 @@ app.on('activate', () => {
 		createWindow();
 	}
 });
+
+//fileApi.get("/file", (req, res) => res.send("test"));
 
 ipcMain.on('load-page', (event, arg) => {
 	mainWindow.loadURL(arg);
