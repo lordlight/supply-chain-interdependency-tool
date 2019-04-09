@@ -23,10 +23,11 @@
 	},
 	"scripts": {
 		"dev": "yarn react-scripts start",
-		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json",
+		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js",
 		"start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-		"pack": "electron-packager ./build CSCRM --out=dist --platform=darwin --arch=x64 --overwrite",
-		"dist": "npx build --x64 --macos --win --linux --c.extraMetadata.main=build/electron.js -p always"
+		"pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite",
+		"pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite",
+		"pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
 	},
 	"eslintConfig": {
 		"extends": "react-app"
