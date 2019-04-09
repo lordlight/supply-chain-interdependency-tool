@@ -2,12 +2,7 @@ const { app, BrowserWindow, shell, ipcMain, Menu, TouchBar } = require('electron
 const { TouchBarButton, TouchBarLabel, TouchBarSpacer } = TouchBar;
 
 const path = require('path');
-let isDev = false; 
-try {
-	isDev = require('electron-is-dev');
-} catch (err){
-	console.log("isDev failed to import");
-}
+let isDev = require('electron-is-dev');
 
 /*const csv = require('csv-parser');
 const fs = require('fs');
@@ -25,13 +20,11 @@ createWindow = () => {
 		titleBarStyle: 'default',
 		webPreferences: {
 			nodeIntegration: false,
-			preload: __dirname + '/preload.js',
+			preload: __dirname + '/../preload.js',
 		},
 		height: 860,
 		width: 1280,
 	});
-
-	console.log("&&&&&&&&&&&&&&&&: ", isDev);
 
 	mainWindow.loadURL(
 		isDev
@@ -70,6 +63,8 @@ createWindow = () => {
 			shell.openExternal(arg);
 		});
 	});
+
+	mainWindow.webContents.openDevTools();
 };
 
 generateMenu = () => {
@@ -167,8 +162,15 @@ app.on('activate', () => {
 	}
 });
 
-//fileApi.get("/file", (req, res) => res.send("test"));
+app.on('ondragstart', (event, filePath) => {
+	console.log("drag start: ", filePath);
+	/*event.sender.startDrag({
+		file: filePath,
+		icon: '/path/to/icon.png'
+	  })*/
+});
 
-ipcMain.on('load-page', (event, arg) => {
-	mainWindow.loadURL(arg);
+ipcMain.on('asynchronous-message', (event, arg) => {
+    console.log(arg) // prints "ping"
+    event.sender.send('asynchronous-reply', 'pong')
 });

@@ -7,6 +7,14 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import { Typography, Button } from "@material-ui/core";
 
+const electron = window.electron;
+//console.log("electron: ", electron);
+const ipcRenderer = electron.ipcRenderer;
+
+ipcRenderer.on('asynchronous-reply', (event, arg) => {
+    console.log('arg: ', arg);
+});
+
 const styles = theme => ({
     root: {
       flexGrow: 1,
@@ -24,7 +32,44 @@ const styles = theme => ({
 class Home extends Component {
     constructor(props){
         super(props);
-    } 
+    }
+
+    dragEnterHandler = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    dragOverHandler = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    dropHandler = (event) => {
+        // Stop default behaviors and propagation.
+        event.stopPropagation();
+        event.preventDefault();
+        
+        // Get the items.
+        const dt = event.dataTransfer;
+        const files = dt.files;
+
+        //const count = files.length;
+
+        //console.log("num files: ", count);
+
+        let filesToLoad = [];
+
+        for (let i = 0; i < files.length; i++){
+            //console.log("File: " + i + ", type: " + typeof(files[i]) + ", name: " + files[i].name);
+            //console.log("file: ", files[i]);
+            filesToLoad.push({name: files[i].name, path:files[i].path});
+        }
+
+        console.log("files to load: ", filesToLoad);
+
+        // Send the file to the electron main thread.
+        ipcRenderer.send('asynchronous-message', filesToLoad);
+    }
 
     render() {
         const { classes } = this.props;
@@ -36,7 +81,7 @@ class Home extends Component {
                     <Grid item xs={5}>
                         <Paper className={classes.paper}>Overview</Paper>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={3} onDragEnter={this.dragEnterHandler} onDragOver={this.dragOverHandler} onDrop={this.dropHandler}>
                         {/*<Card className="card">
                             <CardContent>
                                 <Typography className="title" color="textSecondary" gutterBottom>
