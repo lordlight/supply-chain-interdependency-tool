@@ -1,14 +1,13 @@
 const { app, BrowserWindow, shell, ipcMain, Menu, TouchBar } = require('electron');
 const { TouchBarButton, TouchBarLabel, TouchBarSpacer } = TouchBar;
+const fs = require('fs');
 
 const path = require('path');
 let isDev = require('electron-is-dev');
 
-/*const csv = require('csv-parser');
-const fs = require('fs');
+const csv = require('csv-parser');
 
-const express = require('express');
-const fileApi = express();*/
+console.log("dirname: ", __dirname);
 
 let mainWindow;
 
@@ -162,15 +161,42 @@ app.on('activate', () => {
 	}
 });
 
-app.on('ondragstart', (event, filePath) => {
-	console.log("drag start: ", filePath);
-	/*event.sender.startDrag({
-		file: filePath,
-		icon: '/path/to/icon.png'
-	  })*/
-});
+ipcMain.on('asynchronous-file-load', (event, req) => {
+	let response = {error: null, data:[], type:null};
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log(arg) // prints "ping"
-    event.sender.send('asynchronous-reply', 'pong')
+	if (!req.type || !req.filesToLoad){
+		response.error = "Missing type or files to upload.";
+		event.sender.send('asynchronous-file-response', response);
+	} else {
+		const files = req.filesToLoad;
+		response.type = req.type;
+
+		//console.log("files: ", files);
+
+		files.forEach((file) => {
+			if (!file.path || !file.name){
+				response.error = "**ERROR** One did not have the name and/or path properties.";
+				event.sender.send('asynchronous-file-response', response);
+			} else {
+				if (file.path.endsWith(".csv")){
+					try {
+						fs.createReadStream(file.path)
+						.pipe(csv())
+						.on('data', (data) => {
+							response.data.push(data);
+						})
+						.on('end', () => {
+							console.log("done");
+							event.sender.send('asynchronous-file-response', response);
+						});
+					} catch (err){
+						response.error = error;
+						event.sender.send('asynchronous-file-response', response);
+					}
+				} else {
+					event.sender.send('asynchronous-file-response', response);
+				}
+			}
+		});
+	}
 });

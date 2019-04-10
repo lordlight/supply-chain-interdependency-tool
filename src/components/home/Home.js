@@ -11,7 +11,7 @@ const electron = window.electron;
 //console.log("electron: ", electron);
 const ipcRenderer = electron.ipcRenderer;
 
-ipcRenderer.on('asynchronous-reply', (event, arg) => {
+ipcRenderer.on('asynchronous-file-response', (event, arg) => {
     console.log('arg: ', arg);
 });
 
@@ -44,7 +44,7 @@ class Home extends Component {
         event.preventDefault();
     }
 
-    dropHandler = (event) => {
+    dropHandler = (event, type) => {
         // Stop default behaviors and propagation.
         event.stopPropagation();
         event.preventDefault();
@@ -57,18 +57,18 @@ class Home extends Component {
 
         //console.log("num files: ", count);
 
-        let filesToLoad = [];
+        let req = {type: type, filesToLoad: []};
 
         for (let i = 0; i < files.length; i++){
             //console.log("File: " + i + ", type: " + typeof(files[i]) + ", name: " + files[i].name);
             //console.log("file: ", files[i]);
-            filesToLoad.push({name: files[i].name, path:files[i].path});
+            req.filesToLoad.push({name: files[i].name, path:files[i].path});
         }
 
-        console.log("files to load: ", filesToLoad);
+        console.log("files to load: ", req.filesToLoad);
 
         // Send the file to the electron main thread.
-        ipcRenderer.send('asynchronous-message', filesToLoad);
+        ipcRenderer.send('asynchronous-file-load', req);
     }
 
     render() {
@@ -81,7 +81,7 @@ class Home extends Component {
                     <Grid item xs={5}>
                         <Paper className={classes.paper}>Overview</Paper>
                     </Grid>
-                    <Grid item xs={3} onDragEnter={this.dragEnterHandler} onDragOver={this.dragOverHandler} onDrop={this.dropHandler}>
+                    <Grid item xs={3} onDragEnter={this.dragEnterHandler} onDragOver={this.dragOverHandler} onDrop={(e) => this.dropHandler(e, "projects")}>
                         {/*<Card className="card">
                             <CardContent>
                                 <Typography className="title" color="textSecondary" gutterBottom>
