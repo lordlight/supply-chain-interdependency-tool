@@ -11,15 +11,12 @@
 		"d3": "^5.9.2",
 		"electron-devtools-installer": "^2.2.4",
 		"electron-is-dev": "^1.0.1",
-		"electron-publisher-s3": "^20.17.2",
-		"express": "^4.16.4",
 		"react": "^16.8.5",
 		"react-dev-utils": "^8.0.0",
 		"react-dom": "^16.8.5",
-		"react-router-dom": "^5.0.0",
-		"react-table": "^6.9.2",
-		"survey-react": "^1.0.76",
-		"xlsx": "^0.14.1"
+		"react-redux": "^7.0.1",
+		"redux": "^4.0.1",
+		"survey-react": "^1.0.76"
 	},
 	"scripts": {
 		"dev": "yarn react-scripts start",

@@ -7,6 +7,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 
+import { connect } from "react-redux";
+
 const listStyles = theme => ({
     root: {
         width: '100%',
@@ -18,10 +20,16 @@ const listStyles = theme => ({
     },
 });
 
+const mapState = state => ({
+    suppliers: state.suppliers,
+    products: state.products,
+    projects: state.projects
+});
+
 class List extends Component {
     constructor(props){
         super(props);
-    } 
+    }
       
     createData(id, name, calories, fat, carbs, protein) {
         id += 1;
@@ -30,72 +38,48 @@ class List extends Component {
     }
 
     render() {
-        let id = 0;
-        const data = {
-            "labels": ["Dessert", "Calories", "Fat (g)", "Carbs (g)", "Protein (g)"],
-            "rows": [
-                ['Frozen yoghurt', 159, 6.0, 24, 4.0],
-                ['Ice cream sandwich', 237, 9.0, 37, 4.3],
-                ['Eclair', 262, 16.0, 24, 6.0],
-                ['Cupcake', 305, 3.7, 67, 4.3],
-                ['Gingerbread', 356, 16.0, 49, 3.9]
-            ]
-        };
+        if (this.props.projects.length < 1){
+            return null;
+        }
+
+        const labels = Object.keys(this.props.projects[0]).map((label, i) => (
+            <TableCell key={"label-" + i}
+            align={(() => {
+                if (i > 0) return "right";
+                else return "left";
+            })()}
+            >
+                {label}
+            </TableCell>
+        ));
+
+        const rows = this.props.projects.map((row, i) => (
+            <TableRow key={i}>
+                {Object.keys(row).map((prop, j) => (
+                    <TableCell key={i + "-" + j}>
+                        <TextField 
+                            inputProps={{style: {textAlign: "right"}}}
+                            defaultValue={row[prop]}
+                        >
+                        </TextField>
+                    </TableCell>
+                ))}
+            </TableRow>
+        ));
 
         return (
             <Table className={this.props.table}>
                 <TableHead>
                     <TableRow>
-                        {data.labels.map((label, index) => (
-                           <TableCell
-                             align={(() => {
-                                if (index > 0) return "right";
-                                else return "left";
-                             })()}
-                             >{label}</TableCell> 
-                        ))}
+                        {labels}
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {data.rows.map((row, index) => (
-                        <TableRow key={index}>
-                            <TableCell component="th" scope="row">
-                                {row[0]}
-                            </TableCell>
-                            <TableCell align="right">
-                                <TextField
-                                    inputProps={{style: {textAlign: "right"}}}
-                                    defaultValue={row[1]}
-                                >
-                                </TextField>
-                            </TableCell>
-                            <TableCell align="right">
-                                <TextField
-                                    inputProps={{style: {textAlign: "right"}}}
-                                    defaultValue={row[2]}
-                                >
-                                </TextField>
-                            </TableCell>
-                            <TableCell align="right">
-                                <TextField
-                                    inputProps={{style: {textAlign: "right"}}}
-                                    defaultValue={row[3]}
-                                >
-                                </TextField>
-                            </TableCell>
-                            <TableCell align="right">
-                                <TextField
-                                    inputProps={{style: {textAlign: "right"}}}
-                                    defaultValue={row[4]}
-                                >
-                                </TextField>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {rows}
                 </TableBody>
             </Table>
         );
     }
 }
 
-export default withStyles(listStyles)(List);
+export default withStyles(listStyles)(connect(mapState)(List));

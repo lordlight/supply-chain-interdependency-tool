@@ -7,13 +7,9 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import { Typography, Button } from "@material-ui/core";
 
+// This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
-//console.log("electron: ", electron);
 const ipcRenderer = electron.ipcRenderer;
-
-ipcRenderer.on('asynchronous-file-response', (event, arg) => {
-    console.log('arg: ', arg);
-});
 
 const styles = theme => ({
     root: {
