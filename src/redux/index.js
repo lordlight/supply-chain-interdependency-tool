@@ -1,5 +1,3 @@
-import store from "./store/index";
-import { addSuppliers } from "./actions";
+import store from "./store";
 
 window.store = store;
-window.addSuppliers = addSuppliers;

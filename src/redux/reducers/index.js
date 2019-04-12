@@ -1,9 +1,12 @@
-import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS } from "../actions";
+import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, INIT_SESSION } from "../actions";
 
 const initialState = {
     suppliers: [],
     products: [],
-    projects: []
+    projects: [],
+    supplierResponses: {},
+	productResponses: {},
+	projectResponses: {}
 };
 
 function rootReducer(state = initialState, action) {
@@ -18,6 +21,15 @@ function rootReducer(state = initialState, action) {
     } else if (action.type === ADD_PROJECTS){
         return Object.assign({}, state, {
             projects: state.projects = action.payload
+        });
+    } else if (action.type === INIT_SESSION){
+        return Object.assign({}, state, {
+            suppliers: state.suppliers = action.payload.suppliers,
+            products: state.products = action.payload.products,
+            projects: state.projects = action.payload.projects,
+            supplierResponses: state.supplierResponses = action.payload.supplierResponses,
+            productResponses: state.productResponses = action.payload.productResponses,
+            projectResponses: state.projectResponses = action.payload.projectResponses
         });
     }
     return state;

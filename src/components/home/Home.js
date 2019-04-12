@@ -7,9 +7,17 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import { Typography, Button } from "@material-ui/core";
 
+import { connect } from "react-redux";
+
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
+
+const mapState = state => ({
+    suppliers: state.suppliers,
+    products: state.products,
+    projects: state.projects
+});
 
 const styles = theme => ({
     root: {
@@ -77,39 +85,35 @@ class Home extends Component {
                     <Grid item xs={5}>
                         <Paper className={classes.paper}>Overview</Paper>
                     </Grid>
-                    <Grid item xs={3} onDragEnter={this.dragEnterHandler} onDragOver={this.dragOverHandler} onDrop={(e) => this.dropHandler(e, "projects")}>
-                        {/*<Card className="card">
-                            <CardContent>
-                                <Typography className="title" color="textSecondary" gutterBottom>
-                                    Word of the Day
-                                </Typography>
-                                <Typography variant="h5" component="h2">
-                                    be
-                                    {bull}
-                                    nev
-                                    {bull}o{bull}
-                                    lent
-                                </Typography>
-                                <Typography className="blarg" color="textSecondary">
-                                    adjective
-                                    </Typography>
-                                    <Typography component="p">
-                                    well meaning and kindly.
-                                    <br />
-                                    {'"a benevolent smile"'}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button size="small">Learn More</Button>
-                            </CardActions>
-                        </Card>*/}
-                        <Paper className={classes.paper}>Projects</Paper>
+                    <Grid item xs={3}
+                          onDragEnter={this.dragEnterHandler}
+                          onDragOver={this.dragOverHandler}
+                          onDrop={(e) => this.dropHandler(e, "projects")}
+                    >
+                        { this.props.projects.length < 1
+                          ? <Paper className={classes.paper}>Add Projects</Paper>
+                          : <Paper className={classes.paper}>{this.props.projects.length} Projects</Paper>
+                        }
                     </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper}>Products</Paper>
+                    <Grid item xs={3}
+                          onDragEnter={this.dragEnterHandler}
+                          onDragOver={this.dragOverHandler}
+                          onDrop={(e) => this.dropHandler(e, "products")}
+                    >
+                        { this.props.products.length < 1
+                          ? <Paper className={classes.paper}>Add Products</Paper>
+                          : <Paper className={classes.paper}>{this.props.products.length} Products</Paper>
+                        }
                     </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper}>Suppliers</Paper>
+                    <Grid item xs={3}
+                          onDragEnter={this.dragEnterHandler}
+                          onDragOver={this.dragOverHandler}
+                          onDrop={(e) => this.dropHandler(e, "suppliers")}
+                    >
+                        { this.props.suppliers.length < 1
+                          ? <Paper className={classes.paper}>Add Suppliers</Paper>
+                          : <Paper className={classes.paper}>{this.props.suppliers.length} Suppliers</Paper>
+                        }
                     </Grid>
                 </Grid>
             </div>
@@ -117,4 +121,4 @@ class Home extends Component {
   }
 }
 
-export default withStyles(styles)(Home);
+export default withStyles(styles)(connect(mapState)(Home));

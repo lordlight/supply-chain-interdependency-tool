@@ -30,19 +30,22 @@ class List extends Component {
     constructor(props){
         super(props);
     }
-      
-    createData(id, name, calories, fat, carbs, protein) {
-        id += 1;
-        console.log("id: ", id);
-        return { id, name, calories, fat, carbs, protein };
-    }
 
     render() {
-        if (this.props.projects.length < 1){
+        let list = null;
+        if (this.props.type === "suppliers"){
+            list = this.props.suppliers;
+        } else if (this.props.type === "products"){
+            list = this.props.products;
+        } else if (this.props.type === "projects"){
+            list = this.props.projects;
+        }
+
+        if (list < 1){
             return null;
         }
 
-        const labels = Object.keys(this.props.projects[0]).map((label, i) => (
+        const labels = Object.keys(list[0]).map((label, i) => (
             <TableCell key={"label-" + i}
             align={(() => {
                 if (i > 0) return "right";
@@ -53,10 +56,16 @@ class List extends Component {
             </TableCell>
         ));
 
-        const rows = this.props.projects.map((row, i) => (
+        const rows = list.map((row, i) => (
             <TableRow key={i}>
                 {Object.keys(row).map((prop, j) => (
-                    <TableCell key={i + "-" + j}>
+                    <TableCell
+                      key={i + "-" + j}
+                      align={(() => {
+                        if (j > 0) return "right";
+                        else return "left";
+                      })()}
+                    >
                         <TextField 
                             inputProps={{style: {textAlign: "right"}}}
                             defaultValue={row[prop]}

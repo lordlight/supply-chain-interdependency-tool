@@ -6,6 +6,10 @@ import { AppBar, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { blue, blueGrey } from "@material-ui/core/colors";
 
+// This only works when running electron or as an app (i.e. will not work in browser).
+const electron = window.electron;
+const ipcRenderer = electron.ipcRenderer;
+
 const theme = createMuiTheme({
   palette: {
     primary: blue,
@@ -23,6 +27,11 @@ class App extends Component {
     this.state = {
       value: 'dashboard'
     };
+  }
+
+  componentDidMount(){
+    // Let the main/server know the app has started.
+    ipcRenderer.send('renderer-loaded');
   }
 
   handleChange = (event, value) => {
@@ -43,9 +52,9 @@ class App extends Component {
           </Tabs>
         </AppBar>
         {value === 'dashboard' && <Home />}
-        {value === 'projects' && <List />}
-        {value === 'products' && <List />}
-        {value === 'suppliers' && <List />}
+        {value === 'projects' && <List type="projects"/>}
+        {value === 'products' && <List type="products"/>}
+        {value === 'suppliers' && <List type="suppliers"/>}
         {value === 'network' && <RiskGraph />}
       </MuiThemeProvider>
     )
