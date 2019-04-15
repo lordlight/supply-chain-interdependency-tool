@@ -20,6 +20,16 @@ ipcRenderer.on('init-state', (event, arg) => {
     store.dispatch(initSession(arg));
 });
 
+ipcRenderer.on('save-confirm', (event, arg) => {
+    console.log("Save confirmed: ", arg);
+});
+
+ipcRenderer.on('save-error', (event, arg) => {
+    console.log("!!!Save error: ", arg);
+});
+
+ipcRenderer.on('app-loc', (event, arg) => {console.log("app location: ", arg);});
+
 // Asynchronous file response: what to do after the main has loaded a file at the request of the renderer.
 // params: event - typical event, arg - object structured like the following: {data: null or array representing rows of csv,
 //                                                                            error: null or string,

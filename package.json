@@ -1,5 +1,5 @@
 {
-	"name": "supply-chain-risk-questionnaire",
+	"name": "CSCRM",
 	"version": "0.1.0",
 	"private": true,
 	"homepage": "./",
@@ -22,9 +22,9 @@
 	},
 	"scripts": {
 		"dev": "yarn react-scripts start",
-		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js",
+		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; npm --prefix ./build install ./build",
 		"start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-		"pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite",
+		"pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.'",
 		"pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite",
 		"pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
 	},
