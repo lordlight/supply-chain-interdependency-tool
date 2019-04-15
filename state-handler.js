@@ -17,7 +17,7 @@ let sessionData = {
 	suppliers: [],
 	products: [],
 	projects: [],
-	supplierResponses: {},
+	supplierResponses: {}, // {supplierId: sid, responses: [ {questionId: qid, answerId, aid} ]}
 	productResponses: {},
 	projectResponses: {}
 }
@@ -100,7 +100,7 @@ updateSessionData = (data, type) => {
 }
 
 getAppRoot = () => {
-	const appPath = app.getAppPath('exe');
+	const appPath = app.getPath('exe');
 	const appName = app.getName();
 
 	let appRoot = "";
@@ -113,7 +113,7 @@ getAppRoot = () => {
 		if (appIndex > -1){
 			appRoot = appPath.substring(0, appIndex);
 		} else {
-			appRoot = appPath;
+			appRoot = app.getAppPath();
 		}
 	} else if (process.platform === 'win32'){
 		console.log("***Platform is Windows");
@@ -121,10 +121,10 @@ getAppRoot = () => {
 		if (appIndex > -1){
 			appRoot = appPath.substring(0, appIndex);
 		} else {
-			appRoot = appPath;
+			appRoot = app.getAppPath();
 		}
 	} else {
-		appRoot = appPath;
+		appRoot = app.getAppPath();
 	}
 
 	return appRoot;
