@@ -34,9 +34,13 @@ const resourcePaths = [
 
 // Load any previuosly generated session data.
 loadSessionData = () => {
-	const appRoot = getAppRoot();
-	const dataPath = appRoot + "/data";
+	const appPath = app.getPath('appData') + "/" + app.getName();
+	// If the CSCRM app folder does not exist, create it.
+	if (!fs.existsSync(appPath)){
+		fs.mkdirSync(appPath);
+	}
 
+	const dataPath = appPath + "/data";
 	// If the data folder does not exist, create it.
 	if (!fs.existsSync(dataPath)){
 		fs.mkdirSync(dataPath);
@@ -61,9 +65,13 @@ loadSessionData = () => {
 }
 
 saveSessionData = (event) => {
-	const appRoot = getAppRoot();
-	const dataPath = appRoot + "/data";
+	const appPath = app.getPath('appData') + "/" + app.getName();
+	// If the CSCRM app folder does not exist, create it.
+	if (!fs.existsSync(appPath)){
+		fs.mkdirSync(appPath);
+	}
 
+	const dataPath = appPath + "/data";
 	// If the data folder does not exist, create it.
 	if (!fs.existsSync(dataPath)){
 		fs.mkdirSync(dataPath);
@@ -99,7 +107,7 @@ updateSessionData = (data, type) => {
 	}
 }
 
-getAppRoot = () => {
+/*getAppRoot = () => {
 	const appPath = app.getPath('exe');
 	const appName = app.getName();
 
@@ -128,12 +136,12 @@ getAppRoot = () => {
 	}
 
 	return appRoot;
-}
+}*/
 
 // Functions and event handlers for communicating with data.
 ipcMain.on('renderer-loaded', (event) => {
 	event.sender.send('init-state', sessionData);
-	//event.sender.send('app-loc', getAppRoot());
+	//event.sender.send('app-loc', app.getPath('appData'));
 });
 
 ipcMain.on('asynchronous-file-load', (event, req) => {
