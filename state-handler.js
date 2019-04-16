@@ -7,16 +7,13 @@ const csvParser = require('csv-parser');
 const csvSync = require('csv-parse/lib/sync');
 const json2csv = require('json-2-csv');
 
-let questions = {
-	supplier: [], // {id: qid, label: "question?", riskWeighting: 1.0, critWeighting: 0.5, answers: [{id: aid, label: "answer", value: 1}]}
-	product: [],
-	project: []
-};
-
 let sessionData = {
 	suppliers: [],
 	products: [],
 	projects: [],
+	supplierQuestions: [], // {id: qid, label: "question?", riskWeighting: 1.0, critWeighting: 0.5, answers: [{id: aid, label: "answer", value: 1}]}
+	productQuestions: [],
+	projectQuestions: [],
 	supplierResponses: {}, // {supplierId: sid, responses: [ {questionId: qid, answerId, aid} ]}
 	productResponses: {},
 	projectResponses: {}
@@ -26,6 +23,20 @@ let sessionData = {
 // TODO: Load product questions
 // TODO: Load project questions
 
+// Constants for file names that will contain the data.
+
+const questionPaths = [
+	{path: "/assets/supplier-questions.csv", type: "supplierQuestions"},
+	{path: "/assets/product-questions.csv", type: "productQuestions"},
+	{path: "/assets/project-questions.csv", type: "projectQuestions"}
+];
+
+const responsePaths = [
+	{path: "/assets/supplier-responses.csv", type: "supplierResponses"},
+	{path: "/assets/product-responses.csv", type: "productResponses"},
+	{path: "/assets/project-responses.csv", type: "projectResponses"}
+]
+
 const resourcePaths = [
 	{path: "suppliers.csv", type: "suppliers"},
 	{path: "products.csv", type: "products"},
@@ -34,6 +45,7 @@ const resourcePaths = [
 
 // Load any previuosly generated session data.
 loadSessionData = () => {
+	/* Load data given by user */
 	const appPath = app.getPath('appData') + "/" + app.getName();
 	// If the CSCRM app folder does not exist, create it.
 	if (!fs.existsSync(appPath)){
@@ -47,21 +59,35 @@ loadSessionData = () => {
 	}
 
 	resourcePaths.forEach( (resource) => {
-		let resourceData = [];
-		if (fs.existsSync(dataPath + "/" + resource.path)){
-			try {
-				data = fs.readFileSync(dataPath + "/"  + resource.path, 'utf8');
-				try {
-					resourceData = csvSync(data, {columns: true});
-					updateSessionData(resourceData, resource.type);
-				} catch(csvErr){
-					console.log("csv error with ", resource.path);
-				}
-			} catch (err){
-				console.log("error loading ", resource.path);
-			}
-		}
+		loadFileContents(dataPath + "/" + resource.path, resource.type);
 	});
+
+	/* Load question data */
+	questionPaths.forEach( (questionItem) => {
+		loadFileContents(__dirname + "/" + questionItem.path, questionItem.type);
+	});
+
+	/* Load response data */
+	responsePaths.forEach ( (responseItem) => {
+		loadFileContents(dataPath + "/" + responseItem.path, responseItem.type);
+	});
+}
+
+loadFileContents = (path, itemType) => {
+	let itemData = [];
+	if (fs.existsSync(path)){
+		try {
+			let data = fs.readFileSync(path, 'utf8');
+			try {
+				itemData = csvSync(data, {columns: true});
+				updateSessionData(itemData, itemType);
+			} catch(csvErr){
+				console.log("csv error with ", path);
+			}
+		} catch (err){
+			console.log("error loading ", path);
+		}
+	}
 }
 
 saveSessionData = (event) => {
@@ -98,12 +124,10 @@ saveSessionData = (event) => {
 }
 
 updateSessionData = (data, type) => {
-	if (type === "suppliers"){
-		sessionData.suppliers = data;
-	} else if (type === "products"){
-		sessionData.products = data;
-	} else if (type === "projects"){
-		sessionData.projects = data;
+	if (sessionData.hasOwnProperty(type)){
+		sessionData[type] = data;
+	} else {
+		console.error("updateSessionData() - sessionData does not have property: ", type);
 	}
 }
 
