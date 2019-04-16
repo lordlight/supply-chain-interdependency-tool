@@ -45,7 +45,6 @@ const resourcePaths = [
 
 // Load any previuosly generated session data.
 loadSessionData = () => {
-	/* Load data given by user */
 	const appPath = app.getPath('appData') + "/" + app.getName();
 	// If the CSCRM app folder does not exist, create it.
 	if (!fs.existsSync(appPath)){
@@ -58,18 +57,47 @@ loadSessionData = () => {
 		fs.mkdirSync(dataPath);
 	}
 
-	resourcePaths.forEach( (resource) => {
+	// Load data given by user
+	resourcePaths.forEach((resource) => {
 		loadFileContents(dataPath + "/" + resource.path, resource.type);
 	});
 
-	/* Load question data */
-	questionPaths.forEach( (questionItem) => {
+	// Load question data
+	questionPaths.forEach((questionItem) => {
 		loadFileContents(__dirname + "/" + questionItem.path, questionItem.type);
 	});
 
-	/* Load response data */
-	responsePaths.forEach ( (responseItem) => {
+	// Convert answers to json, instead of the 'value={number};label="Some text" | ...' strings
+	convertAnswers();
+
+	// Load response data
+	responsePaths.forEach ((responseItem) => {
 		loadFileContents(dataPath + "/" + responseItem.path, responseItem.type);
+	});
+}
+
+convertAnswers = () => {
+	let questionGroups = [sessionData.supplierQuestions, sessionData.productQuestions, sessionData.projectQuestions];
+
+	questionGroups.forEach( (group) => {
+		group.forEach( (question) => {
+			if (question.hasOwnProperty("Answers")){
+				let answers = [];
+				let answerString = question.Answers.trim();
+				let splitAnswers = answerString.split(" | ");
+				//console.log("split answers: ", splitAnswers.length, ", data: ", splitAnswers);
+				splitAnswers.forEach((answerString) => {
+					let splitAns = answerString.split(";");
+					if (splitAns.length == 2){
+						let answerVal = Number(splitAns[0].replace("value=", ""));
+						let answerLabel = splitAns[1].replace("label=", "").replace('"', '');
+						answers.push({val: answerVal, label: answerLabel});
+					}
+				});
+
+				question.Answers = answers;
+			}
+		})
 	});
 }
 
