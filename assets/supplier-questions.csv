@@ -1,51 +1,51 @@
-﻿ID,ISO/IEC 27001,NIST,FSP (hide),Question,Answers,What to do next,Notes,Disposition,Interface look,JG Internal Discussion
-1.1,,NONE,NONE,Does the supplier have fewer than 10 employees?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
+﻿ID,QID,ISO/IEC 27001,NIST,FSP (hide),Question,Answers,What to do next,Notes,Disposition,Interface look,JG Internal Discussion
+1.1,1.1,,NONE,NONE,Does the supplier have fewer than 10 employees?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
 If no, no risk score change;
 
 Go to next question",This question targets the stability of the supplier. Using the threshold 10 because of this source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/,,,"What is the meaning of 'X'? i.e. should we consider XX vs X to mean simply more risk, or literally double risk?"
-1.2,,NONE,NONE,How long has this supplier been in business?,"value=1;label=""< 3 years"" | value=0;label=""< 5 years"" | value=0;label=""< 10 years"" | value=0;label=""10+ years"" | value=1;label=""I don't know""","If less than 3, RAISE the risk score by XX
+1.2,1.2,,NONE,NONE,How long has this supplier been in business?,"value=1;label=""< 3 years"" | value=0;label=""< 5 years"" | value=0;label=""< 10 years"" | value=0;label=""10+ years"" | value=1;label=""I don't know""","If less than 3, RAISE the risk score by XX
 If less than 5, RAISE the risk score by X
 If less than 10, no risk score change 
 If over 10, CREDIT the risk score by X; 
 
 Go to next question",Year ranges modifiable by user,,,
-1.3,,NONE,NONE,How much of the supplier's total business is provided by the acquirer?,"value=1;label=""> 90%"" | value=1;label=""60%-90%"" | value=1;label=""40%-59% | value=0;label=""20%-39%"" | value=0;label=""< 20%"" | value=1;label=""I don't know""","If over the threshold, RAISE the risk score by X
+1.3,1.3,,NONE,NONE,How much of the supplier's total business is provided by the acquirer?,"value=1;label=""> 90%"" | value=1;label=""60%-90%"" | value=1;label=""40%-59% | value=0;label=""20%-39%"" | value=0;label=""< 20%"" | value=1;label=""I don't know""","If over the threshold, RAISE the risk score by X
 If no, no risk score change; 
 
 Go to next question",Ranges and threshold configurable by acquirer.,,,
-2.1.1,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's portal for payment?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If Portal for payment, RAISE the risk score by X
+2.1.1,2.1.1,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's portal for payment?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If Portal for payment, RAISE the risk score by X
 If Inventory, RAISE the risk score by XX
 If Networks and/or systems, RAISE the risk score by XXX
 If Physical, RAISE the risk score by XXXX; 
 
 Go to next question",Dave's Bubble - Include examples,,,
-2.1.2,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's inventory information?,"value=2;label=""Yes"" | value=0;label=""No"" | value=2;label=""I don't know""",,,,,
-2.1.3,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's networks and/or systems?,"value=3;label=""Yes"" | value=0;label=""No"" | value=3;label=""I don't know""",,,,,
-2.1.4,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's physical facilities?,"value=4;label=""Yes"" | value=0;label=""No"" | value=4;label=""I don't know""",,,,,
-2.2,A.09.4.1,PR.AC-4,PR.AC-4,"Does supplier have access to acquirer-sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
+2.1.2,2.1.2,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's inventory information?,"value=2;label=""Yes"" | value=0;label=""No"" | value=2;label=""I don't know""",,,,,
+2.1.3,2.1.3,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's networks and/or systems?,"value=3;label=""Yes"" | value=0;label=""No"" | value=3;label=""I don't know""",,,,,
+2.1.4,2.1.4,A.09.2.1,PR.AC-1,PR.AC-1.1,Does supplier have access to the acquirer's physical facilities?,"value=4;label=""Yes"" | value=0;label=""No"" | value=4;label=""I don't know""",,,,,
+2.2,2.2,A.09.4.1,PR.AC-4,PR.AC-4,"Does supplier have access to acquirer-sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
 If no, no risk score change;
 
 Go to next question",Merged IP and other sensitive info,,,
-2.3,A.18.1.4,PR.AC-7,PR.AC-7.1,"Does the supplier have access to acquirer's regulated data (e.g., PII, PHI, PCI, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
+2.3,2.3,A.18.1.4,PR.AC-7,PR.AC-7.1,"Does the supplier have access to acquirer's regulated data (e.g., PII, PHI, PCI, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by X
 If no, no risk score change;
 
 Go to next question",,Put in documentation that they may want to customize if they want to separate these questions,,Should simple access score higher? I.e. isn't access without the need to process usually a violation or indication of incomplete process?
-2.4,A.18.1.4,PR.AC-7,PR.AC-7.1,"Does the supplier process acquirer's regulated data (e.g., PII, PHI, PCI, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by XX
+2.4,2.4,A.18.1.4,PR.AC-7,PR.AC-7.1,"Does the supplier process acquirer's regulated data (e.g., PII, PHI, PCI, etc.)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, RAISE risk score by XX
 If no, no risk score change; 
 
 Go to next question",The magnitude of processing of acquirer data significantly increases the risk,Put in documentation that they may want to customize if they want to separate these questions,,
-3.1,A.15.2.1,ID.SC-4,DM.ED-6.1,Does this supplier follow relevant industry standards?,"value=4;label=""No"" | value=3;label=""self-attestation"" | value=2;label=""self-attestation with proof"" | value=1;label=""self-attestation with 3rd party"" | value=0;label=""conformity assessment"" | value=4;label=""I don't know""","If no, no risk score change
+3.1,3.1,A.15.2.1,ID.SC-4,DM.ED-6.1,Does this supplier follow relevant industry standards?,"value=4;label=""No"" | value=3;label=""self-attestation"" | value=2;label=""self-attestation with proof"" | value=1;label=""self-attestation with 3rd party"" | value=0;label=""conformity assessment"" | value=4;label=""I don't know""","If no, no risk score change
 If self-attestation, CREDIT the risk score by X
 If self-attestation with proof, CREDIT the risk score by XX
 If self attestation with third party assessment, CREDIT the risk score by XXX
 If conformity assessment, CREDIT the risk score by XXXX; 
 
 Go to next question","Rethink X, XX, XXX, XXXX for the algorithm",,,Whose note was this?
-3.2,6.1,ID.RM-1,GV.PL-3.1?,"Does this supplier operate in highly regulated industries or provides products/services to highly regulated industries (e.g., Financial services, Energy)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, CREDIT the risk score by X
+3.2,3.2,6.1,ID.RM-1,GV.PL-3.1?,"Does this supplier operate in highly regulated industries or provides products/services to highly regulated industries (e.g., Financial services, Energy)?","value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, CREDIT the risk score by X
 If no, no risk score change; 
 
 Go to next question",,,,
-4.1,"A.18.1.1
+4.1,4.1,"A.18.1.1
 A.18.1.2
 A.18.1.3
 A.18.1.4
@@ -53,7 +53,7 @@ A.18.1.5",ID.GV-3,GV.SF-2.1,"The supplier is owned, controlled, or influenced in
 otherwise, no risk score change; 
 
 Go to next question","Dave's Bubble: providing more detail for potential entities, as well as descriptions of ownership, control, and influence",,,Discuss threshold
-5.1,"A.15.1.2
+5.1,5.1,"A.15.1.2
 A.15.1.3",ID.SC-3,DM.ED-6.5,"How sensitive is the supplier's ability to provide quality products/services to supply chain disruptions, both manmade and natural?","value=1;label=""Very sensitive"" | value=1;label=""Somewhat sensitive"" | value=0;label=""Not sensitive"" | value=1;label=""I don't know""","If over threshold, RAISE the risk score by X
 otherwise, no risk score change; 
 
@@ -61,24 +61,24 @@ Go to next question","Threshold configurable by supplier (e.g., within 24 hrs fo
 Changed per CP feedback.",,,"1) Perhaps too broad - should we break this out? I.e. political disruptions, economic shifts, climate, etc
 
 2) Right now the risk score change is binary. Should we scale it? i.e. 1-5 would be 0X-4X"
-6.1,,ID.GV-4,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to the acquirer?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, no risk score change
+6.1,6.1,,ID.GV-4,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to the acquirer?,"value=1;label=""Yes"" | value=0;label=""No"" | value=1;label=""I don't know""","If yes, no risk score change
 If no, RAISE the risk score by XX;
 
 Go to next question",,,,
-6.2,,ID.GV-4,ID.GV-4,Has the acquirer verified the information provided by the supplier on their supplier questionnaire?,"value=2;label=""Not verified"" | value=1;label=""Reviewed documentation"" | value=0;label=""3rd party assessment"" | value=0;label=""Audit conducted""","If not verified, RAISE the risk score by XX
+6.2,6.2,,ID.GV-4,ID.GV-4,Has the acquirer verified the information provided by the supplier on their supplier questionnaire?,"value=2;label=""Not verified"" | value=1;label=""Reviewed documentation"" | value=0;label=""3rd party assessment"" | value=0;label=""Audit conducted""","If not verified, RAISE the risk score by XX
 If documentation review, RAISE the risk score by X
 If third party audit, no risk score change
 If acquirer audit, CREDIT the risk score by X; 
 
 Go to next question",For algorithm chose the highest value and discount others,,,
-6.3,"A.15.1.2
+6.3,6.3,"A.15.1.2
 A.15.1.3",ID.SC-3,DM.ED-6.2,Is the acquirer able to influence this supplier's security practices through supplier agreements?,"value=1;label=""Yes, for all products and services"" | value=1;label=""Yes, for some products and services"" | value=0;label=""Not at all"" | value=1;label=""I don't know""","If over the threshold, RAISE the risk score by X and go to next question
 If no, then go to next question",Threshold configurable by supplier,,,
-7.1,,,,Does the acquirer know this supplier's sub-suppliers?,"value=1;label=""None"" | value=1;label=""Some"" | value=0;label=""all"" | value=0;label=""N/A""","If N/A, go to next section.
+7.1,7.1,,,,Does the acquirer know this supplier's sub-suppliers?,"value=1;label=""None"" | value=1;label=""Some"" | value=0;label=""all"" | value=0;label=""N/A""","If N/A, go to next section.
 If None, RAISE the risk score by ? and go to next section.
 If Some, CREDIT the risk score by ? and go to next question
 If All, CREDIT risk score by ? and go to next question",,,,"Should we have them do a separate ""supplier"" questionaire per sub-supplier?"
-7.2,,,,Does the acquirer have relationships with those sub-suppliers?,"value=1;label=""None"" | value=1;label=""Some"" | value=0;label=""All"" | value=0;label=""I don't know""","If N/A, go to next section.
+7.2,7.2,,,,Does the acquirer have relationships with those sub-suppliers?,"value=1;label=""None"" | value=1;label=""Some"" | value=0;label=""All"" | value=0;label=""I don't know""","If N/A, go to next section.
 If None, RAISE the risk score by ? and go to next section.
 If Some, CREDIT the risk score by ? and go to next question
 If All, CREDIT risk score by ? and go to next question",,,,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Assessment, Home, List, RiskGraph } from "./components/";
+import { Assessment, Home, ItemOverview, List, RiskGraph } from "./components/";
 
 import { AppBar, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
@@ -52,9 +52,9 @@ class App extends Component {
           </Tabs>
         </AppBar>
         {value === 'dashboard' && <Home />}
-        {value === 'projects' && <List type="projects"/>}
-        {value === 'products' && <List type="products"/>}
-        {value === 'suppliers' && <List type="suppliers"/>}
+        {value === 'projects' && <ItemOverview type="projects"/>}
+        {value === 'products' && <ItemOverview type="products"/>}
+        {value === 'suppliers' && <ItemOverview type="suppliers"/>}
         {value === 'network' && <RiskGraph />}
       </MuiThemeProvider>
     )

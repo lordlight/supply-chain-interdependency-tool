@@ -85,12 +85,12 @@ convertAnswers = () => {
 				let answers = [];
 				let answerString = question.Answers.trim();
 				let splitAnswers = answerString.split(" | ");
-				//console.log("split answers: ", splitAnswers.length, ", data: ", splitAnswers);
+				
 				splitAnswers.forEach((answerString) => {
 					let splitAns = answerString.split(";");
 					if (splitAns.length == 2){
 						let answerVal = Number(splitAns[0].replace("value=", ""));
-						let answerLabel = splitAns[1].replace("label=", "").replace('"', '');
+						let answerLabel = splitAns[1].replace("label=", "").replace(/\"/g, '');
 						answers.push({val: answerVal, label: answerLabel});
 					}
 				});
@@ -99,6 +99,8 @@ convertAnswers = () => {
 			}
 		})
 	});
+
+	console.log("SUPPLIERS: ", sessionData.supplierQuestions);
 }
 
 loadFileContents = (path, itemType) => {
