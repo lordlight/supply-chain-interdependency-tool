@@ -3,10 +3,21 @@ import { connect } from "react-redux";
 
 import { Question } from "../../components/";
 
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
 const mapState = state => ({
+    currentType: state.currentType,
+    currentItemId: state.currentItemId,
     supplierQuestions: state.supplierQuestions,
     productQuestions: state.productQuestions,
-    projectQuestions: state.projectQuestions
+    projectQuestions: state.projectQuestions,
+    supplierResponses: state.supplierResponses, // Responses are objects, with supplier/product/project ids as keys.
+    productResponses: state.productResponses,
+    projectResponses: state.projectResponses
 });
 
 class QuestionList extends Component {
@@ -15,33 +26,64 @@ class QuestionList extends Component {
     }
 
     render() {
-        if (/*this.props.supplierId == null ||*/ this.props.type == null /*|| this.props.responses == null*/){
-            return <div className={"question-list"}>Missing component attributes. Make sure to provide supplierId, questions, responses.</div>
+        //console.log("state: ", this.props);
+        if (this.props.currentType == null || this.props.currentItemId == null){
+            return <div className={"question-list"}>Either the current list type (suppliers, products, projects) or the current id (supplier, product, project) have no value.</div>
         }
 
-        console.log("type: ", this.props.type);
+        let type = this.props.currentType;
+        let itemId = this.props.currentItemId;
 
+        // Get responses for the given 
+        let responses = null;
+        if (type === "suppliers"){
+            responses = this.props.supplierResponses;
+        } else if (type === "products"){
+            responses = this.props.productResponses;
+        } else if (type === "projects"){
+            responses = this.props.projectResponses;
+        }
+
+        // Filter by the given item (supplier/product/project) id
+        if (responses.hasOwnProperty(itemId)){
+            responses = responses[itemId];
+        }
+
+        // Get the relevant questions.
         let questions = null;
-        if (this.props.type === "suppliers"){
+        if (type === "suppliers"){
             questions = this.props.supplierQuestions;
-        } else if (this.props.type === "products"){
+        } else if (type === "products"){
             questions = this.props.productQuestions;
-        } else if (this.props.type === "projects"){
+        } else if (type === "projects"){
             questions = this.props.projectQuestions;
         }
-
-        console.log("questions  : ", questions);
 
         if (questions < 1){
             return null;
         }
 
+        const rows = questions.map((question, i) => (
+            <TableRow key={i}>
+                <TableCell key={i}>
+                    <Question key={i} question={question}/>
+                </TableCell>
+            </TableRow>
+        ));
+
         return (
-            <div className={"question-list"}>
-                {questions.map((question, i) => (
-                    <Question question={question}/>
-                ))}
-            </div>
+            <Table className={this.props.table}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>
+                            {itemId} Questions
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {rows}
+                </TableBody>
+            </Table>
         );
     }
 }

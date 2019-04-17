@@ -6,6 +6,7 @@ const fs = require('fs');
 const csvParser = require('csv-parser');
 const csvSync = require('csv-parse/lib/sync');
 const json2csv = require('json-2-csv');
+const stripBom = require('strip-bom'); // Needed because fs has no encoding, like utf-8-sig in python, for files with BOM (byte order mark)
 
 let sessionData = {
 	suppliers: [],
@@ -14,14 +15,10 @@ let sessionData = {
 	supplierQuestions: [], // {id: qid, label: "question?", riskWeighting: 1.0, critWeighting: 0.5, answers: [{id: aid, label: "answer", value: 1}]}
 	productQuestions: [],
 	projectQuestions: [],
-	supplierResponses: {}, // {supplierId: sid, responses: [ {questionId: qid, answerId, aid} ]}
+	supplierResponses: {}, // {supplierId: { questionId: {answerInd: int, value: num} } }
 	productResponses: {},
 	projectResponses: {}
 }
-
-// TODO: Load supplier questions
-// TODO: Load product questions
-// TODO: Load project questions
 
 // Constants for file names that will contain the data.
 
@@ -74,6 +71,9 @@ loadSessionData = () => {
 	responsePaths.forEach ((responseItem) => {
 		loadFileContents(dataPath + "/" + responseItem.path, responseItem.type);
 	});
+
+	// Add empty objects for to eventually hold responses for each supplier, product, and project.
+	createCorrespondingResponses();
 }
 
 convertAnswers = () => {
@@ -99,15 +99,30 @@ convertAnswers = () => {
 			}
 		})
 	});
+}
 
-	console.log("SUPPLIERS: ", sessionData.supplierQuestions);
+createCorrespondingResponses = () => {
+	let responseGroups = [
+		{itemList: sessionData.suppliers, responses: sessionData.supplierResponses},
+		{itemList: sessionData.products, responses: sessionData.productResponses},
+		{itemList: sessionData.projects, responses: sessionData.projectResponses}
+	];
+
+	responseGroups.forEach((group) => {
+		group.itemList.forEach((item) => {
+			if (!group.responses.hasOwnProperty(item.ID)){
+				group.responses[item.ID] = {};
+			}
+		});
+	});
 }
 
 loadFileContents = (path, itemType) => {
 	let itemData = [];
 	if (fs.existsSync(path)){
 		try {
-			let data = fs.readFileSync(path, 'utf8');
+			let data = fs.readFileSync(path);
+			data = stripBom(data.toString());
 			try {
 				itemData = csvSync(data, {columns: true});
 				updateSessionData(itemData, itemType);
@@ -115,7 +130,7 @@ loadFileContents = (path, itemType) => {
 				console.log("csv error with ", path);
 			}
 		} catch (err){
-			console.log("error loading ", path);
+			console.log("error loading ", path, ", error: ", err);
 		}
 	}
 }
@@ -228,6 +243,7 @@ ipcMain.on('asynchronous-file-load', (event, req) => {
 							updateSessionData(response.data, response.type);
 
 							saveSessionData(event);
+							createCorrespondingResponses();
 							console.log("done");
 						});
 					} catch (err){

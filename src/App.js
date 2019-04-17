@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Assessment, Home, ItemOverview, List, RiskGraph } from "./components/";
+import { Home, ItemOverview, QuestionList, RiskGraph } from "./components/";
 
-import { AppBar, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+// Router
+import { Route, Switch} from "react-router-dom";
+
+//import { AppBar, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
+import { /*MuiThemeProvider,*/ createMuiTheme } from "@material-ui/core/styles";
 import { blue, blueGrey } from "@material-ui/core/colors";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
@@ -41,7 +44,13 @@ class App extends Component {
   render() {
     const { value } = this.state;
     return (
-      <MuiThemeProvider theme={theme}>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/item-overview" component={ItemOverview} />
+        <Route exact path="/question-list" component={QuestionList} />
+        <Route exact path="/risk-visual" component={RiskGraph} />
+      </Switch>
+      /*<MuiThemeProvider theme={theme}>
         <AppBar position="static">
           <Tabs value={value} onChange={this.handleChange}>
             <Tab value="dashboard" label="Dashboard" />
@@ -56,7 +65,7 @@ class App extends Component {
         {value === 'products' && <ItemOverview type="products"/>}
         {value === 'suppliers' && <ItemOverview type="suppliers"/>}
         {value === 'network' && <RiskGraph />}
-      </MuiThemeProvider>
+     </MuiThemeProvider>*/
     )
   }
 }

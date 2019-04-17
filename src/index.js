@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { BrowserRouter as Router } from 'react-router-dom';
 import store from './redux/store';
 import { addSuppliers, addProducts, addProjects, initSession } from "./redux/actions";
 
@@ -13,7 +14,7 @@ const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 // Handle response from the electron main thread/server.
-store.subscribe(() => console.log("Store accessed"));
+store.subscribe(() => console.log("Store accessed: ", store.getState()));
 
 ipcRenderer.on('init-state', (event, arg) => {
     console.log("init state: ", arg);
@@ -51,7 +52,9 @@ ipcRenderer.on('asynchronous-file-response', (event, arg) => {
 ReactDOM.render(
     (
         <Provider store={store}>
-            <App />
+            <Router>
+                <App />
+            </Router>
         </Provider>
     ), document.getElementById('root'));
 
