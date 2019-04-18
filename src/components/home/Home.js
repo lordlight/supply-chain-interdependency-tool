@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 import store from '../../redux/store';
-import { updateCurrentType } from "../../redux/actions";
+import { updateCurrentItemId, updateCurrentType, updateNavState } from "../../redux/actions";
 import { connect } from "react-redux";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
@@ -39,6 +39,7 @@ class Home extends Component {
         super(props);
         // Clear current type on home
         store.dispatch(updateCurrentType({currentType: null}));
+        store.dispatch(updateCurrentItemId({currentItemId: null}));
     }
 
     dragEnterHandler = (event) => {
@@ -80,12 +81,11 @@ class Home extends Component {
 
     handleTypeSelection = (event, type) => {
         store.dispatch(updateCurrentType({currentType: type}));
+        store.dispatch(updateNavState({navState: type}));
     }
 
     render() {
         const { classes } = this.props;
-
-        const url = '/item-overview';
 
         return (
             <div className={classes.root}>
@@ -102,12 +102,10 @@ class Home extends Component {
                           ? <Paper className={classes.paper}>Add Projects</Paper>
                           : <Paper className={classes.paper}>
                                 <Typography>
-                                    <RouterLink 
-                                            to={{pathname: url}}
-                                            onClick={(e) => this.handleTypeSelection(e, "projects")}
+                                    <Link onClick={(e) => this.handleTypeSelection(e, "projects")}
                                         >
                                         {this.props.projects.length} Projects
-                                    </RouterLink>
+                                    </Link>
                                 </Typography>
                             </Paper>
                         }
@@ -121,12 +119,9 @@ class Home extends Component {
                           ? <Paper className={classes.paper}>Add Products</Paper>
                           : <Paper className={classes.paper}>
                                 <Typography>
-                                    <RouterLink 
-                                            to={{pathname: url}}
-                                            onClick={(e) => this.handleTypeSelection(e, "Products")}
-                                        >
+                                    <Link onClick={(e) => this.handleTypeSelection(e, "products")}>
                                         {this.props.products.length} Products
-                                    </RouterLink>
+                                    </Link>
                                 </Typography>
                             </Paper>
                         }
@@ -140,12 +135,9 @@ class Home extends Component {
                           ? <Paper className={classes.paper}>Add Suppliers</Paper>
                           : <Paper className={classes.paper}>
                                 <Typography>
-                                    <RouterLink 
-                                        to={{pathname: url}}
-                                        onClick={(e) => this.handleTypeSelection(e, "suppliers")}
-                                    >
+                                    <Link onClick={(e) => this.handleTypeSelection(e, "suppliers")}>
                                         {this.props.suppliers.length} Suppliers
-                                    </RouterLink>
+                                    </Link>
                                 </Typography>
                             </Paper>
                         }

@@ -79,7 +79,7 @@ class RiskGraph extends Component {
                     "translate(" + margin.left + "," + margin.top + ")");
 
         // adds the links between the nodes
-        var link = g.selectAll(".link")
+        g.selectAll(".link")
             .data( nodes.descendants().slice(1))
             .enter().append("path")
             .attr("class", "link")

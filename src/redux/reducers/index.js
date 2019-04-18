@@ -1,9 +1,10 @@
 import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, ANSWER_QUESTION, INIT_SESSION,
-    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEMID } from "../actions";
+    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEMID, UPDATE_NAV_STATE } from "../actions";
 
 const initialState = {
     currentType: null,
     currentItemId: null,
+    navState: "home",
     suppliers: [],
     products: [],
     projects: [],
@@ -41,6 +42,28 @@ function rootReducer(state = initialState, action) {
                     }
                 }
             }
+        } else if (type === "products"){
+            return {
+                ...state,
+                productResponses: {
+                    ...state.productResponses,
+                    [action.payload.itemId]: {
+                        ...state.productResponses[action.payload.itemId],
+                        [action.payload.queId]: action.payload.ansInd
+                    }
+                }
+            }
+        } else if (type === "projects") {
+            return {
+                ...state,
+                projectResponses: {
+                    ...state.projectResponses,
+                    [action.payload.itemId]: {
+                        ...state.projectResponses[action.payload.itemId],
+                        [action.payload.queId]: action.payload.ansInd
+                    }
+                }
+            }
         }
     } else if (action.type === INIT_SESSION){
         return Object.assign({}, state, {
@@ -61,6 +84,10 @@ function rootReducer(state = initialState, action) {
     } else if (action.type === UPDATE_CURRENT_TYPE){
         return Object.assign({}, state, {
             currentType: state.currentType = action.payload.currentType
+        });
+    } else if (action.type === UPDATE_NAV_STATE){
+        return Object.assign({}, state, {
+            navSTate: state.navState = action.payload.navState
         });
     }
     return state;

@@ -6,6 +6,7 @@ export const INIT_SESSION = "INIT_SESSION";
 export const ANSWER_QUESTION = "ANSWER_QUESTION";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
 export const UPDATE_CURRENT_ITEMID = "UPDATE_CURRENT_ITEMID";
+export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
 
 // Action creators
 export function addSuppliers(payload) {
@@ -34,4 +35,8 @@ export function updateCurrentType(payload){
 
 export function updateCurrentItemId(payload){
     return {type: UPDATE_CURRENT_ITEMID, payload }
+}
+
+export function updateNavState(payload){
+    return {type: UPDATE_NAV_STATE, payload }
 }

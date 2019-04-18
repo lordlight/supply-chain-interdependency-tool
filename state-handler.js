@@ -29,9 +29,9 @@ const questionPaths = [
 ];
 
 const responsePaths = [
-	{path: "/assets/supplier-responses.csv", type: "supplierResponses"},
-	{path: "/assets/product-responses.csv", type: "productResponses"},
-	{path: "/assets/project-responses.csv", type: "projectResponses"}
+	{path: "supplier-responses.csv", type: "supplierResponses"},
+	{path: "product-responses.csv", type: "productResponses"},
+	{path: "project-responses.csv", type: "projectResponses"}
 ]
 
 const resourcePaths = [
@@ -166,6 +166,25 @@ saveSessionData = (event) => {
 			});
 		}
 	});
+
+	responsePaths.forEach((path) => {
+		if (Object.keys(sessionData[path.type]).length > 0){
+			json2csv.json2csv(sessionData[path.type], (err, csv) => {
+				if (!err){
+					fs.writeFile(dataPath + "/" +path.path, csv, (csvErr) => {
+						if (!csvErr){
+                            console.log(path.type, " saved");
+                            event.sender.send('save-confirm', path.type + " saved");
+                        } else {
+                            event.sender.send('save-error', csvErr);
+                        }
+					});
+				} else {
+                    event.sender.send('save-error', err);
+                }
+			});
+		}
+	});
 }
 
 updateSessionData = (data, type) => {
@@ -211,6 +230,11 @@ updateSessionData = (data, type) => {
 ipcMain.on('renderer-loaded', (event) => {
 	event.sender.send('init-state', sessionData);
 	//event.sender.send('app-loc', app.getPath('appData'));
+});
+
+ipcMain.on('response-update', (event, arg) => {
+	sessionData[arg.type] = arg.responses;
+	saveSessionData(event);
 });
 
 ipcMain.on('asynchronous-file-load', (event, req) => {

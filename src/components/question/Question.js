@@ -30,7 +30,6 @@ const mapState = state => ({
 
 class Question extends Component {
     handleChange = event => {
-        //console.log("value changed: ", event.target.value, ", question id: ", this.props.question.ID);
         store.dispatch(
             answerQuestion({
                 type: this.props.currentType,
@@ -45,12 +44,18 @@ class Question extends Component {
         if (this.props.question == null){
             return <div className={"question"}>No question was passed to the component.</div>
         }
+
+        let response = "-1";
+        if (this.props.response){
+            response = this.props.response;
+        }
         return (
             <div className={"question"}>
                 <FormControl component="fieldset" className="question-form">
                     <FormLabel component="legend">Question {this.props.question.ID}: {this.props.question.Question}</FormLabel>
                     <RadioGroup
                       onChange={(e) => this.handleChange(e, this.props.question.ID)}
+                      defaultValue={response}
                     >
                         {this.props.question.Answers.map((answer, i) => (
                             <FormControlLabel key={i} value={i.toString()} control={<Radio/>} label={answer.label} />

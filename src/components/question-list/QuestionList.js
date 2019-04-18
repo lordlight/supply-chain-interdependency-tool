@@ -8,6 +8,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 
 const mapState = state => ({
     currentType: state.currentType,
@@ -21,12 +22,7 @@ const mapState = state => ({
 });
 
 class QuestionList extends Component {
-    constructor(props){
-        super(props);
-    }
-
     render() {
-        //console.log("state: ", this.props);
         if (this.props.currentType == null || this.props.currentItemId == null){
             return <div className={"question-list"}>Either the current list type (suppliers, products, projects) or the current id (supplier, product, project) have no value.</div>
         }
@@ -60,13 +56,17 @@ class QuestionList extends Component {
         }
 
         if (questions < 1){
-            return null;
+            return (
+                <Typography>
+                    Questions are not available for {type} at the moment.
+                </Typography>
+            );
         }
 
         const rows = questions.map((question, i) => (
             <TableRow key={i}>
                 <TableCell key={i}>
-                    <Question key={i} question={question}/>
+                    <Question key={i} question={question} response={responses[question.ID]}/>
                 </TableCell>
             </TableRow>
         ));
