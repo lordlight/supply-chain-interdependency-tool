@@ -45,14 +45,26 @@ class App extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    console.log("will receive props");
+    //console.log("will receive props");
+    let diff = {};
     Object.keys(nextProps)
         .filter(key => {
           return nextProps[key] !== this.props[key];
         })
         .map(key => {
           if (key.includes("Responses")){
-            ipcRenderer.send('response-update', {responseType: key, responses: nextProps[key]});
+            if (!diff.hasOwnProperty(key)){
+              diff[key] = {};
+            }
+            Object.keys(nextProps[key])
+              .filter(qKey => {
+                //console.log("&&&&&&&: ", nextProps[key][qKey], ", ####: ", this.props[key][qKey]);
+                return nextProps[key][qKey] !== this.props[key][qKey];
+              })
+              .map(qKey => {
+                diff[key][qKey] = nextProps[key][qKey];
+              });
+            ipcRenderer.send('response-update', {type: key, changedResponses: diff});
           }
           //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
         });

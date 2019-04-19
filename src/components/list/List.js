@@ -27,10 +27,6 @@ const mapState = state => ({
 });
 
 class List extends Component {
-    constructor(props){
-        super(props);
-    }
-
     render() {
         let list = null;
         if (this.props.type === "suppliers"){

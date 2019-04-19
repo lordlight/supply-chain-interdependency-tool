@@ -29,9 +29,9 @@ const questionPaths = [
 ];
 
 const responsePaths = [
-	{path: "supplier-responses.csv", type: "supplierResponses"},
-	{path: "product-responses.csv", type: "productResponses"},
-	{path: "project-responses.csv", type: "projectResponses"}
+	{path: "supplier-responses.json", type: "supplierResponses"},
+	{path: "product-responses.json", type: "productResponses"},
+	{path: "project-responses.json", type: "projectResponses"}
 ]
 
 const resourcePaths = [
@@ -56,12 +56,12 @@ loadSessionData = () => {
 
 	// Load data given by user
 	resourcePaths.forEach((resource) => {
-		loadFileContents(dataPath + "/" + resource.path, resource.type);
+		loadCSVFileContents(dataPath + "/" + resource.path, resource.type);
 	});
 
 	// Load question data
 	questionPaths.forEach((questionItem) => {
-		loadFileContents(__dirname + "/" + questionItem.path, questionItem.type);
+		loadCSVFileContents(__dirname + "/" + questionItem.path, questionItem.type);
 	});
 
 	// Convert answers to json, instead of the 'value={number};label="Some text" | ...' strings
@@ -69,8 +69,10 @@ loadSessionData = () => {
 
 	// Load response data
 	responsePaths.forEach ((responseItem) => {
-		loadFileContents(dataPath + "/" + responseItem.path, responseItem.type);
+		loadJSONFileContents(dataPath + "/" + responseItem.path, responseItem.type);
 	});
+
+	console.log("supplier responses: ", sessionData.supplierResponses);
 
 	// Add empty objects for to eventually hold responses for each supplier, product, and project.
 	createCorrespondingResponses();
@@ -114,10 +116,12 @@ createCorrespondingResponses = () => {
 				group.responses[item.ID] = {};
 			}
 		});
+
+		console.log("group: ", group);
 	});
 }
 
-loadFileContents = (path, itemType) => {
+loadCSVFileContents = (path, itemType) => {
 	let itemData = [];
 	if (fs.existsSync(path)){
 		try {
@@ -135,7 +139,18 @@ loadFileContents = (path, itemType) => {
 	}
 }
 
-saveSessionData = (event) => {
+loadJSONFileContents = (path, itemType) => {
+	if (fs.existsSync(path)){
+		try {
+			let data = JSON.parse(fs.readFileSync(path));
+			updateSessionData(data, itemType);
+		} catch (err){
+			console.log("**loadJSONFileContents: error loading ", path, ", error: ", err);
+		}
+	}
+}
+
+saveSessionData = (event, type) => {
 	const appPath = app.getPath('appData') + "/" + app.getName();
 	// If the CSCRM app folder does not exist, create it.
 	if (!fs.existsSync(appPath)){
@@ -148,43 +163,43 @@ saveSessionData = (event) => {
 		fs.mkdirSync(dataPath);
 	}
 	
-	resourcePaths.forEach( (resource) => {
-		if (sessionData[resource.type].length > 0){
-			json2csv.json2csv(sessionData[resource.type], (err, csv) => {
-				if (!err){
-					fs.writeFile(dataPath + "/" +resource.path, csv, (csvErr) => {
-						if (!csvErr){
-                            console.log(resource.type, " saved");
-                            event.sender.send('save-confirm', resource.type + " saved");
-                        } else {
-                            event.sender.send('save-error', csvErr);
-                        }
-					});
-				} else {
-                    event.sender.send('save-error', err);
-                }
-			});
-		}
-	});
-
-	responsePaths.forEach((path) => {
-		if (Object.keys(sessionData[path.type]).length > 0){
-			json2csv.json2csv(sessionData[path.type], (err, csv) => {
-				if (!err){
-					fs.writeFile(dataPath + "/" +path.path, csv, (csvErr) => {
-						if (!csvErr){
-                            console.log(path.type, " saved");
-                            event.sender.send('save-confirm', path.type + " saved");
-                        } else {
-                            event.sender.send('save-error', csvErr);
-                        }
-					});
-				} else {
-                    event.sender.send('save-error', err);
-                }
-			});
-		}
-	});
+	if (type === "resources"){
+		resourcePaths.forEach( (resource) => {
+			if (sessionData[resource.type].length > 0){
+				json2csv.json2csv(sessionData[resource.type], (err, csv) => {
+					if (!err){
+						fs.writeFile(dataPath + "/" +resource.path, csv, (csvErr) => {
+							if (!csvErr){
+								console.log(resource.type, " saved");
+								event.sender.send('save-confirm', resource.type + " saved");
+							} else {
+								console.log("save csv error: ", csvErr);
+								event.sender.send('save-error', csvErr);
+							}
+						});
+					} else {
+						console.log("save write error: ", err);
+						event.sender.send('save-error', err);
+					}
+				});
+			}
+		});
+	} else if (type === "responses"){
+		responsePaths.forEach((path) => {
+			if (Object.keys(sessionData[path.type]).length > 0){
+				let data = JSON.stringify(sessionData[path.type]);
+				fs.writeFile(dataPath + "/" +path.path, data, (err) => {
+					if (!err){
+						console.log(path.type, " saved");
+						event.sender.send('save-confirm', path.type + " saved");
+					} else {
+						console.log("save error: ", err);
+						event.sender.send('save-error', err);
+					}
+				});
+			}
+		});
+	}
 }
 
 updateSessionData = (data, type) => {
@@ -233,8 +248,12 @@ ipcMain.on('renderer-loaded', (event) => {
 });
 
 ipcMain.on('response-update', (event, arg) => {
-	sessionData[arg.type] = arg.responses;
-	saveSessionData(event);
+	Object.keys(arg.changedResponses).map(typeKey => {
+		Object.keys(arg.changedResponses[typeKey]).map(itemKey => {
+			sessionData[typeKey][itemKey] = arg.changedResponses[typeKey][itemKey];
+		})
+	});
+	saveSessionData(event, "responses");
 });
 
 ipcMain.on('asynchronous-file-load', (event, req) => {
@@ -266,7 +285,7 @@ ipcMain.on('asynchronous-file-load', (event, req) => {
 
 							updateSessionData(response.data, response.type);
 
-							saveSessionData(event);
+							saveSessionData(event, "resources");
 							createCorrespondingResponses();
 							console.log("done");
 						});
