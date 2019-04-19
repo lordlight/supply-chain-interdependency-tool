@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
+
+import store from '../../redux/store';
 import { connect } from "react-redux";
+
+import { updateCurrentItemId, updateCurrentType, updateNavState } from "../../redux/actions";
 
 import { Question } from "../../components/";
 
+import Link from '@material-ui/core/Link';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -22,6 +27,10 @@ const mapState = state => ({
 });
 
 class QuestionList extends Component {
+    handleBack = (event) => {
+        store.dispatch(updateCurrentItemId({currentItemId: null}));
+    }
+
     render() {
         if (this.props.currentType == null || this.props.currentItemId == null){
             return <div className={"question-list"}>Either the current list type (suppliers, products, projects) or the current id (supplier, product, project) have no value.</div>
@@ -59,6 +68,9 @@ class QuestionList extends Component {
             return (
                 <Typography>
                     Questions are not available for {type} at the moment.
+                    <Link onClick={(e) => this.handleBack(e)} >
+                        Back to {itemId}
+                    </Link>
                 </Typography>
             );
         }
@@ -76,7 +88,10 @@ class QuestionList extends Component {
                 <TableHead>
                     <TableRow>
                         <TableCell>
-                            {itemId} Questions
+                            <Link onClick={(e) => this.handleBack(e)} >
+                                {itemId}
+                            </Link>
+                            Questions
                         </TableCell>
                     </TableRow>
                 </TableHead>

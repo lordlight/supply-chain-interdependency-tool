@@ -11,7 +11,6 @@ import { updateCurrentType, updateNavState } from "./redux/actions";
 
 import { AppBar, IconButton, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import { blue, blueGrey } from "@material-ui/core/colors";
 import MenuIcon from '@material-ui/icons/Menu';
 
 // This only works when running electron or as an app (i.e. will not work in browser).
@@ -23,11 +22,21 @@ const theme = createMuiTheme({
     flexGrow: 1,
   },
   palette: {
-    primary: blue,
-    secondary: blueGrey
+    primary: {
+      main: '#12659c',
+    },
+    secondary: {
+      main: '#257a2d',
+    },
   },
   spacing: {
     doubleUnit: 16
+  },
+  typography: {
+    fontFamily: '"Source Sans Pro"',
+  },
+  tabRoot: {
+    background: 'secondary',
   }
 });
 
@@ -46,28 +55,29 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps){
     //console.log("will receive props");
-    let diff = {};
-    Object.keys(nextProps)
+    let diff = Object.keys(nextProps)
         .filter(key => {
           return nextProps[key] !== this.props[key];
         })
         .map(key => {
           if (key.includes("Responses")){
-            if (!diff.hasOwnProperty(key)){
-              diff[key] = {};
-            }
             Object.keys(nextProps[key])
               .filter(qKey => {
                 //console.log("&&&&&&&: ", nextProps[key][qKey], ", ####: ", this.props[key][qKey]);
                 return nextProps[key][qKey] !== this.props[key][qKey];
               })
               .map(qKey => {
-                diff[key][qKey] = nextProps[key][qKey];
+                return nextProps[key][qKey];
               });
-            ipcRenderer.send('response-update', {type: key, changedResponses: diff});
+
+              return {[key]: nextProps[key]};
+          } else {
+            // If not a response change, pass along an empty object (so it is ignored).
+            return {};
           }
           //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
         });
+        ipcRenderer.send('response-update', diff);
   }
 
   handleChange = (event, value) => {
@@ -91,11 +101,11 @@ class App extends Component {
             <IconButton className={this.props.menuButton} color="inherit" aria-label="Open drawer">
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit">
+            <Typography variant="h6" color="inherit" style={{fontWeight: "lighter"}}>
               NIST Cyber Supply Chain Management
             </Typography>
           </Toolbar>
-          <Tabs value={value} onChange={this.handleChange}>
+          <Tabs value={value} onChange={this.handleChange} style={{color: "secondary"}}>
             <Tab value="home" label="Dashboard" onClick={(e) => this.handleTabChange(e, mainProps)}/>
             <Tab value="projects" label="Projects" onClick={(e) => this.handleTabChange(e, projProps)}/>
             <Tab value="products" label="Products" onClick={(e) => this.handleTabChange(e, prodProps)}/>

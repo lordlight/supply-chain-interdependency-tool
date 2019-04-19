@@ -116,8 +116,6 @@ createCorrespondingResponses = () => {
 				group.responses[item.ID] = {};
 			}
 		});
-
-		console.log("group: ", group);
 	});
 }
 
@@ -247,11 +245,14 @@ ipcMain.on('renderer-loaded', (event) => {
 	//event.sender.send('app-loc', app.getPath('appData'));
 });
 
-ipcMain.on('response-update', (event, arg) => {
-	Object.keys(arg.changedResponses).map(typeKey => {
-		Object.keys(arg.changedResponses[typeKey]).map(itemKey => {
-			sessionData[typeKey][itemKey] = arg.changedResponses[typeKey][itemKey];
-		})
+ipcMain.on('response-update', (event, changedResponses) => {
+	//console.log("changed: ", changedResponses);
+	changedResponses.forEach((responseSet) => {
+		Object.keys(responseSet).forEach((typeKey) => {
+			Object.keys(responseSet[typeKey]).forEach((itemKey) => {
+				sessionData[typeKey][itemKey] = responseSet[typeKey][itemKey]
+			});
+		});
 	});
 	saveSessionData(event, "responses");
 });
