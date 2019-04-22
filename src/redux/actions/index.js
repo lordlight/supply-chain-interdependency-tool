@@ -7,6 +7,7 @@ export const ANSWER_QUESTION = "ANSWER_QUESTION";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
 export const UPDATE_CURRENT_ITEMID = "UPDATE_CURRENT_ITEMID";
 export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
+export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
 
 // Action creators
 export function addSuppliers(payload) {
@@ -39,4 +40,8 @@ export function updateCurrentItemId(payload){
 
 export function updateNavState(payload){
     return {type: UPDATE_NAV_STATE, payload }
+}
+
+export function updateTypeRisk(payload){
+    return {type: UPDATE_TYPE_RISK, payload }
 }

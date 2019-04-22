@@ -1,5 +1,5 @@
 import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, ANSWER_QUESTION, INIT_SESSION,
-    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEMID, UPDATE_NAV_STATE } from "../actions";
+    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEMID, UPDATE_NAV_STATE, UPDATE_TYPE_RISK } from "../actions";
 
 const initialState = {
     currentType: null,
@@ -8,6 +8,9 @@ const initialState = {
     suppliers: [],
     products: [],
     projects: [],
+    suppliersRisk: {},
+    productsRisk: {},
+    projectsRisk: {},
     supplierQuestions: [],
     productQuestions: [],
     projectQuestions: [],
@@ -87,8 +90,24 @@ function rootReducer(state = initialState, action) {
         });
     } else if (action.type === UPDATE_NAV_STATE){
         return Object.assign({}, state, {
-            navSTate: state.navState = action.payload.navState
+            navState: state.navState = action.payload.navState
         });
+    } else if (action.type === UPDATE_TYPE_RISK){
+        //console.log("RISK UPDATE: ", action.payload);
+        let type = action.payload.type;
+        if (type === "suppliers"){
+            return Object.assign({}, state, {
+                suppliersRisk: action.payload.itemsRisk
+            });
+        } else if (type === "products"){
+            return Object.assign({}, state, {
+                productsRisk: action.payload.itemsRisk
+            });
+        } else if (type === "projects"){
+            return Object.assign({}, state, {
+                projectsRisk: action.payload.itemsRisk
+            });
+        }
     }
     return state;
 };

@@ -2,9 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import { /*Breadcrumb,*/ Home, ItemOverview, /*QuestionList,*/ RiskGraph } from "./components/";
 
+// Redux
 import { connect } from "react-redux";
 import store from './redux/store';
-import { updateCurrentType, updateNavState } from "./redux/actions";
+import { updateCurrentType, updateNavState, updateTypeRisk } from "./redux/actions";
+
+// Risk calculation
+import { calculateItemRisk } from './utils/risk-calculations';
 
 // Router
 //import { Route, Switch} from "react-router-dom";
@@ -42,9 +46,15 @@ const theme = createMuiTheme({
 
 const mapState = state => ({
   navState: state.navState,
+  suppliers: state.suppliers,
+  products: state.products,
+  projects: state.projects,
+  supplierQuestions: state.supplierQuestions,
+  productQuestions: state.productQuestions,
+  projectQuestions: state.projectQuestions,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses,
+  projectResponses: state.projectResponses
 });
 
 class App extends Component {
@@ -54,7 +64,7 @@ class App extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    //console.log("will receive props");
+    
     let diff = Object.keys(nextProps)
         .filter(key => {
           return nextProps[key] !== this.props[key];
@@ -77,7 +87,15 @@ class App extends Component {
           }
           //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
         });
-        ipcRenderer.send('response-update', diff);
+    console.log("diff: ", diff);
+    if (diff !== {}) {
+      ipcRenderer.send('response-update', diff);
+    }
+
+    // TEMP - Do risk calculation (just for testing; will figure out most appropriate place later)
+    if (nextProps.suppliers.length > 0){
+      store.dispatch(updateTypeRisk({"type":"suppliers", "itemsRisk":calculateItemRisk(nextProps.supplierResponses, nextProps.supplierQuestions)}));
+    }
   }
 
   handleChange = (event, value) => {

@@ -8,6 +8,7 @@ import { updateCurrentItemId, updateCurrentType, updateNavState } from "../../re
 import { Question } from "../../components/";
 
 import Link from '@material-ui/core/Link';
+import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -21,6 +22,9 @@ const mapState = state => ({
     supplierQuestions: state.supplierQuestions,
     productQuestions: state.productQuestions,
     projectQuestions: state.projectQuestions,
+    suppliersRisk: state.suppliersRisk,
+    productsRisk: state.productsRisk,
+    projectsRisk: state.projectsRisk,
     supplierResponses: state.supplierResponses, // Responses are objects, with supplier/product/project ids as keys.
     productResponses: state.productResponses,
     projectResponses: state.projectResponses
@@ -54,14 +58,17 @@ class QuestionList extends Component {
             responses = responses[itemId];
         }
 
-        // Get the relevant questions.
-        let questions = null;
+        // Get the relevant questions and assign the relevant risk item
+        let questions = null, riskVal = null;
         if (type === "suppliers"){
             questions = this.props.supplierQuestions;
+            riskVal = this.props.suppliersRisk[itemId];
         } else if (type === "products"){
             questions = this.props.productQuestions;
+            riskVal = this.props.productsRisk[itemId];
         } else if (type === "projects"){
             questions = this.props.projectQuestions;
+            riskVal = this.props.projectsRisk[itemId];
         }
 
         if (questions < 1){
@@ -84,21 +91,34 @@ class QuestionList extends Component {
         ));
 
         return (
-            <Table className={this.props.table}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>
-                            <Link onClick={(e) => this.handleBack(e)} >
-                                {itemId}
-                            </Link>
-                            Questions
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows}
-                </TableBody>
-            </Table>
+            <div className="question-list">
+                <Table className={this.props.table}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>
+                                <Link onClick={(e) => this.handleBack(e)} >
+                                    {itemId}
+                                </Link>
+                                Questions
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows}
+                    </TableBody>
+                </Table>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    open={true}
+                    ContentProps={{
+                        'aria-describedby': 'message-id',
+                    }}
+                    message={<span id="message-id">Current Risk: {riskVal}</span>}
+                />
+            </div>
         );
     }
 }
