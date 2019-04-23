@@ -72,8 +72,6 @@ loadSessionData = () => {
 		loadJSONFileContents(dataPath + "/" + responseItem.path, responseItem.type);
 	});
 
-	console.log("supplier responses: ", sessionData.supplierResponses);
-
 	// Add empty objects for to eventually hold responses for each supplier, product, and project.
 	createCorrespondingResponses();
 }

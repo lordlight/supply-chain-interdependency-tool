@@ -12,7 +12,7 @@ export function calculateItemRisk(responses, questions) {
             numQuestions += 1;
             let questionVal = 1;
             if (question.hasOwnProperty("Weight")){
-                questionVal = question.Weight;
+                questionVal = Number(question.Weight);
             }
 
             if (itemResponses.hasOwnProperty(question.ID)){
@@ -43,7 +43,11 @@ export function calculateTypeRiskFromItemsRisk(itemsRisk){
 function getMaxRisk(questions){
     let maxRisk = 0;
     questions.forEach(question => {
-        maxRisk += Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
+        let questionVal = 1;
+        if (question.hasOwnProperty("Weight")){
+            questionVal = Number(question.Weight);
+        }
+        maxRisk += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
     });
 
     return maxRisk;
