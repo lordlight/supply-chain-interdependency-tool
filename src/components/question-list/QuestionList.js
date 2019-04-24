@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import store from '../../redux/store';
 import { connect } from "react-redux";
 
-import { updateCurrentItemId, updateCurrentType, updateNavState } from "../../redux/actions";
+import { updateCurrentItem} from "../../redux/actions";
 
 import { Question } from "../../components/";
 
@@ -18,7 +18,7 @@ import Typography from '@material-ui/core/Typography';
 
 const mapState = state => ({
     currentType: state.currentType,
-    currentItemId: state.currentItemId,
+    currentItem: state.currentItem,
     supplierQuestions: state.supplierQuestions,
     productQuestions: state.productQuestions,
     projectQuestions: state.projectQuestions,
@@ -32,16 +32,16 @@ const mapState = state => ({
 
 class QuestionList extends Component {
     handleBack = (event) => {
-        store.dispatch(updateCurrentItemId({currentItemId: null}));
+        store.dispatch(updateCurrentItem({currentItem: null}));
     }
 
     render() {
-        if (this.props.currentType == null || this.props.currentItemId == null){
+        if (this.props.currentType == null || this.props.currentItem == null){
             return <div className={"question-list"}>Either the current list type (suppliers, products, projects) or the current id (supplier, product, project) have no value.</div>
         }
 
         let type = this.props.currentType;
-        let itemId = this.props.currentItemId;
+        let item = this.props.currentItem;
 
         // Get responses for the given 
         let responses = null;
@@ -54,52 +54,56 @@ class QuestionList extends Component {
         }
 
         // Filter by the given item (supplier/product/project) id
-        if (responses.hasOwnProperty(itemId)){
-            responses = responses[itemId];
+        if (responses.hasOwnProperty(item.ID)){
+            responses = responses[item.ID];
         }
 
         // Get the relevant questions and assign the relevant risk item
         let questions = null, riskVal = null;
         if (type === "suppliers"){
             questions = this.props.supplierQuestions;
-            riskVal = this.props.suppliersRisk[itemId];
+            riskVal = this.props.suppliersRisk[item.ID];
         } else if (type === "products"){
             questions = this.props.productQuestions;
-            riskVal = this.props.productsRisk[itemId];
+            riskVal = this.props.productsRisk[item.ID];
         } else if (type === "projects"){
             questions = this.props.projectQuestions;
-            riskVal = this.props.projectsRisk[itemId];
+            riskVal = this.props.projectsRisk[item.ID];
         }
 
         if (questions < 1){
             return (
                 <Typography>
-                    Questions are not available for {type} at the moment.
+                    <p>Questions are not available for {type} at the moment.</p>
                     <Link onClick={(e) => this.handleBack(e)} >
-                        Back to {itemId}
+                        Back to {type}
                     </Link>
                 </Typography>
             );
         }
 
         const rows = questions.map((question, i) => (
-            <TableRow key={i}>
-                <TableCell key={i}>
-                    <Question key={i} question={question} response={responses[question.ID]}/>
-                </TableCell>
-            </TableRow>
+            <Question key={i} question={question} response={responses[question.ID]}/>
         ));
 
         return (
             <div className="question-list">
                 <Table className={this.props.table}>
+                    <colgroup>
+                        <col style={{width:'480px'}}/>
+                    </colgroup>
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                <Link onClick={(e) => this.handleBack(e)} >
-                                    {itemId}
+                                {item.Name} questions
+                            </TableCell>
+                            <TableCell>
+                                <Link
+                                  style={{cursor: "pointer"}}
+                                  onClick={(e) => this.handleBack(e)}
+                                >
+                                    Back to {type} overview
                                 </Link>
-                                Questions
                             </TableCell>
                         </TableRow>
                     </TableHead>

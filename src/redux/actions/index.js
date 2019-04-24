@@ -5,7 +5,7 @@ export const ADD_PROJECTS = "ADD_PROJECTS";
 export const INIT_SESSION = "INIT_SESSION";
 export const ANSWER_QUESTION = "ANSWER_QUESTION";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
-export const UPDATE_CURRENT_ITEMID = "UPDATE_CURRENT_ITEMID";
+export const UPDATE_CURRENT_ITEM = "UPDATE_CURRENT_ITEM";
 export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
 export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
 
@@ -34,8 +34,8 @@ export function updateCurrentType(payload){
     return {type: UPDATE_CURRENT_TYPE, payload }
 }
 
-export function updateCurrentItemId(payload){
-    return {type: UPDATE_CURRENT_ITEMID, payload }
+export function updateCurrentItem(payload){
+    return {type: UPDATE_CURRENT_ITEM, payload }
 }
 
 export function updateNavState(payload){

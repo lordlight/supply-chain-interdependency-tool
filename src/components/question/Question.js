@@ -5,15 +5,16 @@ import store from '../../redux/store';
 import { answerQuestion } from "../../redux/actions";
 
 import { withStyles } from '@material-ui/core/styles';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 
 const styles = theme => ({
-    root: {
-      display: 'flex',
+    question: {
+      display: 'inline-flex',
     },
     formControl: {
       margin: theme.spacing.unit * 3,
@@ -25,7 +26,7 @@ const styles = theme => ({
 
 const mapState = state => ({
     currentType: state.currentType,
-    currentItemId: state.currentItemId
+    currentItem: state.currentItem
 });
 
 class Question extends Component {
@@ -33,9 +34,9 @@ class Question extends Component {
         store.dispatch(
             answerQuestion({
                 type: this.props.currentType,
-                itemId: this.props.currentItemId,
+                itemId: this.props.currentItem.ID,
                 queId: this.props.question.ID,
-                ansInd: event.target.value
+                ansInd: event.target.value-1 
             })
         );
     };
@@ -45,24 +46,36 @@ class Question extends Component {
             return <div className={"question"}>No question was passed to the component.</div>
         }
 
-        let response = "-1";
-        if (this.props.response){
-            response = this.props.response;
+        let response = 0;
+        if (this.props.hasOwnProperty("response")){
+            if (typeof(this.props.response) !== 'undefined'){
+                response = parseInt(this.props.response);
+                // Have to add then remove 1 from the index because the Select only accepts > 0 values (otherwise sets to blank)
+                response += 1;
+            }
         }
         return (
-            <div className={"question"}>
-                <FormControl component="fieldset" className="question-form">
-                    <FormLabel component="legend">Question {this.props.question.ID}: {this.props.question.Question}</FormLabel>
-                    <RadioGroup
-                      onChange={(e) => this.handleChange(e, this.props.question.ID)}
-                      defaultValue={response}
-                    >
-                        {this.props.question.Answers.map((answer, i) => (
-                            <FormControlLabel key={i} value={i.toString()} control={<Radio/>} label={answer.label} />
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-            </div>
+            <TableRow>
+                <TableCell>
+                    <FormLabel component="legend">{this.props.question.Question}</FormLabel>
+                </TableCell>
+                <TableCell>
+                    <FormControl component="fieldset" className="question-form">
+                        <Select
+                            value={parseInt(response)}
+                            onChange={(e) => this.handleChange(e, this.props.question.ID)}
+                            inputProps={{
+                                name: this.props.question.ID,
+                                id: this.props.question.ID,
+                            }}
+                        >
+                            {this.props.question.Answers.map((answer, i) => (
+                                <MenuItem key={i} value={i+1}>{answer.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </TableCell>
+            </TableRow>
         );
     }
 }

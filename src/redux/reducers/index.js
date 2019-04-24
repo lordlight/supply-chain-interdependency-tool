@@ -1,9 +1,9 @@
 import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, ANSWER_QUESTION, INIT_SESSION,
-    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEMID, UPDATE_NAV_STATE, UPDATE_TYPE_RISK } from "../actions";
+    UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEM, UPDATE_NAV_STATE, UPDATE_TYPE_RISK } from "../actions";
 
 const initialState = {
     currentType: null,
-    currentItemId: null,
+    currentItem: null,
     navState: "home",
     suppliers: [],
     products: [],
@@ -80,9 +80,9 @@ function rootReducer(state = initialState, action) {
             productResponses: state.productResponses = action.payload.productResponses,
             projectResponses: state.projectResponses = action.payload.projectResponses
         });
-    } else if (action.type === UPDATE_CURRENT_ITEMID){
+    } else if (action.type === UPDATE_CURRENT_ITEM){
         return Object.assign({}, state, {
-            currentItemId: state.currentItemId = action.payload.currentItemId
+            currentItem: state.currentItem = action.payload.currentItem
         });
     } else if (action.type === UPDATE_CURRENT_TYPE){
         return Object.assign({}, state, {

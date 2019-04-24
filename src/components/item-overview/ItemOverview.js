@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { ItemList, QuestionList } from '../../components';
 
 import store from '../../redux/store';
-import { updateCurrentItemId } from "../../redux/actions";
+import { updateCurrentItem } from "../../redux/actions";
 import { connect } from "react-redux";
 
 const mapState = state => ({
     currentType: state.currentType,
-    currentItemId: state.currentItemId,
+    currentItem: state.currentItem,
     suppliers: state.suppliers,
     products: state.products,
     projects: state.projects
@@ -18,7 +18,7 @@ class ItemOverview extends Component {
     constructor(props){
         super(props);
         // Clear current type on home
-        store.dispatch(updateCurrentItemId({currentItemId: null}));
+        store.dispatch(updateCurrentItem({currentItem: null}));
     }
 
     render() {
@@ -26,7 +26,7 @@ class ItemOverview extends Component {
             return <div className={"item-overview"}>Current type is null in the current session.</div>;
         }
 
-        if (this.props.currentItemId != null){
+        if (this.props.currentItem != null){
             return <QuestionList />;
         }
 

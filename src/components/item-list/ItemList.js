@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import store from '../../redux/store';
-import { updateCurrentItemId } from "../../redux/actions";
+import { updateCurrentItem } from "../../redux/actions";
 import { connect } from "react-redux";
 
 import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
@@ -26,8 +26,8 @@ const mapState = state => ({
 });
 
 class ItemList extends Component {
-    handleItemSelection = (event, itemId) => {
-        store.dispatch(updateCurrentItemId({currentItemId: itemId}));
+    handleItemSelection = (event, item) => {
+        store.dispatch(updateCurrentItem({currentItem: item}));
     }
 
     render() {
@@ -57,7 +57,10 @@ class ItemList extends Component {
         const rows = list.map((row, i) => (
             <TableRow key={i}>
                 <TableCell key={i}>
-                    <Link onClick={(e) => this.handleItemSelection(e, row.ID)}>
+                    <Link
+                      style={{cursor: "pointer"}}
+                      onClick={(e) => this.handleItemSelection(e, row)}
+                    >
                         {row.Name}{(() => {
                                     if (riskSet.hasOwnProperty(row.ID)) return " - risk value: "+riskSet[row.ID];
                                     else return "";

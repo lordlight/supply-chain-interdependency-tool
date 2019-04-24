@@ -40,7 +40,7 @@ const theme = createMuiTheme({
     fontFamily: '"Source Sans Pro"',
   },
   tabRoot: {
-    background: 'secondary',
+    background: 'white',
   }
 });
 
@@ -119,11 +119,11 @@ class App extends Component {
             <IconButton className={this.props.menuButton} color="inherit" aria-label="Open drawer">
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit" style={{fontWeight: "lighter"}}>
+            <Typography variant="h6" color="inherit" style={{fontWeight: "regular"}}>
               NIST Cyber Supply Chain Management
             </Typography>
           </Toolbar>
-          <Tabs value={value} onChange={this.handleChange} style={{color: "secondary"}}>
+          <Tabs className="tabRoot" value={value} onChange={this.handleChange}>
             <Tab value="home" label="Dashboard" onClick={(e) => this.handleTabChange(e, mainProps)}/>
             <Tab value="projects" label="Projects" onClick={(e) => this.handleTabChange(e, projProps)}/>
             <Tab value="products" label="Products" onClick={(e) => this.handleTabChange(e, prodProps)}/>
