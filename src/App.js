@@ -5,26 +5,22 @@ import { /*Breadcrumb,*/ Home, ItemOverview, /*QuestionList,*/ RiskGraph } from 
 // Redux
 import { connect } from "react-redux";
 import store from './redux/store';
-import { updateCurrentType, updateNavState, updateTypeRisk } from "./redux/actions";
+import { updateCurrentType, updateCurrentItem, updateNavState, updateTypeRisk } from "./redux/actions";
 
 // Risk calculation
 import { calculateItemRisk } from './utils/risk-calculations';
-
-// Router
-//import { Route, Switch} from "react-router-dom";
-
+// Material UI
+import { withStyles } from '@material-ui/core/styles';
 import { AppBar, IconButton, Tab, Tabs, Toolbar, Typography } from "@material-ui/core";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
 
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 const theme = createMuiTheme({
-  root: {
-    flexGrow: 1,
-  },
   palette: {
     primary: {
       main: '#12659c',
@@ -34,18 +30,56 @@ const theme = createMuiTheme({
     },
   },
   spacing: {
-    doubleUnit: 16
+    doubleUnit: 16,
   },
   typography: {
     fontFamily: '"Source Sans Pro"',
   },
+});
+
+const styles = theme => ({
+  toolbar: {
+    paddingLeft: '0px',
+  },
+  questionsToolbar: {
+    paddingLeft: '0px',
+    backgroundColor: '#257a2d',
+    color: 'black',
+  },
+  questionsToolbarText: {
+    fontSize: '18px',
+    fontWeight: 400,
+    paddingLeft: '24px',
+  },
+  toolbarHeading: {
+    paddingLeft: '24px',
+  },
+  tabsRoot: {
+    backgroundColor: 'white',
+    color: 'primary',
+  },
+  tabsIndicator: {
+    backgroundColor: '#12659c',
+    color: '#12659c',
+  },
   tabRoot: {
-    background: 'white',
-  }
+    color: 'rgba(0,0,0,0.6)',
+    textTransform: 'uppercase',
+    '&:hover': {
+      color: '#12659c',
+      opacity: 1,
+    },
+    '&$tabSelected': {
+      color: '#12659c',
+    },
+  },
+  tabSelected: {},
 });
 
 const mapState = state => ({
   navState: state.navState,
+  currentType: state.currentType,
+  currentItem: state.currentItem,
   suppliers: state.suppliers,
   products: state.products,
   projects: state.projects,
@@ -106,7 +140,13 @@ class App extends Component {
     store.dispatch(updateCurrentType({currentType: props.currentType}));
   }
 
+  handleQuestionPageBack = (event) => {
+      store.dispatch(updateCurrentItem({currentItem: null}));
+  }
+
   render() {
+    const { classes } = this.props;
+    console.log("classes: ", classes);
     const value = this.props.navState;
     const mainProps = {currentType: null};
     const suppProps = {currentType: "suppliers"};
@@ -115,21 +155,58 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <AppBar position="static">
-          <Toolbar>
+          <Toolbar className={classes.toolbar}>
             <IconButton className={this.props.menuButton} color="inherit" aria-label="Open drawer">
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit" style={{fontWeight: "regular"}}>
+            <Typography className={classes.toolbarHeading} variant="h6" color="inherit" style={{fontWeight: "regular"}}>
               NIST Cyber Supply Chain Management
             </Typography>
           </Toolbar>
-          <Tabs className="tabRoot" value={value} onChange={this.handleChange}>
-            <Tab value="home" label="Dashboard" onClick={(e) => this.handleTabChange(e, mainProps)}/>
-            <Tab value="suppliers" label="Suppliers"onClick={(e) => this.handleTabChange(e, suppProps)} />
-            <Tab value="products" label="Products" onClick={(e) => this.handleTabChange(e, prodProps)}/>
-            <Tab value="projects" label="Projects" onClick={(e) => this.handleTabChange(e, projProps)}/>
-            <Tab value="network" label="Supply Network" />
-          </Tabs>
+          {this.props.currentItem == null
+            ? <Tabs
+               classes={{root: classes.tabsRoot, indicator: classes.tabsIndicator}}
+               value={value}
+               onChange={this.handleChange}>
+                <Tab
+                  classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+                  value="home"
+                  label="Dashboard"
+                  onClick={(e) => this.handleTabChange(e, mainProps)}/>
+                <Tab
+                  classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+                  value="suppliers"
+                  label="Suppliers"
+                  onClick={(e) => this.handleTabChange(e, suppProps)} />
+                <Tab
+                  classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+                  value="products"
+                  label="Products"
+                  onClick={(e) => this.handleTabChange(e, prodProps)}/>
+                <Tab
+                  classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+                  value="projects"
+                  label="Projects"
+                  onClick={(e) => this.handleTabChange(e, projProps)}/>
+                <Tab
+                  classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+                  value="network"
+                  label="Supply Network" />
+              </Tabs>
+            : <Toolbar className={classes.questionsToolbar}>
+                <IconButton color="inherit" onClick={(e) => this.handleQuestionPageBack(e)}>
+                  <ChevronLeft />
+                </IconButton>
+                <Typography className={classes.questionsToolbarText} variant='h7'>
+                  {(() => {
+                    if (this.props.currentType === "suppliers") return "Supplier ";
+                    else if (this.props.currentType === "products") return "Product ";
+                    else if (this.props.currentType === "projects") return "Project ";
+                  })()}
+                  Questions: {this.props.currentItem.Name}
+                </Typography>
+              </Toolbar>
+          }
         </AppBar>
         {value === 'home' && <Home/>}
         {value === 'projects' && <ItemOverview/>}
@@ -141,4 +218,4 @@ class App extends Component {
   }
 }
 
-export default connect(mapState)(App);
+export default withStyles(styles)(connect(mapState)(App));

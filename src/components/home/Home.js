@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { TypeCard } from '../../components/';
+import { ActionCard, TypeCard } from '../../components/';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -53,11 +53,26 @@ class Home extends Component {
     render() {
         const { classes } = this.props;
 
+        const testRecs = [
+            "Find new supplier for Product X",
+            "Improve supplier Y perimeter security",
+            "Get NIST CSF form to Supplier Z",
+            "Improve ZZZ for Supplier P"
+        ];
+        const testItems = [
+            "Answer Risk Questions for 12 Products",
+            "Answer Risk Questions for 3 Suppliers",
+            "Finish thing 1",
+            "Do thing 2",
+            "Revisit thing 3"
+        ];
         return (
             <div className={classes.root}>
                 <TypeCard type="suppliers" items={this.props.suppliers} />
                 <TypeCard type="products" items={this.props.products} />
                 <TypeCard type="projects" items={this.props.projects} />
+                <ActionCard type="checklist" items={testItems} title="To Do" plural="To Do Items" />
+                <ActionCard type="recommendations" items={testRecs} title="Cyber Supply Chain Risk" plural="Recommendations"/>
             </div>
         );
   }

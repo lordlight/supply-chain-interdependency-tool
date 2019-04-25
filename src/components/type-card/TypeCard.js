@@ -27,17 +27,6 @@ import projectsImg from "../../imgs/projects.png";
 const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
-function getModalStyle() {
-    const top = 50;
-    const left = 50;
-
-    return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
-    };
-}
-
 const styles = theme => ({
     card: {
         display:"inline-flex",
@@ -65,6 +54,13 @@ const styles = theme => ({
         boxShadow: theme.shadows[5],
         padding: theme.spacing.unit * 4,
         outline: 'none',
+    },
+    title: {
+        fontSize: 13,
+        fontWeight: "regular",
+    },
+    heading: {
+        fontSize: 25,
     },
   });
 
@@ -139,7 +135,7 @@ class TypeCard extends Component {
             tempImg = suppliersImg;
         } else if (this.props.type === "products"){
             tempImg = productsImg;
-        } if (this.props.type === "projects"){
+        } else if (this.props.type === "projects"){
             tempImg = projectsImg;
         }
 
@@ -152,13 +148,13 @@ class TypeCard extends Component {
                         className={classes.media}
                         height="194"
                         image={tempImg}
-                        title="Projects"
+                        title={this.props.type}
                     />
                     <CardContent>
-                        <Typography gutterBottom fontSize={13} fontWeight="regular">
+                        <Typography gutterBottom className={classes.title}>
                             {this.props.type}
                         </Typography>
-                        <Typography gutterBottom fontSize={21} color="textPrimary" fontWeight="bold">
+                        <Typography gutterBottom className={classes.heading}>
                             {this.props.items.length > 0
                                 ? this.props.items.length + " " + this.props.type
                                 : "No " + this.props.type + " provided"
@@ -176,7 +172,7 @@ class TypeCard extends Component {
                             style={{fontSize: '15px', textAlign:'left', justifyContent:'left'}}
                             onClick={(e) => this.handleTypeSelection(e, this.props.type)}
                         >
-                            DETAILS
+                            DETAILS...
                         </Button>
                         <Button
                             size="small"
@@ -196,21 +192,19 @@ class TypeCard extends Component {
                     >
                     <DialogTitle id="alert-dialog-title">{this.props.type} import</DialogTitle>
                     <DialogContent>
-                        <DialogContent id="alert-dialog-description">
-                            <Paper
-                              className="modal-paper"
-                              elevation={1}
-                              style={{height: "200px"}}
-                              onDragEnter={this.dragEnterHandler}
-                              onDragOver={this.dragOverHandler}
-                              onDragLeave={this.dragLeaveHandler}
-                              onDrop={(e) => this.dropHandler(e, this.props.type)}
-                            >
-                                <Typography id="modal-title">
-                                    Drag and drop the {this.props.type} file here
-                                </Typography>
-                            </Paper>
-                        </DialogContent>
+                        <Paper
+                            className="paper"
+                            elevation={1}
+                            style={{height: "200px"}}
+                            onDragEnter={this.dragEnterHandler}
+                            onDragOver={this.dragOverHandler}
+                            onDragLeave={this.dragLeaveHandler}
+                            onDrop={(e) => this.dropHandler(e, this.props.type)}
+                        >
+                            <Typography id="modal-title">
+                                Drag and drop the {this.props.type} file here
+                            </Typography>
+                        </Paper>
                     </DialogContent>
                     <DialogActions>
                         <Button

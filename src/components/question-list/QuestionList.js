@@ -3,13 +3,10 @@ import React, { Component } from 'react';
 import store from '../../redux/store';
 import { connect } from "react-redux";
 
-import { updateCurrentItem} from "../../redux/actions";
-
 import { Question } from "../../components/";
 
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
 import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -73,10 +70,6 @@ const mapState = state => ({
 });
 
 class QuestionList extends Component {
-    handleBack = (event) => {
-        store.dispatch(updateCurrentItem({currentItem: null}));
-    }
-
     render() {
         const { classes } = this.props;
         if (this.props.currentType == null || this.props.currentItem == null){
@@ -117,10 +110,7 @@ class QuestionList extends Component {
         if (questions < 1){
             return (
                 <Typography>
-                    <p>Questions are not available for {type} at the moment.</p>
-                    <Link onClick={(e) => this.handleBack(e)} >
-                        Back to {type}
-                    </Link>
+                    Questions are not available for {type} at the moment.
                 </Typography>
             );
         }
@@ -135,15 +125,6 @@ class QuestionList extends Component {
                     <TableHead>
                         <TableRow style={{border: "none"}}>
                             <TableCell style={{border: "none"}}>
-                                {item.Name} questions
-                            </TableCell>
-                            <TableCell style={{border: "none"}}>
-                                <Link
-                                  style={{cursor: "pointer"}}
-                                  onClick={(e) => this.handleBack(e)}
-                                >
-                                    Back to {type} overview
-                                </Link>
                             </TableCell>
                         </TableRow>
                     </TableHead>

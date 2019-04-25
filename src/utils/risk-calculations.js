@@ -7,9 +7,9 @@ export function calculateItemRisk(responses, questions) {
         let itemResponses = responseEntry[1];
 
         perItemRisk[itemId] = 0;
-        let numQuestions = 0;
+        //let numQuestions = 0;
         questions.forEach((question) => {
-            numQuestions += 1;
+            //numQuestions += 1;
             let questionVal = 1;
             if (question.hasOwnProperty("Weight")){
                 questionVal = Number(question.Weight);
@@ -17,6 +17,7 @@ export function calculateItemRisk(responses, questions) {
 
             if (itemResponses.hasOwnProperty(question.ID)){
                 let ansInd = parseInt(itemResponses[question.ID]);
+                if (ansInd < 0) ansInd = 0;
                 //console.log("****answer given: ", questionVal * (question.Answers[ansInd].val));
                 perItemRisk[itemId] += questionVal * (question.Answers[ansInd].val);
             } else {
