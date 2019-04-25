@@ -11,7 +11,6 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
@@ -20,6 +19,9 @@ import { updateCurrentType, updateNavState } from "../../redux/actions";
 
 // Images
 import placeholder from "../../imgs/placeholder.png";
+import suppliersImg from "../../imgs/suppliers.png";
+import productsImg from "../../imgs/products.png";
+import projectsImg from "../../imgs/projects.png";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
@@ -132,6 +134,15 @@ class TypeCard extends Component {
     render() {
         const { classes } = this.props;
 
+        let tempImg = placeholder;
+        if (this.props.type === "suppliers"){
+            tempImg = suppliersImg;
+        } else if (this.props.type === "products"){
+            tempImg = productsImg;
+        } if (this.props.type === "projects"){
+            tempImg = projectsImg;
+        }
+
         return (
             <div>
                 <Card className={classes.card}>
@@ -140,7 +151,7 @@ class TypeCard extends Component {
                         alt="Projects"
                         className={classes.media}
                         height="194"
-                        image={placeholder}
+                        image={tempImg}
                         title="Projects"
                     />
                     <CardContent>

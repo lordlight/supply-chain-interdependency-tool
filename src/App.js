@@ -125,9 +125,9 @@ class App extends Component {
           </Toolbar>
           <Tabs className="tabRoot" value={value} onChange={this.handleChange}>
             <Tab value="home" label="Dashboard" onClick={(e) => this.handleTabChange(e, mainProps)}/>
-            <Tab value="projects" label="Projects" onClick={(e) => this.handleTabChange(e, projProps)}/>
-            <Tab value="products" label="Products" onClick={(e) => this.handleTabChange(e, prodProps)}/>
             <Tab value="suppliers" label="Suppliers"onClick={(e) => this.handleTabChange(e, suppProps)} />
+            <Tab value="products" label="Products" onClick={(e) => this.handleTabChange(e, prodProps)}/>
+            <Tab value="projects" label="Projects" onClick={(e) => this.handleTabChange(e, projProps)}/>
             <Tab value="network" label="Supply Network" />
           </Tabs>
         </AppBar>

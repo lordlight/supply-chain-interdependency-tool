@@ -13,16 +13,19 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 
 const styles = theme => ({
-    question: {
-      display: 'inline-flex',
+    input: {
+        borderRadius: 4,
+        position: 'relative',
+        border: '1px solid rgba(0, 0, 0, 0.54)',
+        color: 'rgba(0, 0, 0, 0.54)',
+        margin: '',
+        fontSize: 17,
+        width: '344px',
+        height: '45px',
+        padding: '0px 8px 0px 12px',
+        margin: '24px 0px 24px 40px',
     },
-    formControl: {
-      margin: theme.spacing.unit * 3,
-    },
-    group: {
-      margin: `${theme.spacing.unit}px 0`,
-    },
-  });
+});
 
 const mapState = state => ({
     currentType: state.currentType,
@@ -42,6 +45,7 @@ class Question extends Component {
     };
 
     render() {
+        const { classes } = this.props;
         if (this.props.question == null){
             return <div className={"question"}>No question was passed to the component.</div>
         }
@@ -55,13 +59,12 @@ class Question extends Component {
             }
         }
         return (
-            <TableRow>
-                <TableCell>
+            <TableRow style={{border: "none"}}>
+                <TableCell style={{border: "none"}}>
                     <FormLabel component="legend">{this.props.question.Question}</FormLabel>
-                </TableCell>
-                <TableCell>
                     <FormControl component="fieldset" className="question-form">
                         <Select
+                            className={classes.input}
                             value={parseInt(response)}
                             onChange={(e) => this.handleChange(e, this.props.question.ID)}
                             inputProps={{
@@ -69,6 +72,9 @@ class Question extends Component {
                                 id: this.props.question.ID,
                             }}
                         >
+                            <MenuItem value={0}>
+                                (not answered yet)
+                            </MenuItem>
                             {this.props.question.Answers.map((answer, i) => (
                                 <MenuItem key={i} value={i+1}>{answer.label}</MenuItem>
                             ))}

@@ -7,6 +7,8 @@ import { updateCurrentItem} from "../../redux/actions";
 
 import { Question } from "../../components/";
 
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
@@ -15,6 +17,46 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+
+const styles = theme => ({
+    questionList: {
+        padding: '0px 8px 40px 12px',
+    },
+    buttonContainer: {
+        marginLeft: '24px',
+        marginTop: '36px',
+    },
+    button: {
+        color: 'primary',
+        width: 181,
+        height: 45,
+    },
+    tertiaryButton: {
+        width: 181,
+        height: 45,
+        marginRight: '12px',
+        boxShadow: 'none',
+        textTransform: 'none',
+        padding: '6px 12px',
+        border: '1px solid',
+        lineHeight: 1.5,
+        color: 'white',
+        backgroundColor: '#f5c636',
+        borderColor: '#f5c636',
+        '&:hover': {
+            backgroundColor: '#be9600',
+            borderColor: '#be9600',
+        },
+        '&:active': {
+            boxShadow: 'none',
+            backgroundColor: '#be9600',
+            borderColor: '#be9600',
+        },
+        '&:focus': {
+            boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
+        },
+    },
+});
 
 const mapState = state => ({
     currentType: state.currentType,
@@ -36,6 +78,7 @@ class QuestionList extends Component {
     }
 
     render() {
+        const { classes } = this.props;
         if (this.props.currentType == null || this.props.currentItem == null){
             return <div className={"question-list"}>Either the current list type (suppliers, products, projects) or the current id (supplier, product, project) have no value.</div>
         }
@@ -87,17 +130,14 @@ class QuestionList extends Component {
         ));
 
         return (
-            <div className="question-list">
-                <Table className={this.props.table}>
-                    <colgroup>
-                        <col style={{width:'480px'}}/>
-                    </colgroup>
+            <div className={classes.questionList}>
+                <Table className={this.props.table} border={0}>
                     <TableHead>
-                        <TableRow>
-                            <TableCell>
+                        <TableRow style={{border: "none"}}>
+                            <TableCell style={{border: "none"}}>
                                 {item.Name} questions
                             </TableCell>
-                            <TableCell>
+                            <TableCell style={{border: "none"}}>
                                 <Link
                                   style={{cursor: "pointer"}}
                                   onClick={(e) => this.handleBack(e)}
@@ -111,6 +151,14 @@ class QuestionList extends Component {
                         {rows}
                     </TableBody>
                 </Table>
+                <div className={classes.buttonContainer}>
+                    <Button variant="contained" className={classes.tertiaryButton}>
+                        CANCEL
+                    </Button>
+                    <Button variant="contained" color="primary" className={classes.button}>
+                        OK
+                    </Button>
+                </div>
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
@@ -127,4 +175,4 @@ class QuestionList extends Component {
     }
 }
 
-export default connect(mapState)(QuestionList);
+export default withStyles(styles)(connect(mapState)(QuestionList));
