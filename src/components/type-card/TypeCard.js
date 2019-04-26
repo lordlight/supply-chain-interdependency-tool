@@ -58,9 +58,11 @@ const styles = theme => ({
     title: {
         fontSize: 13,
         fontWeight: "regular",
+        textTransform: "uppercase",
     },
     heading: {
         fontSize: 25,
+        textTransform: 'capitalize',
     },
   });
 
@@ -161,8 +163,8 @@ class TypeCard extends Component {
                             }
                         </Typography>
                         <Typography className={classes.desc} color="textSecondary" component="p">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                            across all continents except Antarctica
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+                            incididunt ut labore et dolore magna aliqua.
                         </Typography>
                     </CardContent>
                     <CardActions>

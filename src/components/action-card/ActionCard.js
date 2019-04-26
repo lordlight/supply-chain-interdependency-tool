@@ -56,10 +56,12 @@ const styles = theme => ({
     title: {
         fontSize: 13,
         fontWeight: "regular",
+        textTransform: 'uppercase',
     },
     heading: {
         fontSize: 25,
         paddingBottom: 24,
+        textTransform: 'capitalize',
     },
     item: {
         color: 'rgba(0, 0, 0, 0.6)',

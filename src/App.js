@@ -191,7 +191,7 @@ class App extends Component {
                 <Tab
                   classes={{root: classes.tabRoot, selected: classes.tabSelected}}
                   value="network"
-                  label="Supply Network" />
+                  label="Supply Chain" />
               </Tabs>
             : <Toolbar className={classes.questionsToolbar}>
                 <IconButton color="inherit" onClick={(e) => this.handleQuestionPageBack(e)}>

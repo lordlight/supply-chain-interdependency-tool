@@ -6,6 +6,8 @@ import { connect } from "react-redux";
 
 import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,9 +22,35 @@ const mapState = state => ({
     suppliers: state.suppliers,
     products: state.products,
     projects: state.projects,
+    supplierQuestions: state.supplierQuestions,
+    productQuestions: state.productQuestions,
+    projectQuestions: state.projectQuestions,
     suppliersRisk: state.suppliersRisk,
     productsRisk: state.productsRisk,
-    projectsRisk: state.projectsRisk
+    projectsRisk: state.projectsRisk,
+    supplierResponses: state.supplierResponses,
+    productResponses: state.productResponses,
+    projectResponses: state.projectResponses
+});
+
+const styles = theme => ({
+    overview: {
+        display: 'inline-flex',
+    },
+    table: {
+
+    },
+    titleCol: {
+        textTransform: 'uppercase',
+    },
+    regCol: {
+        textTransform: 'capitalize',
+    },
+    button: {
+        textTransform: 'uppercase',
+        width: 72,
+        height: 27,
+    },
 });
 
 class ItemList extends Component {
@@ -31,6 +59,7 @@ class ItemList extends Component {
     }
 
     render() {
+        const { classes } = this.props;
         if (this.props.currentType == null){
             return <div className={"item-list"}>Current type is null in the current session.</div>;
         }
@@ -38,20 +67,28 @@ class ItemList extends Component {
         let type = this.props.currentType;
 
         let list = null;
+        let questions = null;
+        let responses = null;
         let riskVal = null;
         let riskSet = null;
         if (type === "suppliers"){
             list = this.props.suppliers;
             riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
             riskSet = this.props.suppliersRisk;
+            questions = this.props.supplierQuestions;
+            responses = this.props.supplierResponses;
         } else if (type === "products"){
             list = this.props.products;
             riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
             riskSet = this.props.productsRisk;
+            questions = this.props.productQuestions;
+            responses = this.props.productResponses;
         } else if (type === "projects"){
             list = this.props.projects;
             riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
             riskSet = this.props.projectsRisk;
+            questions = this.props.projectQuestions;
+            responses = this.props.projectResponses;
         }
 
         const rows = list.map((row, i) => (
@@ -61,22 +98,78 @@ class ItemList extends Component {
                       style={{cursor: "pointer"}}
                       onClick={(e) => this.handleItemSelection(e, row)}
                     >
-                        {row.Name}{(() => {
-                                    if (riskSet.hasOwnProperty(row.ID)) return " - risk value: "+riskSet[row.ID];
-                                    else return "";
-                                  })()}
+                        {row.Name}
                     </Link>
+                </TableCell>
+                <TableCell>
+                    {(() => {
+                        if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID];
+                        else return "N/A";
+                    })()}
+                </TableCell>
+                <TableCell>
+                    {(() => {
+                        if (riskSet.hasOwnProperty(row.ID)) {
+                            if (riskSet[row.ID] < 0.25){
+                                return "*";
+                            } else if (riskSet[row.ID] < 0.5){
+                                return "**";
+                            } else if (riskSet[row.ID] < 0.75){
+                                return "***";
+                            } else {
+                                return "****";
+                            }
+                        }
+                        else return "N/A";
+                    })()}
+                </TableCell>
+                <TableCell>
+                    {(() => {
+                        return 100 * (Object.keys(responses[row.ID]).length / questions.length);
+                    })()}%
+                </TableCell>
+                <TableCell>
+                    <em>age calc</em>
+                </TableCell>
+                <TableCell>
+                    <Button variant="contained" size="small" color="primary" className={classes.button}>
+                        {(() => {
+                            if (Object.keys(responses[row.ID]).length === 0){
+                                return "Start...";
+                            } else {
+                                return "Edit...";
+                            }
+                        })()}
+                    </Button>
                 </TableCell>
             </TableRow>
         ));
 
         return (
             <div>
-                <Table className={this.props.table}>
+                <div className={classes.overview}>
+                    
+                </div>
+                <Table className={classes.table}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>
-                            {type} overview
+                            <TableCell className={classes.titleCol}>
+                                {type.substring(0, type.length - 1)}
+                            </TableCell>
+                            <TableCell className={classes.regCol}>
+                                Risk
+                            </TableCell>
+                            <TableCell className={classes.regCol}>
+                                Risk
+                            </TableCell>
+                            <TableCell className={classes.regCol}>
+                                Ques
+                            </TableCell>
+                            <TableCell className={classes.regCol}>
+                                Question Age
+                            </TableCell>
+                            <TableCell className={classes.regCol}>
+                                Action
                             </TableCell>
                         </TableRow>
                     </TableHead>
@@ -100,4 +193,4 @@ class ItemList extends Component {
     }
 }
 
-export default connect(mapState)(ItemList);
+export default withStyles(styles)(connect(mapState)(ItemList));
