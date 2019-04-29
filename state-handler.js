@@ -1,6 +1,6 @@
 const process = require('process');
 
-const { app, ipcMain } = require('electron');
+const { app, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 
 const csvParser = require('csv-parser');
@@ -241,6 +241,11 @@ updateSessionData = (data, type) => {
 ipcMain.on('renderer-loaded', (event) => {
 	event.sender.send('init-state', sessionData);
 	//event.sender.send('app-loc', app.getPath('appData'));
+});
+
+ipcMain.on('open-import', (event) => {
+	let importFile = dialog.showOpenDialog({ properties: ['openFile'] });
+	event.sender.send('return-import', importFile);
 });
 
 ipcMain.on('response-update', (event, changedResponses) => {

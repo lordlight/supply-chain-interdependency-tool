@@ -2,10 +2,11 @@
 export const ADD_SUPPLIERS = "ADD_SUPPLIERS";
 export const ADD_PRODUCTS = "ADD_PRODUCTS";
 export const ADD_PROJECTS = "ADD_PROJECTS";
-export const INIT_SESSION = "INIT_SESSION";
 export const ANSWER_QUESTION = "ANSWER_QUESTION";
+export const INIT_SESSION = "INIT_SESSION";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
 export const UPDATE_CURRENT_ITEM = "UPDATE_CURRENT_ITEM";
+export const UPDATE_IMPORT_FILE = "UPDATE_IMPORT_FILE";
 export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
 export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
 
@@ -36,6 +37,10 @@ export function updateCurrentType(payload){
 
 export function updateCurrentItem(payload){
     return {type: UPDATE_CURRENT_ITEM, payload }
+}
+
+export function updateImportFile(payload){
+    return {type: UPDATE_IMPORT_FILE, payload}
 }
 
 export function updateNavState(payload){

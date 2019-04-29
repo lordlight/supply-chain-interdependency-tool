@@ -11,11 +11,13 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 import store from '../../redux/store';
-import { updateCurrentType, updateNavState } from "../../redux/actions";
+import { connect } from "react-redux";
+import { updateCurrentType, updateImportFile, updateNavState } from "../../redux/actions";
 
 // Images
 import placeholder from "../../imgs/placeholder.png";
@@ -26,6 +28,16 @@ import projectsImg from "../../imgs/projects.png";
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
+
+ipcRenderer.on('return-import', (event, response) => {
+    if (response.length > 0){
+        store.dispatch(updateImportFile({importFile: response[0]}));
+    }
+});
+
+const mapState = state => ({
+    importFile: state.importFile
+});
 
 const styles = theme => ({
     card: {
@@ -64,6 +76,42 @@ const styles = theme => ({
         fontSize: 25,
         textTransform: 'capitalize',
     },
+    dialogDesc: {
+        width: 420,
+    },
+    dialogTitle: {
+        textTransform: 'capitalize',
+        fontSize: 21,
+        fontWeight: 'bold',
+        width: 420,
+    },
+    dropTarget: {
+        backgroundColor: '#dedede',
+        paddingTop: 24,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 420,
+    },
+    importButton: {
+        backgroundColor: '#12659c',
+        color: 'white',
+        textTransform: 'uppercase',
+        width: 166,
+        height: 36,
+        fontWeight: 'normal',
+        fontSize: 15,
+    },
+    importText: {
+        paddingLeft: 22,
+        width: 232,
+        height: 28,
+        display: 'flex',
+        alignItems: 'center',
+    },
+    actionButton: {
+        width: 166,
+    }
   });
 
 class TypeCard extends Component {
@@ -121,12 +169,16 @@ class TypeCard extends Component {
 
     handleClose = (event, closeType) => {
         this.setState({ open: false });
-        console.log("close type: ", closeType);
+        store.dispatch(updateImportFile({importFile: null}));
     };
 
     handleTypeSelection = (event, type) => {
         store.dispatch(updateCurrentType({currentType: type}));
         store.dispatch(updateNavState({navState: type}));
+    }
+
+    openDialog = (event) => {
+        ipcRenderer.send('open-import');
     }
 
     render() {
@@ -139,6 +191,23 @@ class TypeCard extends Component {
             tempImg = productsImg;
         } else if (this.props.type === "projects"){
             tempImg = projectsImg;
+        }
+
+        const formatHref = "javascript:;";
+        const formatLink = <Link href={formatHref}>File format details/help...</Link>;
+
+        const os = window.navigator.userAgent;
+        let fileText = "No file chosen";
+        let saveDisabled = true;
+        if (this.props.importFile != null){
+            fileText = this.props.importFile;
+            if (os.indexOf("Windows") > -1){
+                fileText = fileText.substring(fileText.lastIndexOf("\\")+1);
+            } else {
+                fileText = fileText.substring(fileText.lastIndexOf("/")+1);
+            }
+            
+            saveDisabled = false;
         }
 
         return (
@@ -187,40 +256,47 @@ class TypeCard extends Component {
                     </CardActions>
                 </Card>
                 <Dialog
-                    open={this.state.open}
-                    onClose={(e) => this.handleClose(e, 'cancel')}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
+                        open={this.state.open}
+                        onClose={(e) => this.handleClose(e, 'cancel')}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
                     >
-                    <DialogTitle id="alert-dialog-title">{this.props.type} import</DialogTitle>
-                    <DialogContent>
-                        <Paper
-                            className="paper"
-                            elevation={1}
-                            style={{height: "200px"}}
-                            onDragEnter={this.dragEnterHandler}
-                            onDragOver={this.dragOverHandler}
-                            onDragLeave={this.dragLeaveHandler}
-                            onDrop={(e) => this.dropHandler(e, this.props.type)}
+                    <DialogTitle className={classes.dialogTitle}>import {this.props.type}</DialogTitle>
+                    <DialogContent className={classes.dialogDesc}>
+                        Import CSV file of {this.props.type}. Press the choose file button or drag a file here. {formatLink}
+                    </DialogContent>
+                    <DialogContent
+                      className={classes.dropTarget}
+                      onDragEnter={this.dragEnterHandler}
+                      onDragOver={this.dragOverHandler}
+                      onDragLeave={this.dragLeaveHandler}
+                      onDrop={(e) => this.dropHandler(e, this.props.type)}
+                    >
+                        <Button
+                          className={classes.importButton}
+                          onClick={(e) => this.openDialog(e)}
                         >
-                            <Typography id="modal-title">
-                                Drag and drop the {this.props.type} file here
-                            </Typography>
-                        </Paper>
+                            choose file...
+                        </Button>
+                        <Typography className={classes.importText} component="div">
+                            {fileText}
+                        </Typography>
                     </DialogContent>
                     <DialogActions>
                         <Button
+                          className={classes.actionButton}
                           onClick={(e) => this.handleClose(e, 'cancel')}
                           color="primary"
                         >
                             Cancel
                         </Button>
                         <Button
+                          className={classes.actionButton}
                           onClick={(e) => this.handleClose(e, 'save')}
                           color="primary"
-                          autoFocus
+                          disabled={saveDisabled}
                         >
-                            Save
+                            OK
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -229,4 +305,4 @@ class TypeCard extends Component {
     }
 }
 
-export default withStyles(styles)(TypeCard);
+export default withStyles(styles)(connect(mapState)(TypeCard));

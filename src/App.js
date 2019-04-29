@@ -121,7 +121,7 @@ class App extends Component {
           }
           //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
         });
-    console.log("diff: ", diff);
+    //console.log("diff: ", diff);
     if (diff !== {}) {
       ipcRenderer.send('response-update', diff);
     }
@@ -146,7 +146,6 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-    console.log("classes: ", classes);
     const value = this.props.navState;
     const mainProps = {currentType: null};
     const suppProps = {currentType: "suppliers"};
@@ -197,7 +196,7 @@ class App extends Component {
                 <IconButton color="inherit" onClick={(e) => this.handleQuestionPageBack(e)}>
                   <ChevronLeft />
                 </IconButton>
-                <Typography className={classes.questionsToolbarText} variant='h7'>
+                <Typography className={classes.questionsToolbarText}>
                   {(() => {
                     if (this.props.currentType === "suppliers") return "Supplier ";
                     else if (this.props.currentType === "products") return "Product ";

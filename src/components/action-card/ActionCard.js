@@ -94,7 +94,7 @@ class ActionCard extends Component {
                         <Typography gutterBottom className={classes.heading}>
                             {this.props.plural}
                         </Typography>
-                        <Typography gutterBottom fontSize={21} color="textPrimary" fontWeight="bold">
+                        <Typography component="div" gutterBottom fontSize={21} color="textPrimary" fontWeight="bold">
                             {itemElements}
                         </Typography>
                     </CardContent>

@@ -94,12 +94,7 @@ class ItemList extends Component {
         const rows = list.map((row, i) => (
             <TableRow key={i}>
                 <TableCell key={i}>
-                    <Link
-                      style={{cursor: "pointer"}}
-                      onClick={(e) => this.handleItemSelection(e, row)}
-                    >
-                        {row.Name}
-                    </Link>
+                    {row.Name}
                 </TableCell>
                 <TableCell>
                     {(() => {
@@ -132,7 +127,13 @@ class ItemList extends Component {
                     <em>age calc</em>
                 </TableCell>
                 <TableCell>
-                    <Button variant="contained" size="small" color="primary" className={classes.button}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      className={classes.button}
+                      onClick={(e) => this.handleItemSelection(e, row)}
+                    >
                         {(() => {
                             if (Object.keys(responses[row.ID]).length === 0){
                                 return "Start...";
