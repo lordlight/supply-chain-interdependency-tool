@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ImportDialog } from '../../components/';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -7,17 +8,11 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 import store from '../../redux/store';
 import { connect } from "react-redux";
-import { updateCurrentType, updateImportFile, updateNavState } from "../../redux/actions";
+import { updateCurrentType, updateImportFile, updateImportState, updateNavState } from "../../redux/actions";
 
 // Images
 import placeholder from "../../imgs/placeholder.png";
@@ -25,18 +20,8 @@ import suppliersImg from "../../imgs/suppliers.png";
 import productsImg from "../../imgs/products.png";
 import projectsImg from "../../imgs/projects.png";
 
-// This only works when running electron or as an app (i.e. will not work in browser).
-const electron = window.electron;
-const ipcRenderer = electron.ipcRenderer;
-
-ipcRenderer.on('return-import', (event, response) => {
-    if (response.length > 0){
-        store.dispatch(updateImportFile({importFile: response[0]}));
-    }
-});
-
 const mapState = state => ({
-    importFile: state.importFile
+    importState: state.importState
 });
 
 const styles = theme => ({
@@ -76,109 +61,27 @@ const styles = theme => ({
         fontSize: 25,
         textTransform: 'capitalize',
     },
-    dialogDesc: {
-        width: 420,
-    },
-    dialogTitle: {
-        textTransform: 'capitalize',
-        fontSize: 21,
-        fontWeight: 'bold',
-        width: 420,
-    },
-    dropTarget: {
-        backgroundColor: '#dedede',
-        paddingTop: 24,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 420,
-    },
-    importButton: {
-        backgroundColor: '#12659c',
-        color: 'white',
-        textTransform: 'uppercase',
-        width: 166,
-        height: 36,
-        fontWeight: 'normal',
-        fontSize: 15,
-    },
-    importText: {
-        paddingLeft: 22,
-        width: 232,
-        height: 28,
-        display: 'flex',
-        alignItems: 'center',
-    },
-    actionButton: {
-        width: 166,
-    }
   });
 
 class TypeCard extends Component {
     state = {
-        open: false,
-        dragHovering: false,
-    }
-
-    dragEnterHandler = (event) => {
-        console.log("drag enter");
-        this.state.dragHovering = true;
-        event.stopPropagation();
-        event.preventDefault();
-    }
-
-    dragOverHandler = (event) => {
-        console.log("drag over");
-        event.stopPropagation();
-        event.preventDefault();
-    }
-
-    dragLeaveHandler = (event) => {
-        console.log("drag leave");
-        event.stopPropagation();
-        event.preventDefault();
-        this.state.dragHovering = false;
-    }
-
-    dropHandler = (event, type) => {
-        console.log("drop");
-        this.state.dragHovering = false;
-        // Stop default behaviors and propagation.
-        event.stopPropagation();
-        event.preventDefault();
-        
-        // Get the items.
-        const dt = event.dataTransfer;
-        const files = dt.files;
-
-        let req = {type: type, filesToLoad: []};
-
-        for (let i = 0; i < files.length; i++){
-            req.filesToLoad.push({name: files[i].name, path:files[i].path});
-        }
-
-        console.log("files to load: ", req.filesToLoad);
-
-        // Send the file to the electron main thread.
-        ipcRenderer.send('asynchronous-file-load', req);
+        open: false
     }
 
     handleOpen = () => {
         this.setState({ open: true });
+        store.dispatch(updateImportState({importState: 'prompting'}));
     };
 
-    handleClose = (event, closeType) => {
+    handleClose = (event, ) => {
         this.setState({ open: false });
         store.dispatch(updateImportFile({importFile: null}));
+        store.dispatch(updateImportState({importState: null}));
     };
 
     handleTypeSelection = (event, type) => {
         store.dispatch(updateCurrentType({currentType: type}));
         store.dispatch(updateNavState({navState: type}));
-    }
-
-    openDialog = (event) => {
-        ipcRenderer.send('open-import');
     }
 
     render() {
@@ -193,21 +96,9 @@ class TypeCard extends Component {
             tempImg = projectsImg;
         }
 
-        const formatHref = "javascript:;";
-        const formatLink = <Link href={formatHref}>File format details/help...</Link>;
-
-        const os = window.navigator.userAgent;
-        let fileText = "No file chosen";
-        let saveDisabled = true;
-        if (this.props.importFile != null){
-            fileText = this.props.importFile;
-            if (os.indexOf("Windows") > -1){
-                fileText = fileText.substring(fileText.lastIndexOf("\\")+1);
-            } else {
-                fileText = fileText.substring(fileText.lastIndexOf("/")+1);
-            }
-            
-            saveDisabled = false;
+        if (this.props.importState === null){
+            this.state.open = false;
+            store.dispatch(updateImportFile({importFile: null}));
         }
 
         return (
@@ -255,51 +146,7 @@ class TypeCard extends Component {
                         </Button>
                     </CardActions>
                 </Card>
-                <Dialog
-                        open={this.state.open}
-                        onClose={(e) => this.handleClose(e, 'cancel')}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                    <DialogTitle className={classes.dialogTitle}>import {this.props.type}</DialogTitle>
-                    <DialogContent className={classes.dialogDesc}>
-                        Import CSV file of {this.props.type}. Press the choose file button or drag a file here. {formatLink}
-                    </DialogContent>
-                    <DialogContent
-                      className={classes.dropTarget}
-                      onDragEnter={this.dragEnterHandler}
-                      onDragOver={this.dragOverHandler}
-                      onDragLeave={this.dragLeaveHandler}
-                      onDrop={(e) => this.dropHandler(e, this.props.type)}
-                    >
-                        <Button
-                          className={classes.importButton}
-                          onClick={(e) => this.openDialog(e)}
-                        >
-                            choose file...
-                        </Button>
-                        <Typography className={classes.importText} component="div">
-                            {fileText}
-                        </Typography>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                          className={classes.actionButton}
-                          onClick={(e) => this.handleClose(e, 'cancel')}
-                          color="primary"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                          className={classes.actionButton}
-                          onClick={(e) => this.handleClose(e, 'save')}
-                          color="primary"
-                          disabled={saveDisabled}
-                        >
-                            OK
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                <ImportDialog type={this.props.type} open={this.state.open} handleClose={this.handleClose}/>
             </div>
         );
     }

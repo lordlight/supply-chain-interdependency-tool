@@ -263,44 +263,43 @@ ipcMain.on('response-update', (event, changedResponses) => {
 ipcMain.on('asynchronous-file-load', (event, req) => {
 	let response = {error: null, data:[], type:null};
 
-	if (!req.type || !req.filesToLoad){
-		response.error = "Missing type or files to upload.";
+	if (!req.type || !req.filePath){
+		response.error = "Missing type or file path.";
 		event.sender.send('asynchronous-file-response', response);
 	} else {
-		const files = req.filesToLoad;
+		const filePath = req.filePath;
 		response.type = req.type;
 
-		//console.log("files: ", files);
+		console.log("asynch file load, filePath: ", filePath);
 
-		files.forEach((file) => {
-			if (!file.path || !file.name){
-				response.error = "**ERROR** One did not have the name and/or path properties.";
-				event.sender.send('asynchronous-file-response', response);
-			} else {
-				if (file.path.endsWith(".csv")){
-					try {
-						fs.createReadStream(file.path)
-						.pipe(csvParser())
-						.on('data', (data) => {
-							response.data.push(data);
-						})
-						.on('end', () => {
-							event.sender.send('asynchronous-file-response', response);
-
-							updateSessionData(response.data, response.type);
-
-							saveSessionData(event, "resources");
-							createCorrespondingResponses();
-							console.log("done");
-						});
-					} catch (err){
-						response.error = error;
+		if (filePath === null || typeof(filePath) === 'undefined'){
+			response.error = "**ERROR** The file path was not given.";
+			event.sender.send('asynchronous-file-response', response);
+		} else {
+			if (filePath.endsWith(".csv")){
+				try {
+					fs.createReadStream(filePath)
+					.pipe(csvParser())
+					.on('data', (data) => {
+						response.data.push(data);
+					})
+					.on('end', () => {
 						event.sender.send('asynchronous-file-response', response);
-					}
-				} else {
+
+						updateSessionData(response.data, response.type);
+
+						saveSessionData(event, "resources");
+						createCorrespondingResponses();
+						console.log("done");
+					});
+				} catch (err){
+					response.error = "**ERROR**" + err;
 					event.sender.send('asynchronous-file-response', response);
 				}
+			} else {
+				response.error = "**ERROR** Not a CSV";
+				event.sender.send('asynchronous-file-response', response);
 			}
-		});
+		}
 	}
 });

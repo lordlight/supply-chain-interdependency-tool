@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import store from './redux/store';
-import { addSuppliers, addProducts, addProjects, initSession } from "./redux/actions";
+import { addSuppliers, addProducts, addProjects, initSession, updateImportState } from "./redux/actions";
 
 import './index.css';
 import App from './App';
@@ -46,6 +46,18 @@ ipcRenderer.on('asynchronous-file-response', (event, arg) => {
         }
 
         console.log("store: ", store.getState());
+
+        //store.dispatch(updateImportState({importState: null}));
+        setTimeout(
+            () => {store.dispatch(updateImportState({importState: null}))},
+            1000 // Arbitrary delay to give the impression it is doing something
+        );
+    } else {
+        //store.dispatch(updateImportState({importState: 'error'}));
+        setTimeout(
+            () => {store.dispatch(updateImportState({importState: arg.error}))},
+            1000
+        );
     }
 });
 

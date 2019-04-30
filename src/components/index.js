@@ -1,6 +1,7 @@
 export { default as ActionCard } from "./action-card/ActionCard";
 export { default as Assessment } from "./assessment/Assessment";
 export { default as Home } from "./home/Home";
+export { default as ImportDialog } from "./import-dialog/ImportDialog";
 export { default as ItemList} from "./item-list/ItemList";
 export { default as ItemOverview } from "./item-overview/ItemOverview";
 export { default as List } from "./list/List";
