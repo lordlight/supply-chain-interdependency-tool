@@ -1,6 +1,6 @@
-import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, ANSWER_QUESTION,
+import { ADD_SUPPLIERS, ADD_PRODUCTS, ADD_PROJECTS, ANSWER_MULTI, ANSWER_TEMP,
     INIT_SESSION, UPDATE_CURRENT_TYPE, UPDATE_CURRENT_ITEM, UPDATE_IMPORT_FILE,
-    UPDATE_IMPORT_STATE, UPDATE_NAV_STATE, UPDATE_TYPE_RISK } from "../actions";
+    UPDATE_IMPORT_STATE, UPDATE_NAV_STATE, UPDATE_TEMP_RESPONSES, UPDATE_TYPE_RISK } from "../actions";
 
 const initialState = {
     currentType: null,
@@ -19,7 +19,8 @@ const initialState = {
     projectQuestions: [],
     supplierResponses: {},
 	productResponses: {},
-	projectResponses: {}
+    projectResponses: {},
+    tempResponses: {}
 };
 
 function rootReducer(state = initialState, action) {
@@ -35,7 +36,7 @@ function rootReducer(state = initialState, action) {
         return Object.assign({}, state, {
             projects: state.projects = action.payload
         });
-    } else if (action.type === ANSWER_QUESTION){
+    } /*else if (action.type === ANSWER_QUESTION){
         let type = action.payload.type;
         if (type === "suppliers"){
             return {
@@ -71,6 +72,42 @@ function rootReducer(state = initialState, action) {
                 }
             }
         }
+    } */
+    else if (action.type === ANSWER_MULTI){
+        let type = action.payload.type;
+        if (type === "suppliers"){
+            return {
+                ...state,
+                supplierResponses: {
+                    ...state.supplierResponses,
+                    [action.payload.itemId]: action.payload.responses
+                }
+            }
+        } else if (type === "products"){
+            return {
+                ...state,
+                productResponses: {
+                    ...state.productResponses,
+                    [action.payload.itemId]: action.payload.responses
+                }
+            }
+        } else if (type === "projects") {
+            return {
+                ...state,
+                projectResponses: {
+                    ...state.projectResponses,
+                    [action.payload.itemId]: action.payload.responses
+                }
+            }
+        }
+    } else if (action.type === ANSWER_TEMP){
+        return {
+            ...state,
+            tempResponses: {
+                ...state.tempResponses,
+                [action.payload.qId]: action.payload.ansInd
+            }
+        }
     } else if (action.type === INIT_SESSION){
         return Object.assign({}, state, {
             suppliers: state.suppliers = action.payload.suppliers,
@@ -103,8 +140,11 @@ function rootReducer(state = initialState, action) {
         return Object.assign({}, state, {
             navState: state.navState = action.payload.navState
         });
+    } else if (action.type === UPDATE_TEMP_RESPONSES){
+        return Object.assign({}, state, {
+            tempResponses: state.tempResponses = action.payload.tempResponses
+        });
     } else if (action.type === UPDATE_TYPE_RISK){
-        //console.log("RISK UPDATE: ", action.payload);
         let type = action.payload.type;
         if (type === "suppliers"){
             return Object.assign({}, state, {

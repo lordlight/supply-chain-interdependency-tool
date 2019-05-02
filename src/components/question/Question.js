@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 
 import store from '../../redux/store';
-import { answerQuestion } from "../../redux/actions";
 
 import { withStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
@@ -34,14 +33,15 @@ const mapState = state => ({
 
 class Question extends Component {
     handleChange = event => {
-        store.dispatch(
+        this.props.updateResponse(this.props.question.ID, event.target.value-1)
+        /*store.dispatch(
             answerQuestion({
                 type: this.props.currentType,
                 itemId: this.props.currentItem.ID,
                 queId: this.props.question.ID,
                 ansInd: event.target.value-1 
             })
-        );
+        );*/
     };
 
     render() {
@@ -66,7 +66,7 @@ class Question extends Component {
                         <Select
                             className={classes.input}
                             value={parseInt(response)}
-                            onChange={(e) => this.handleChange(e, this.props.question.ID)}
+                            onChange={this.handleChange}
                             inputProps={{
                                 name: this.props.question.ID,
                                 id: this.props.question.ID,

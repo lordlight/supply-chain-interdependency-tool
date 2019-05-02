@@ -5,7 +5,7 @@ import { /*Breadcrumb,*/ Home, ItemOverview, /*QuestionList,*/ RiskGraph } from 
 // Redux
 import { connect } from "react-redux";
 import store from './redux/store';
-import { updateCurrentType, updateCurrentItem, updateNavState, updateTypeRisk } from "./redux/actions";
+import { updateCurrentType, updateCurrentItem, updateNavState, updateTempResponses, updateTypeRisk } from "./redux/actions";
 
 // Risk calculation
 import { calculateItemRisk } from './utils/risk-calculations';
@@ -104,7 +104,7 @@ class App extends Component {
           return nextProps[key] !== this.props[key];
         })
         .map(key => {
-          if (key.includes("Responses")){
+          if (key.includes("Responses") && !key.includes("temp")){
             Object.keys(nextProps[key])
               .filter(qKey => {
                 //console.log("&&&&&&&: ", nextProps[key][qKey], ", ####: ", this.props[key][qKey]);
@@ -123,6 +123,7 @@ class App extends Component {
         });
     //console.log("diff: ", diff);
     if (diff !== {}) {
+      console.log("response update: ", diff);
       ipcRenderer.send('response-update', diff);
     }
 
@@ -142,6 +143,7 @@ class App extends Component {
 
   handleQuestionPageBack = (event) => {
       store.dispatch(updateCurrentItem({currentItem: null}));
+      store.dispatch(updateTempResponses({tempResponses: {}}));
   }
 
   render() {

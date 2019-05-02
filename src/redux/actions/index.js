@@ -2,13 +2,15 @@
 export const ADD_SUPPLIERS = "ADD_SUPPLIERS";
 export const ADD_PRODUCTS = "ADD_PRODUCTS";
 export const ADD_PROJECTS = "ADD_PROJECTS";
-export const ANSWER_QUESTION = "ANSWER_QUESTION";
+export const ANSWER_TEMP = "ANSWER_TEMP";
+export const ANSWER_MULTI = "ANSWER_MULTI";
 export const INIT_SESSION = "INIT_SESSION";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
 export const UPDATE_CURRENT_ITEM = "UPDATE_CURRENT_ITEM";
 export const UPDATE_IMPORT_FILE = "UPDATE_IMPORT_FILE";
 export const UPDATE_IMPORT_STATE = "UPDATE_IMPORT_STATE";
 export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
+export const UPDATE_TEMP_RESPONSES = "UPDATE_TEMP_RESPONSES";
 export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
 
 // Action creators
@@ -24,12 +26,16 @@ export function addProjects(payload) {
     return { type: ADD_PROJECTS, payload }
 };
 
-export function initSession(payload){
-    return {type: INIT_SESSION, payload }
+export function answerMulti(payload){
+    return {type: ANSWER_MULTI, payload }
 }
 
-export function answerQuestion(payload){
-    return {type: ANSWER_QUESTION, payload }
+export function answerTemp(payload){
+    return {type: ANSWER_TEMP, payload }
+}
+
+export function initSession(payload){
+    return {type: INIT_SESSION, payload }
 }
 
 export function updateCurrentType(payload){
@@ -50,6 +56,10 @@ export function updateImportState(payload){
 
 export function updateNavState(payload){
     return {type: UPDATE_NAV_STATE, payload }
+}
+
+export function updateTempResponses(payload){
+    return {type: UPDATE_TEMP_RESPONSES, payload}
 }
 
 export function updateTypeRisk(payload){

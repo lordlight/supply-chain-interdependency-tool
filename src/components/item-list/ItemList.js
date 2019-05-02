@@ -14,8 +14,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-
-import Link from '@material-ui/core/Link';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const mapState = state => ({
     currentType: state.currentType,
@@ -34,17 +34,27 @@ const mapState = state => ({
 });
 
 const styles = theme => ({
+    itemList: {
+        margin: 34
+    },
     overview: {
         display: 'inline-flex',
     },
     table: {
-
+        
+    },
+    cell: {
+        borderRight: '2px solid #f8f8f8',
     },
     titleCol: {
         textTransform: 'uppercase',
+        backgroundColor: '#dcdcdc',
+        borderRight: '2px solid #f8f8f8',
     },
     regCol: {
         textTransform: 'capitalize',
+        backgroundColor: '#dcdcdc',
+        borderRight: '2px solid #f8f8f8',
     },
     button: {
         textTransform: 'uppercase',
@@ -54,8 +64,25 @@ const styles = theme => ({
 });
 
 class ItemList extends Component {
+    state = {
+        sortBy: 'name',
+        sortDir: 'desc'
+    }
+
     handleItemSelection = (event, item) => {
         store.dispatch(updateCurrentItem({currentItem: item}));
+    }
+
+    updateSortHandler = (event, sortType) => {
+        if (sortType !== this.state.sortBy){
+            this.setState({ sortBy: sortType, sortDir: 'desc' });
+        } else {
+            let newSortDir = 'asc';
+            if (this.state.sortDir === 'asc'){
+                newSortDir = 'desc';
+            }
+            this.setState({ sortDir: newSortDir });
+        }
     }
 
     render() {
@@ -72,37 +99,116 @@ class ItemList extends Component {
         let riskVal = null;
         let riskSet = null;
         if (type === "suppliers"){
-            list = this.props.suppliers;
+            list = [...this.props.suppliers];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
             riskSet = this.props.suppliersRisk;
             questions = this.props.supplierQuestions;
             responses = this.props.supplierResponses;
         } else if (type === "products"){
-            list = this.props.products;
+            list = [...this.props.products];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
             riskSet = this.props.productsRisk;
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
-            list = this.props.projects;
+            list = [...this.props.projects];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
             riskSet = this.props.projectsRisk;
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;
         }
 
+        const headerDetails = [
+            {
+                label: type.substring(0, type.length - 1),
+                tooltip: "Sort by name",
+                cssClass: classes.titleCol,
+                sortType: 'Name'
+            },
+            {
+                label: 'Risk',
+                tooltip: "Sort by risk",
+                cssClass: classes.regCol,
+                sortType: 'risk'
+            },
+            {
+                label: 'Risk',
+                tooltip: "Sort by risk",
+                cssClass: classes.regCol,
+                sortType: 'risk'
+            },
+            {
+                label: 'Ques',
+                tooltip: "Sort by completion",
+                cssClass: classes.regCol,
+                sortType: 'completion'
+            },
+            {
+                label: 'Question Age',
+                tooltip: "Sort by age",
+                cssClass: classes.regCol,
+                sortType: 'age'
+            },
+            {
+                label: 'Action',
+                tooltip: "Sort by action",
+                cssClass: classes.regCol,
+                sortType: 'action'
+            },
+        ];
+
+        const rowHeaders = headerDetails.map((col, i) => (
+            <TableCell key={i} className={col.cssClass}>
+                <Tooltip
+                    title={col.tooltip}
+                    placement={'bottom-start'}
+                    enterDelay={300}
+                >
+                    <TableSortLabel
+                        active={this.state.sortBy === col.sortType}
+                        direction={this.state.sortDir}
+                        onClick={(e) => this.updateSortHandler(e, col.sortType)}
+                    >
+                        {col.label}
+                    </TableSortLabel>
+                </Tooltip> 
+            </TableCell>
+        ));
+
+        list.forEach((item) => {
+            if (riskSet.hasOwnProperty(item.ID)){
+                item.risk = riskSet[item.ID];
+                item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
+                item.age = 0;
+                item.action = (Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit");
+            }
+        });
+
+        list.sort((a, b) => {
+            if (this.state.sortDir === 'asc') {
+                if (a[this.state.sortBy] > b[this.state.sortBy]) return 1;
+                if (b[this.state.sortBy] > a[this.state.sortBy]) return -1;
+                return 0;
+            } else {
+                if (a[this.state.sortBy] < b[this.state.sortBy]) return 1;
+                if (b[this.state.sortBy] < a[this.state.sortBy]) return -1;
+                return 0;
+            }
+            
+        });
+
         const rows = list.map((row, i) => (
             <TableRow key={i}>
-                <TableCell key={i}>
+                <TableCell key={i} className={classes.cell}>
                     {row.Name}
                 </TableCell>
-                <TableCell>
+                <TableCell className={classes.cell}>
                     {(() => {
                         if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID];
                         else return "N/A";
                     })()}
                 </TableCell>
-                <TableCell>
+                <TableCell className={classes.cell}>
                     {(() => {
                         if (riskSet.hasOwnProperty(row.ID)) {
                             if (riskSet[row.ID] < 0.25){
@@ -118,15 +224,15 @@ class ItemList extends Component {
                         else return "N/A";
                     })()}
                 </TableCell>
-                <TableCell>
+                <TableCell className={classes.cell}>
                     {(() => {
                         return 100 * (Object.keys(responses[row.ID]).length / questions.length);
                     })()}%
                 </TableCell>
-                <TableCell>
+                <TableCell className={classes.cell}>
                     <em>age calc</em>
                 </TableCell>
-                <TableCell>
+                <TableCell className={classes.cell}>
                     <Button
                       variant="contained"
                       size="small"
@@ -147,31 +253,14 @@ class ItemList extends Component {
         ));
 
         return (
-            <div>
+            <div className={classes.itemList}>
                 <div className={classes.overview}>
                     
                 </div>
                 <Table className={classes.table}>
                     <TableHead>
                         <TableRow>
-                            <TableCell className={classes.titleCol}>
-                                {type.substring(0, type.length - 1)}
-                            </TableCell>
-                            <TableCell className={classes.regCol}>
-                                Risk
-                            </TableCell>
-                            <TableCell className={classes.regCol}>
-                                Risk
-                            </TableCell>
-                            <TableCell className={classes.regCol}>
-                                Ques
-                            </TableCell>
-                            <TableCell className={classes.regCol}>
-                                Question Age
-                            </TableCell>
-                            <TableCell className={classes.regCol}>
-                                Action
-                            </TableCell>
+                            {rowHeaders}
                         </TableRow>
                     </TableHead>
                     <TableBody>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import store from '../../redux/store';
 import { connect } from "react-redux";
+import { answerMulti, answerTemp, updateCurrentItem, updateTempResponses } from "../../redux/actions";
 
 import { Question } from "../../components/";
 
@@ -66,10 +67,53 @@ const mapState = state => ({
     projectsRisk: state.projectsRisk,
     supplierResponses: state.supplierResponses, // Responses are objects, with supplier/product/project ids as keys.
     productResponses: state.productResponses,
-    projectResponses: state.projectResponses
+    projectResponses: state.projectResponses,
+    tempResponses: state.tempResponses
 });
 
 class QuestionList extends Component {
+
+    updateResponse = (qId, ansInd) => {
+        store.dispatch(answerTemp({qId: qId, ansInd: ansInd}))
+    }
+
+    handleCancel = () => {
+        store.dispatch(updateTempResponses({tempResponses: {}}));
+        store.dispatch(updateCurrentItem({currentItem: null}));
+    }
+
+    handleSave = () => {
+        let responses = null;
+        if (this.props.currentType === "suppliers"){
+            responses = this.props.supplierResponses;
+        } else if (this.props.currentType === "products"){
+            responses = this.props.productResponses;
+        } else if (this.props.currentType === "projects"){
+            responses = this.props.projectResponses;
+        }
+
+        if (responses.hasOwnProperty(this.props.currentItem.ID)){
+            responses = responses[this.props.currentItem.ID];
+        }
+
+        let allResponses = Object.assign({}, responses);
+        console.log("current: ", responses);
+        console.log("temp: ", this.props.tempResponses);
+
+        Object.entries(this.props.tempResponses).forEach((resp) => {
+            let key = resp[0], val = resp[1];
+            allResponses[key] = val;
+        });
+
+        store.dispatch(answerMulti({
+            type: this.props.currentType,
+            itemId: this.props.currentItem.ID,
+            responses: allResponses
+        }));
+
+        this.handleCancel();
+    }
+
     render() {
         const { classes } = this.props;
         if (this.props.currentType == null || this.props.currentItem == null){
@@ -95,17 +139,25 @@ class QuestionList extends Component {
         }
 
         // Get the relevant questions and assign the relevant risk item
-        let questions = null, riskVal = null;
+        let questions = null;//, riskVal = null;
         if (type === "suppliers"){
             questions = this.props.supplierQuestions;
-            riskVal = this.props.suppliersRisk[item.ID];
+            //riskVal = this.props.suppliersRisk[item.ID];
         } else if (type === "products"){
             questions = this.props.productQuestions;
-            riskVal = this.props.productsRisk[item.ID];
+            //riskVal = this.props.productsRisk[item.ID];
         } else if (type === "projects"){
             questions = this.props.projectQuestions;
-            riskVal = this.props.projectsRisk[item.ID];
+            //riskVal = this.props.projectsRisk[item.ID];
         }
+
+        // Shallow copy, as responses should be only one level deep
+        let alteredResponses = Object.assign({}, responses);
+
+        Object.entries(this.props.tempResponses).forEach((resp) => {
+            let key = resp[0], val = resp[1];
+            alteredResponses[key] = val;
+        });
 
         if (questions < 1){
             return (
@@ -116,7 +168,12 @@ class QuestionList extends Component {
         }
 
         const rows = questions.map((question, i) => (
-            <Question key={i} question={question} response={responses[question.ID]}/>
+            <Question
+                key={i}
+                question={question} 
+                response={alteredResponses[question.ID]} 
+                updateResponse={this.updateResponse}
+            />
         ));
 
         return (
@@ -133,14 +190,23 @@ class QuestionList extends Component {
                     </TableBody>
                 </Table>
                 <div className={classes.buttonContainer}>
-                    <Button variant="contained" className={classes.tertiaryButton}>
+                    <Button
+                        onClick={this.handleCancel}
+                        variant="contained"
+                        className={classes.tertiaryButton}
+                    >
                         CANCEL
                     </Button>
-                    <Button variant="contained" color="primary" className={classes.button}>
+                    <Button
+                        onClick={this.handleSave}
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                    >
                         OK
                     </Button>
                 </div>
-                <Snackbar
+                {/*<Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
                         horizontal: 'right',
@@ -150,7 +216,7 @@ class QuestionList extends Component {
                         'aria-describedby': 'message-id',
                     }}
                     message={<span id="message-id">Current Risk: {riskVal}</span>}
-                />
+                />*/}
             </div>
         );
     }
