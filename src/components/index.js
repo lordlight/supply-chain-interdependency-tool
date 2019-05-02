@@ -7,5 +7,6 @@ export { default as ItemOverview } from "./item-overview/ItemOverview";
 export { default as List } from "./list/List";
 export { default as QuestionList } from "./question-list/QuestionList";
 export { default as Question } from "./question/Question";
+export { default as QuestionStatusCard } from "./question-status-card/QuestionStatusCard";
 export { default as RiskGraph } from "./risk-graph/RiskGraph";
 export { default as TypeCard } from "./type-card/TypeCard";

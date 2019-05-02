@@ -4,6 +4,8 @@ import store from '../../redux/store';
 import { updateCurrentItem } from "../../redux/actions";
 import { connect } from "react-redux";
 
+import { QuestionStatusCard } from '../../components';
+
 import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -65,9 +67,9 @@ const styles = theme => ({
 
 class ItemList extends Component {
     state = {
-        sortBy: 'name',
-        sortDir: 'desc'
-    }
+        sortBy: 'Name',
+        sortDir: 'asc'
+    };
 
     handleItemSelection = (event, item) => {
         store.dispatch(updateCurrentItem({currentItem: item}));
@@ -75,7 +77,7 @@ class ItemList extends Component {
 
     updateSortHandler = (event, sortType) => {
         if (sortType !== this.state.sortBy){
-            this.setState({ sortBy: sortType, sortDir: 'desc' });
+            this.setState({ sortBy: sortType, sortDir: 'asc' });
         } else {
             let newSortDir = 'asc';
             if (this.state.sortDir === 'asc'){
@@ -255,7 +257,7 @@ class ItemList extends Component {
         return (
             <div className={classes.itemList}>
                 <div className={classes.overview}>
-                    
+                    <QuestionStatusCard />
                 </div>
                 <Table className={classes.table}>
                     <TableHead>
