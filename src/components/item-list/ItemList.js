@@ -4,7 +4,7 @@ import store from '../../redux/store';
 import { updateCurrentItem } from "../../redux/actions";
 import { connect } from "react-redux";
 
-import { QuestionStatusCard } from '../../components';
+import { ItemVisualCard, QuestionStatusCard } from '../../components';
 
 import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
@@ -40,6 +40,8 @@ const styles = theme => ({
         margin: 34
     },
     overview: {
+        marginLeft: -12,
+        marginRight: -12,
         display: 'inline-flex',
     },
     table: {
@@ -52,6 +54,7 @@ const styles = theme => ({
         textTransform: 'uppercase',
         backgroundColor: '#dcdcdc',
         borderRight: '2px solid #f8f8f8',
+        minWidth: 467,
     },
     regCol: {
         textTransform: 'capitalize',
@@ -257,6 +260,7 @@ class ItemList extends Component {
         return (
             <div className={classes.itemList}>
                 <div className={classes.overview}>
+                    <ItemVisualCard />
                     <QuestionStatusCard />
                 </div>
                 <Table className={classes.table}>
