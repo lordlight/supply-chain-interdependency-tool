@@ -125,7 +125,8 @@ class ImportDialog extends Component {
     importFile = () => {
         let req = {
             type: this.props.type,
-            filePath: this.props.importFile
+            filePath: this.props.importFile,
+            keepInactive: true
         };
 
         // Send the file to the electron main thread.

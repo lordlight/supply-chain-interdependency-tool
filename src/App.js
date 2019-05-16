@@ -131,6 +131,12 @@ class App extends Component {
     if (nextProps.suppliers.length > 0){
       store.dispatch(updateTypeRisk({"type":"suppliers", "itemsRisk":calculateItemRisk(nextProps.supplierResponses, nextProps.supplierQuestions)}));
     }
+    if (nextProps.products.length > 0){
+      store.dispatch(updateTypeRisk({"type":"products", "itemsRisk":calculateItemRisk(nextProps.productResponses, nextProps.productQuestions)}));
+    }
+    if (nextProps.projects.length > 0){
+      store.dispatch(updateTypeRisk({"type":"projects", "itemsRisk":calculateItemRisk(nextProps.projectResponses, nextProps.projectQuestions)}));
+    }
   }
 
   handleChange = (event, value) => {

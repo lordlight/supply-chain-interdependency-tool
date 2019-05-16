@@ -26,7 +26,7 @@ export function calculateItemRisk(responses, questions) {
             }
         });
         //console.log(itemId, " has this many questions: ", numQuestions);
-        perItemRisk[itemId] = perItemRisk[itemId]/getMaxRisk(questions);
+        perItemRisk[itemId] = perItemRisk[itemId] / getMaxRisk(questions) * 100;
     });
     //console.log("per item risk: ", perItemRisk);
     return perItemRisk;

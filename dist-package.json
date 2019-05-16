@@ -7,8 +7,9 @@
 	"dependencies": {
 		"csv-parse": "^4.4.0",
 		"csv-parser": "^2.2.0",
-		"json-2-csv": "^3.5.0",
-		"strip-bom": "^3.0.0"
+		"json2csv": "^4.5.1",
+		"strip-bom": "^3.0.0",
+		"strip-bom-stream": "^3.0.0"
 	},
 	"scripts": {
 		"start": "electron ."

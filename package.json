@@ -13,14 +13,17 @@
 		"d3": "^5.9.2",
 		"electron-devtools-installer": "^2.2.4",
 		"electron-is-dev": "^1.0.1",
-		"json-2-csv": "^3.5.0",
+		"json2csv": "^4.5.1",
 		"react": "^16.8.5",
 		"react-dev-utils": "^8.0.0",
 		"react-dom": "^16.8.5",
+		"react-force-graph": "^1.21.1",
+		"react-graph-vis": "^1.0.2",
 		"react-redux": "^7.0.1",
 		"react-router-dom": "^5.0.0",
 		"redux": "^4.0.1",
 		"strip-bom": "^3.0.0",
+		"strip-bom-stream": "^3.0.0",
 		"survey-react": "^1.0.76"
 	},
 	"scripts": {

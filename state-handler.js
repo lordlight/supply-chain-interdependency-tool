@@ -5,8 +5,9 @@ const fs = require('fs');
 
 const csvParser = require('csv-parser');
 const csvSync = require('csv-parse/lib/sync');
-const json2csv = require('json-2-csv');
+const { parse } = require('json2csv');
 const stripBom = require('strip-bom'); // Needed because fs has no encoding, like utf-8-sig in python, for files with BOM (byte order mark)
+const stripBomStream = require('strip-bom-stream');
 
 let sessionData = {
 	suppliers: [],
@@ -56,7 +57,10 @@ loadSessionData = () => {
 
 	// Load data given by user
 	resourcePaths.forEach((resource) => {
-		loadCSVFileContents(dataPath + "/" + resource.path, resource.type);
+		loadCSVFileContents(dataPath + "/" + resource.path, resource.type, data => {
+			data.forEach(d => d._cscrm_active && (d._cscrm_active = parseInt(d._cscrm_active)));
+			return data;
+		})
 	});
 
 	// Load question data
@@ -117,7 +121,7 @@ createCorrespondingResponses = () => {
 	});
 }
 
-loadCSVFileContents = (path, itemType) => {
+loadCSVFileContents = (path, itemType, cb) => {
 	let itemData = [];
 	if (fs.existsSync(path)){
 		try {
@@ -125,6 +129,9 @@ loadCSVFileContents = (path, itemType) => {
 			data = stripBom(data.toString());
 			try {
 				itemData = csvSync(data, {columns: true});
+				if (cb) {
+					itemData = cb(itemData);
+				}
 				updateSessionData(itemData, itemType);
 			} catch(csvErr){
 				console.log("csv error with ", path);
@@ -162,22 +169,37 @@ saveSessionData = (event, type) => {
 	if (type === "resources"){
 		resourcePaths.forEach( (resource) => {
 			if (sessionData[resource.type].length > 0){
-				json2csv.json2csv(sessionData[resource.type], (err, csv) => {
-					if (!err){
-						fs.writeFile(dataPath + "/" +resource.path, csv, (csvErr) => {
-							if (!csvErr){
-								console.log(resource.type, " saved");
-								event.sender.send('save-confirm', resource.type + " saved");
-							} else {
-								console.log("save csv error: ", csvErr);
-								event.sender.send('save-error', csvErr);
-							}
-						});
-					} else {
-						console.log("save write error: ", err);
-						event.sender.send('save-error', err);
-					}
-				});
+				try {
+					const csv = parse(sessionData[resource.type]);
+					fs.writeFile(dataPath + "/" +resource.path, csv, err => {
+						if (!err){
+							console.log(resource.type, " saved");
+							event.sender.send('save-confirm', resource.type + " saved");
+						} else {
+							console.log("save write error: ", err);
+							event.sender.send('save-error', err);
+						}
+					});
+				} catch (csvErr) {
+					console.log("save csv error: ", csvErr);
+					event.sender.send('save-error', csvErr);
+				}
+				// json2csv.json2csv(sessionData[resource.type], (err, csv) => {
+				// 	if (!err){
+				// 		fs.writeFile(dataPath + "/" +resource.path, csv, (csvErr) => {
+				// 			if (!csvErr){
+				// 				console.log(resource.type, " saved");
+				// 				event.sender.send('save-confirm', resource.type + " saved");
+				// 			} else {
+				// 				console.log("save csv error: ", csvErr);
+				// 				event.sender.send('save-error', csvErr);
+				// 			}
+				// 		});
+				// 	} else {
+				// 		console.log("save write error: ", err);
+				// 		event.sender.send('save-error', err);
+				// 	}
+				// });
 			}
 		});
 	} else if (type === "responses"){
@@ -198,12 +220,20 @@ saveSessionData = (event, type) => {
 	}
 }
 
-updateSessionData = (data, type) => {
+updateSessionData = (data, type, keepInactive = false) => {
 	if (sessionData.hasOwnProperty(type)){
+		if (keepInactive) {
+			const updated = data.map(d => {return {...d, _cscrm_active: 1}});
+			const updatedIds = new Set(updated.map(d => d.ID));
+			const inactive = sessionData[type].filter(d => !updatedIds.has(d.ID));
+			inactive.forEach(d => d._cscrm_active = 0);
+			data = [...updated, ...inactive];
+		}
 		sessionData[type] = data;
 	} else {
 		console.error("updateSessionData() - sessionData does not have property: ", type);
 	}
+	return data;
 }
 
 /*getAppRoot = () => {
@@ -268,6 +298,7 @@ ipcMain.on('asynchronous-file-load', (event, req) => {
 		event.sender.send('asynchronous-file-response', response);
 	} else {
 		const filePath = req.filePath;
+		const keepInactive = req.keepInactive;
 		response.type = req.type;
 
 		console.log("asynch file load, filePath: ", filePath);
@@ -279,14 +310,14 @@ ipcMain.on('asynchronous-file-load', (event, req) => {
 			if (filePath.endsWith(".csv")){
 				try {
 					fs.createReadStream(filePath)
+					.pipe(stripBomStream())
 					.pipe(csvParser())
 					.on('data', (data) => {
 						response.data.push(data);
 					})
 					.on('end', () => {
+						response.data = updateSessionData(response.data, response.type, keepInactive);
 						event.sender.send('asynchronous-file-response', response);
-
-						updateSessionData(response.data, response.type);
 
 						saveSessionData(event, "resources");
 						createCorrespondingResponses();

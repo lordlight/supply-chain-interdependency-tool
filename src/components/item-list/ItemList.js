@@ -22,8 +22,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 const mapState = state => ({
     currentType: state.currentType,
     suppliers: state.suppliers,
+    suppliersInactive: state.suppliersInactive,
     products: state.products,
+    productsInactive: state.productsInactive,
     projects: state.projects,
+    projectsInactive: state.projectsInactive,
     supplierQuestions: state.supplierQuestions,
     productQuestions: state.productQuestions,
     projectQuestions: state.projectQuestions,
@@ -49,6 +52,9 @@ const styles = theme => ({
     },
     cell: {
         borderRight: '2px solid #f8f8f8',
+    },
+    cellInactive: {
+        color: "gray"
     },
     titleCol: {
         textTransform: 'uppercase',
@@ -104,24 +110,26 @@ class ItemList extends Component {
         let riskVal = null;
         let riskSet = null;
         if (type === "suppliers"){
-            list = [...this.props.suppliers];
+            list = [...this.props.suppliers, ...this.props.suppliersInactive];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
             riskSet = this.props.suppliersRisk;
             questions = this.props.supplierQuestions;
             responses = this.props.supplierResponses;
         } else if (type === "products"){
-            list = [...this.props.products];
+            list = [...this.props.products, ...this.props.productsInactive];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
             riskSet = this.props.productsRisk;
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
-            list = [...this.props.projects];
+            list = [...this.props.projects, ...this.props.projectsInactive];
             riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
             riskSet = this.props.projectsRisk;
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;
+            console.log({projects: list, riskVal, riskSet, questions, responses});
         }
+        console.log("TYPE", type, responses);
 
         const headerDetails = [
             {
@@ -181,7 +189,7 @@ class ItemList extends Component {
         ));
 
         list.forEach((item) => {
-            if (riskSet.hasOwnProperty(item.ID)){
+            if (item._cscrm_active && riskSet.hasOwnProperty(item.ID) && responses[item.ID]) {
                 item.risk = riskSet[item.ID];
                 item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
                 item.age = 0;
@@ -190,6 +198,12 @@ class ItemList extends Component {
         });
 
         list.sort((a, b) => {
+            console.log("SORT");
+            if (a._cscrm_active > b._cscrm_active) {
+                return -1;
+            } else if (a._cscrm_active < b._cscrm_active) {
+                return 1;
+            }
             if (this.state.sortDir === 'asc') {
                 if (a[this.state.sortBy] > b[this.state.sortBy]) return 1;
                 if (b[this.state.sortBy] > a[this.state.sortBy]) return -1;
@@ -198,13 +212,12 @@ class ItemList extends Component {
                 if (a[this.state.sortBy] < b[this.state.sortBy]) return 1;
                 if (b[this.state.sortBy] < a[this.state.sortBy]) return -1;
                 return 0;
-            }
-            
+            } 
         });
 
-        const rows = list.map((row, i) => (
-            <TableRow key={i}>
-                <TableCell key={i} className={classes.cell}>
+        const rows = list.map((row, i) => row._cscrm_active ? (
+            <TableRow key={row.ID}>
+                <TableCell className={classes.cell}>
                     {row.Name}
                 </TableCell>
                 <TableCell className={classes.cell}>
@@ -231,7 +244,7 @@ class ItemList extends Component {
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {(() => {
-                        return 100 * (Object.keys(responses[row.ID]).length / questions.length);
+                        return 100 * (Object.keys(responses[row.ID] || []).length / questions.length);
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
@@ -246,7 +259,7 @@ class ItemList extends Component {
                       onClick={(e) => this.handleItemSelection(e, row)}
                     >
                         {(() => {
-                            if (Object.keys(responses[row.ID]).length === 0){
+                            if (Object.keys(responses[row.ID] || []).length === 0){
                                 return "Start...";
                             } else {
                                 return "Edit...";
@@ -254,8 +267,19 @@ class ItemList extends Component {
                         })()}
                     </Button>
                 </TableCell>
-            </TableRow>
-        ));
+            </TableRow>) : (
+                <TableRow key={row.ID}>
+                    <TableCell className={classes.cell} style={{color:"gray", fontStyle:"italic"}}>
+                        {row.Name + " (inactive)"}
+                    </TableCell>
+                    <TableCell />
+                    <TableCell />
+                    <TableCell />
+                    <TableCell />
+                    <TableCell />
+                </TableRow>
+            )
+        )
 
         return (
             <div className={classes.itemList}>

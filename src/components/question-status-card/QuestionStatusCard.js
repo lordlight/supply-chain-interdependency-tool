@@ -11,8 +11,11 @@ import { connect } from "react-redux";
 const mapState = state => ({
     currentType: state.currentType,
     suppliers: state.suppliers,
+    suppliersInactive: state.suppliersInactive,
     products: state.products,
+    productsInactive: state.productsInactive,
     projects: state.projects,
+    projectsInactive: state.projectsInactive,
     supplierQuestions: state.supplierQuestions,
     productQuestions: state.productQuestions,
     projectQuestions: state.projectQuestions,
@@ -40,25 +43,32 @@ const styles = theme => ({
         fontSize: 25,
         textTransform: 'capitalize',
     },
+    inactive: {
+        fontSize: 16,
+        color: "gray"
+    }
   });
 
 class QuestionStatusCard extends Component {
     render() {
         const { classes } = this.props;
-
+        
         const type = this.props.currentType;
-        let items, questions, responses;
+        let items, itemsInactive, questions, responses;
 
         if (type === "suppliers"){
             items = [...this.props.suppliers];
+            itemsInactive = [...this.props.suppliersInactive];
             questions = this.props.supplierQuestions;
             responses = this.props.supplierResponses;
         } else if (type === "products"){
             items = [...this.props.products];
+            itemsInactive = [...this.props.productsInactive];
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
             items = [...this.props.projects];
+            itemsInactive = [...this.props.projectsInactive];
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;
         }
@@ -66,7 +76,7 @@ class QuestionStatusCard extends Component {
         let numCompleted = 0, numPartial = 0, numZero = 0;
 
         items.forEach((item) => {
-            let numResp = Object.keys(responses[item.ID]).length;
+            let numResp = Object.keys(responses[item.ID] || []).length;
             if (numResp === questions.length){
                 numCompleted += 1;
             } else if (numResp > 0){
@@ -82,9 +92,22 @@ class QuestionStatusCard extends Component {
                     <Typography gutterBottom className={classes.title}>
                         {type.substring(0, type.length - 1)} question status
                     </Typography>
-                    <Typography gutterBottom className={classes.heading}>
-                        {items.length} {type}:
-                    </Typography>
+                    {itemsInactive.length > 0 ? (
+                        <div style={{display:"flex", alignItems: "baseline"}}>
+                            <Typography gutterBottom className={classes.heading}>
+                                {items.length} {type}
+                            </Typography>
+                            <Typography gutterBottom className={classes.inactive}>
+                                &nbsp;(+ {itemsInactive.length} inactive)
+                            </Typography>
+                            <Typography gutterBottom className={classes.heading}>
+                                :
+                            </Typography>
+                        </div>) : (
+                        <Typography gutterBottom className={classes.heading}>
+                            {items.length} {type}:
+                        </Typography>)
+                    }
                     <Typography className={classes.complete}  component="div">
                         {numCompleted} {type} with complete data
                     </Typography>

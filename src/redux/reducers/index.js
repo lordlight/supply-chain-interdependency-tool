@@ -9,8 +9,11 @@ const initialState = {
     importState: null,
     navState: "home",
     suppliers: [],
+    suppliersInactive: [],
     products: [],
+    productsInactive: [],
     projects: [],
+    projectsInactive: [],
     suppliersRisk: {},
     productsRisk: {},
     projectsRisk: {},
@@ -23,18 +26,40 @@ const initialState = {
     tempResponses: {}
 };
 
+const _ensureResponses = (resources, responses) => {
+    responses = {...responses};
+    resources.forEach(r => {
+        if (!responses[r.ID]) {
+            responses[r.ID] = {};
+        }
+    });
+    return responses;
+}
+
 function rootReducer(state = initialState, action) {
     if (action.type === ADD_SUPPLIERS){
+        const suppliers = action.payload.filter(s => !!s._cscrm_active);
+        const suppliersInactive = action.payload.filter(s => !s._cscrm_active);
+        // add empty responses for new suppliers
+        const supplierResponses = _ensureResponses(suppliers, state.supplierResponses);
         return Object.assign({}, state, {
-            suppliers: state.suppliers = action.payload
+            suppliers, suppliersInactive, supplierResponses
         });
     } else if (action.type === ADD_PRODUCTS){
+        const products = action.payload.filter(p => !!p._cscrm_active);
+        const productsInactive = action.payload.filter(p => !p._cscrm_active);
+        // add empty responses for new products
+        const productResponses = _ensureResponses(products, state.productResponses);
         return Object.assign({}, state, {
-            products: state.products = action.payload
+            products, productsInactive, productResponses
         });
     } else if (action.type === ADD_PROJECTS){
+        const projects = action.payload.filter(p => !!p._cscrm_active);
+        const projectsInactive = action.payload.filter(p => !p._cscrm_active);
+        // add empty responses for new projects
+        const projectResponses = _ensureResponses(projects, state.projectResponses);
         return Object.assign({}, state, {
-            projects: state.projects = action.payload
+            projects, projectsInactive, projectResponses
         });
     } /*else if (action.type === ANSWER_QUESTION){
         let type = action.payload.type;
@@ -109,8 +134,11 @@ function rootReducer(state = initialState, action) {
             }
         }
     } else if (action.type === INIT_SESSION){
+        console.log("SS", action.payload.suppliers)
         return Object.assign({}, state, {
-            suppliers: state.suppliers = action.payload.suppliers,
+            // suppliers: state.suppliers = action.payload.suppliers,
+            suppliers: action.payload.suppliers.filter(s => !!s._cscrm_active),
+            suppliersInactive: action.payload.suppliers.filter(s => !s._cscrm_active),
             products: state.products = action.payload.products,
             projects: state.projects = action.payload.projects,
             supplierQuestions: state.supplierQuestions = action.payload.supplierQuestions,
