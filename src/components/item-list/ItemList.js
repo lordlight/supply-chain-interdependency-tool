@@ -48,7 +48,7 @@ const styles = theme => ({
         display: 'inline-flex',
     },
     table: {
-        
+        marginBottom: 96
     },
     cell: {
         borderRight: '2px solid #f8f8f8',
@@ -222,18 +222,18 @@ class ItemList extends Component {
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {(() => {
-                        if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID];
+                        if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID].toFixed(1);
                         else return "N/A";
                     })()}
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {(() => {
                         if (riskSet.hasOwnProperty(row.ID)) {
-                            if (riskSet[row.ID] < 0.25){
+                            if (riskSet[row.ID] < 25){
                                 return "*";
-                            } else if (riskSet[row.ID] < 0.5){
+                            } else if (riskSet[row.ID] < 50){
                                 return "**";
-                            } else if (riskSet[row.ID] < 0.75){
+                            } else if (riskSet[row.ID] < 75){
                                 return "***";
                             } else {
                                 return "****";
@@ -244,7 +244,7 @@ class ItemList extends Component {
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {(() => {
-                        return 100 * (Object.keys(responses[row.ID] || []).length / questions.length);
+                        return (100 * (Object.keys(responses[row.ID] || []).length / questions.length)).toFixed(1);
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
@@ -306,7 +306,7 @@ class ItemList extends Component {
                     ContentProps={{
                         'aria-describedby': 'message-id',
                     }}
-                    message={<span id="message-id">Current {type} risk: {riskVal}</span>}
+                    message={<span id="message-id">Current {type} risk: {riskVal.toFixed(1)}</span>}
                 />
             </div>
         );

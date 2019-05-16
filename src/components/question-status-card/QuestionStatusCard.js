@@ -4,9 +4,22 @@ import { withStyles } from '@material-ui/core/styles';
 
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import IconButton from '@material-ui/core/IconButton';
+import GestureIcon from "@material-ui/icons/Gesture";
 import Typography from '@material-ui/core/Typography';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Button from '@material-ui/core/Button';
 
 import { connect } from "react-redux";
+import store from '../../redux/store';
+import { answerMulti } from "../../redux/actions";
+
+import { random } from "lodash";
 
 const mapState = state => ({
     currentType: state.currentType,
@@ -50,6 +63,52 @@ const styles = theme => ({
   });
 
 class QuestionStatusCard extends Component {
+
+    state = {
+        dialogOpen: false
+    }
+
+    randomizeAnswers = () => {
+        const type = this.props.currentType;
+        let items, questions, responses;
+        if (type === "suppliers"){
+            items = [...this.props.suppliers];
+            questions = this.props.supplierQuestions;
+            responses = this.props.supplierResponses;
+        } else if (type === "products"){
+            items = [...this.props.products];
+            questions = this.props.productQuestions;
+            responses = this.props.productResponses;
+        } else if (type === "projects"){
+            items = [...this.props.projects];
+            questions = this.props.projectQuestions;
+            responses = this.props.projectResponses;
+        }
+        items.forEach(i => {
+            const itemId = i.ID;
+            responses = {...responses[itemId] || {}}
+            questions.forEach(q => {
+                if (Math.random() < 0.7) {
+                    const answer = random(q.Answers.length - 1);
+                    console.log(itemId, q.ID, q.Answers.length, answer);
+                    responses[q.ID] = answer;
+                } else {
+                    // question not answered
+                    delete responses[q.ID];
+                }
+            });
+            store.dispatch(answerMulti({
+                type,
+                itemId,
+                responses
+            }));
+        });
+    }
+
+    handleClose = () => {
+        this.setState({ dialogOpen: false });
+      };
+
     render() {
         const { classes } = this.props;
         
@@ -117,7 +176,28 @@ class QuestionStatusCard extends Component {
                     <Typography className={classes.zero}  component="div">
                         {numZero} {type} with no data
                     </Typography>
-                </CardContent>
+                    </CardContent>
+                <CardActions style={{justifyContent: "flex-end"}}>
+                    <IconButton size="small" style={{opacity:0.00}} onClick={() => this.setState({ dialogOpen: true })}>
+                        <GestureIcon />
+                    </IconButton>
+                </CardActions>
+                <Dialog onClose={() => this.setState({ dialogOpen: false })} aria-labelledby="simple-dialog-title" open={this.state.dialogOpen}>
+                    <DialogTitle id="simulation-dialog-title">Generate Random Answers</DialogTitle>
+                    <DialogContent>
+                    <DialogContentText>
+                    This will replace all existing answers with randomly generated answers. Continue?
+                    </DialogContentText>
+                </DialogContent>
+                    <DialogActions>
+                    <Button onClick={this.handleClose} color="primary">
+                    Cancel
+                    </Button>
+                    <Button onClick={() => {this.randomizeAnswers(); this.handleClose();}} color="primary">
+                    Continue
+                    </Button>
+                </DialogActions>
+                </Dialog>
             </Card>
         );
     }
