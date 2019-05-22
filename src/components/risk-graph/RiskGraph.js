@@ -9,7 +9,8 @@ import { connect } from "react-redux";
 const mapState = state => ({
     suppliers: state.suppliers,
     products: state.products,
-    projects: state.projects
+    projects: state.projects,
+    organizations: state.organizations
 });
 
 const ORGANIZATION_NODE = {id:"0", title: "Organization", color: "red"};
@@ -61,9 +62,12 @@ class RiskGraph extends Component {
     }
     
     constructGraph = props => {
-        const {projects, products, suppliers} = props;
+        const {organizations, projects, products, suppliers} = props;
+        const organizationNodes = organizations.map(org => {
+            return {id: "P_" + org.ID, title: org.Name}
+        });
         const projectNodes = projects.map(proj => {
-            return {id: "P_" + proj.ID, title: proj.Name}
+            return {id: "P_" + proj.ID, title: proj.Name, group: "projects"}
         });
         const productNodes = products.map(prod => {
             return {id: "PR_" + prod.ID, title: prod.Name, group: "products"}
@@ -71,17 +75,20 @@ class RiskGraph extends Component {
         const supplierNodes = suppliers.map(sup => {
             return {id: "S_" + sup.ID, title: sup.Name, group: "suppliers", depth:4}
         });
-        const projectEdges = projects.map(proj => {
-            return {from: 0, to: "P_" + proj.ID}
+        const projectToProjectEdges = projects.map(proj => {
+            return {from: "P_" + proj.parent.ID, to: "P_" + proj.ID}
         });
+        // const projectEdges = projects.map(proj => {
+        //     return {from: 0, to: "P_" + proj.ID}
+        // });
         const projectToProductEdges = products.map(prod => {
             return {from: "P_" + prod['Project ID'], to: "PR_" + prod.ID}
         });
         const productToSupplierEdges = products.map(prod => {
             return {from: "PR_" + prod.ID, to: "S_" + prod['Supplier ID']}
         });
-        const nodes = [ORGANIZATION_NODE, ...projectNodes, ...productNodes, ...supplierNodes];
-        const edges = [...projectEdges, ...projectToProductEdges, ...productToSupplierEdges];
+        const nodes = [...organizationNodes, ...projectNodes, ...productNodes, ...supplierNodes];
+        const edges = [...projectToProjectEdges, ...projectToProductEdges, ...productToSupplierEdges];
         this.graph = {
             nodes,
             edges
@@ -251,7 +258,6 @@ class RiskGraph extends Component {
     };
 
     render() {
-        console.log("render", this.props);
         return <div id="risk-graph" style={{width:"100%", height:"100%", position: "fixed", backgroundColor: "black"}} ref={tc => (this.treeContainer = tc)}>
                 {/* <div style={{position:"absolute", margin:24}}>
                     <Typography style={{color:"blue"}}>Projects</Typography>

@@ -36,6 +36,34 @@ const _ensureResponses = (resources, responses) => {
     return responses;
 }
 
+const _constructProjectHierarchy = projects => {
+    const level2project = {};
+    projects = projects.map(p => { return {...p, parent: null, children: []}})
+	projects.forEach(p => {
+		const level = p.Level;
+		if (level) {
+			level2project[level] = p;
+		}
+    });
+	projects.forEach(p => {
+        const level = p.Level;
+		if (level) {
+            let child = level2project[p.Level];
+			let parentLvl = level.split(".");
+			parentLvl.pop();
+			parentLvl = parentLvl.join(".");
+			if (parentLvl) {
+				const parent = level2project[parentLvl];
+				if (parent) {
+                    child.parent = parent;
+                    parent.children.push(child);
+				}
+            }
+		}
+    });
+    return projects;
+}
+
 function rootReducer(state = initialState, action) {
     if (action.type === ADD_SUPPLIERS){
         const suppliers = action.payload.filter(s => !!s._cscrm_active);
@@ -54,12 +82,15 @@ function rootReducer(state = initialState, action) {
             products, productsInactive, productResponses
         });
     } else if (action.type === ADD_PROJECTS){
-        const projects = action.payload.filter(p => !!p._cscrm_active);
+        let projects = action.payload.filter(p => !!p._cscrm_active);
+        projects = _constructProjectHierarchy(projects);
+        const organizations = projects.filter(p => !p.parent);
+        projects = projects.filter(p => !!p.parent);
         const projectsInactive = action.payload.filter(p => !p._cscrm_active);
         // add empty responses for new projects
         const projectResponses = _ensureResponses(projects, state.projectResponses);
         return Object.assign({}, state, {
-            projects, projectsInactive, projectResponses
+            projects, projectsInactive, organizations, projectResponses
         });
     } /*else if (action.type === ANSWER_QUESTION){
         let type = action.payload.type;
@@ -133,14 +164,21 @@ function rootReducer(state = initialState, action) {
                 [action.payload.qId]: action.payload.ansInd
             }
         }
-    } else if (action.type === INIT_SESSION){
-        console.log("SS", action.payload.suppliers)
+    } else if (action.type === INIT_SESSION) {
+        let projects = action.payload.projects.filter(p => !!p._cscrm_active);
+        projects = _constructProjectHierarchy(projects);
+        const organizations = projects.filter(p => !p.parent);
+        projects = projects.filter(p => !!p.parent);
+        const projectsInactive = action.payload.projects.filter(p => !p._cscrm_active);
         return Object.assign({}, state, {
             // suppliers: state.suppliers = action.payload.suppliers,
             suppliers: action.payload.suppliers.filter(s => !!s._cscrm_active),
             suppliersInactive: action.payload.suppliers.filter(s => !s._cscrm_active),
-            products: state.products = action.payload.products,
-            projects: state.projects = action.payload.projects,
+            products: action.payload.products.filter(p => !!p._cscrm_active),
+            productsInactive: action.payload.products.filter(p => !p._cscrm_active),
+            projects,
+            projectsInactive,
+            organizations,
             supplierQuestions: state.supplierQuestions = action.payload.supplierQuestions,
             productQuestions: state.productQuestions = action.payload.productQuestions,
             projectQuestions: state.projectQuestions = action.payload.projectQuestions,
