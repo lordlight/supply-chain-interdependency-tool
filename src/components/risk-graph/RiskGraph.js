@@ -13,8 +13,6 @@ const mapState = state => ({
     organizations: state.organizations
 });
 
-const ORGANIZATION_NODE = {id:"0", title: "Organization", color: "red"};
-
 class RiskGraph extends Component {
     graph = {
         nodes: [],
@@ -122,7 +120,7 @@ class RiskGraph extends Component {
     //     this.option.series[0].edges = [...projectEdges, ...projectToProductEdges, ...productToSupplierEdges];
     // }
 
-    ORGANIZATION_NODE = {id: "O_0", name: "Organization", color: "red"};
+    // ORGANIZATION_NODE = {id: "O_0", name: "Organization", color: "red"};
 
     // constructGraph = props => {
     //     const {projects, products, suppliers} = props;
@@ -250,7 +248,7 @@ class RiskGraph extends Component {
         },
         edges: {
             color: {
-                color: "white",
+                // color: "black",
                 inherit: false,
             },
             arrows: "from"
@@ -258,7 +256,7 @@ class RiskGraph extends Component {
     };
 
     render() {
-        return <div id="risk-graph" style={{width:"100%", height:"100%", position: "fixed", backgroundColor: "black"}} ref={tc => (this.treeContainer = tc)}>
+        return <div id="risk-graph" style={{width:"100%", height:"100%", position: "fixed"}} ref={tc => (this.treeContainer = tc)}>
                 {/* <div style={{position:"absolute", margin:24}}>
                     <Typography style={{color:"blue"}}>Projects</Typography>
                     <Typography style={{color:"green"}}>Products</Typography>
