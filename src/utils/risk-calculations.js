@@ -76,7 +76,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
             perItemRisk[itemId].criticality[qkey] = perItemRisk[itemId].criticality[qkey] / getMaxCriticalityRisk(questions, qrType) * nval;
         })
     });
-    console.log("per item risk: ", perItemRisk);
+    // console.log("per item risk: ", perItemRisk);
     return perItemRisk;
 }
 

@@ -205,7 +205,7 @@ class ItemList extends Component {
             if (item._cscrm_active && riskSet.hasOwnProperty(item.ID) && responses[item.ID]) {
                 item['risk.impact'] = riskSet[item.ID].impact;
                 if (hasCriticality) {
-                    item['risk.criticality.max'] = Math.max(Object.values(riskSet[item.ID].criticality));
+                    item['risk.criticality.max'] = Math.max(...Object.values(riskSet[item.ID].criticality));
                 }
                 item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
                 item.age = 0;
