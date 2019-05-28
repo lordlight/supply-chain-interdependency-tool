@@ -76,12 +76,14 @@ class RiskGraph extends Component {
         const projectToProjectEdges = projects.map(proj => {
             return {from: "P_" + proj.parent.ID, to: "P_" + proj.ID}
         });
-        // const projectEdges = projects.map(proj => {
-        //     return {from: 0, to: "P_" + proj.ID}
-        // });
+        // take into account multiple project edges per product
         const projectToProductEdges = products.map(prod => {
-            return {from: "P_" + prod['Project ID'], to: "PR_" + prod.ID}
-        });
+            const projectIds = (prod['Project ID'] || "").split(";").filter(pid => !!pid);
+            const productEdges = projectIds.map(prid => {
+                return {from: "P_" + prid, to: "PR_" + prod.ID}
+            });
+            return productEdges;
+        }).flat();
         const productToSupplierEdges = products.map(prod => {
             return {from: "PR_" + prod.ID, to: "S_" + prod['Supplier ID']}
         });
