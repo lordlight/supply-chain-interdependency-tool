@@ -88,13 +88,31 @@ class QuestionStatusCard extends Component {
             const itemId = i.ID;
             responses = {...responses[itemId] || {}}
             questions.forEach(q => {
-                if (Math.random() < 0.7) {
-                    const answer = random(q.Answers.length - 1);
-                    console.log(itemId, q.ID, q.Answers.length, answer);
-                    responses[q.ID] = answer;
+                const qtype = q["Type of question"];
+                const qeach = q["Question for each"];
+                if (qtype === "criticality" && qeach) {
+                    const [qrtype, qkey] = qeach.split(";");
+                    const qvals = (i[qkey] || "").split(";").filter(v => !!v);
+                    qvals.forEach(qval => {
+                        const qid = `${q.ID}|${qval}`;
+                        if (Math.random() < 0.7) {
+                            const answer = random(q.Answers.length - 1);
+                            console.log(itemId, qid, q.Answers.length, answer);
+                            responses[qid] = answer;
+                        } else {
+                            // question not answered
+                            delete responses[qid];
+                        }
+                    });
                 } else {
-                    // question not answered
-                    delete responses[q.ID];
+                    if (Math.random() < 0.7) {
+                        const answer = random(q.Answers.length - 1);
+                        console.log(itemId, q.ID, q.Answers.length, answer);
+                        responses[q.ID] = answer;
+                    } else {
+                        // question not answered
+                        delete responses[q.ID];
+                    }
                 }
             });
             store.dispatch(answerMulti({

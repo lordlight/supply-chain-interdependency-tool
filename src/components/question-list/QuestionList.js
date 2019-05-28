@@ -18,7 +18,7 @@ import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
     questionList: {
-        padding: '0px 8px 40px 12px',
+        padding: '32px 8px 40px 44px'
     },
     buttonContainer: {
         marginLeft: '24px',
@@ -54,6 +54,10 @@ const styles = theme => ({
             boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
         },
     },
+    sectionTitle: {
+        marginTop: 32,
+        marginBottom: 32
+    }
 });
 
 const mapState = state => ({
@@ -68,7 +72,8 @@ const mapState = state => ({
     supplierResponses: state.supplierResponses, // Responses are objects, with supplier/product/project ids as keys.
     productResponses: state.productResponses,
     projectResponses: state.projectResponses,
-    tempResponses: state.tempResponses
+    tempResponses: state.tempResponses,
+    projects: state.projects
 });
 
 class QuestionList extends Component {
@@ -167,28 +172,89 @@ class QuestionList extends Component {
             );
         }
 
-        const rows = questions.map((question, i) => (
-            <Question
+        const impactRows = questions.filter(q => q["Type of question"] === "impact").map((q, i) => {
+            const foreachKey = q["Question for each"];
+            if (foreachKey) {
+                const foo = item[foreachKey];
+            }
+            return <Question
                 key={i}
-                question={question} 
-                response={alteredResponses[question.ID]} 
+                question={q}
+                questionId={q.ID}
+                questionText={q.Question}
+                response={alteredResponses[q.ID]} 
                 updateResponse={this.updateResponse}
-            />
-        ));
+            /> 
+        });
+        let criticalityRows = questions.filter(q => q["Type of question"] === "criticality").map((q, i) => {
+            const foreachInfo = q["Question for each"];
+            const [foreachType, foreachKey] = foreachInfo.split(";");
+            if (foreachKey) {
+                const foreachVal = item[foreachKey] || "";
+                const subkeys = foreachVal.split(";").filter(k => !!k);
+                const resourcesMap = {};
+                this.props[foreachType].forEach(r => resourcesMap[r.ID] = r)
+                return subkeys.map(sk => {
+                    const qid = `${q.ID}|${sk}`;
+                    console.log("PPPP", this.props.projects);
+                    const questionText = q.Question.replace(`[${foreachKey}]`, `"${resourcesMap[sk].Name}"`);
+                    return <Question
+                        key={i}
+                        question={q}
+                        questionId={qid}
+                        questionText={questionText}
+                        response={alteredResponses[qid]} 
+                        updateResponse={this.updateResponse}
+                    />
+                });
+            } else {
+                return <Question
+                    key={i}
+                    question={q} 
+                    questionID={q.ID}
+                    questionText={q.Question}
+                    response={alteredResponses[q.ID]} 
+                    updateResponse={this.updateResponse}
+                />
+            }
+        });
+        criticalityRows = [].concat(...criticalityRows);
+        console.log("CCCCCCC", criticalityRows);
 
         return (
             <div className={classes.questionList}>
-                <Table className={this.props.table} border={0}>
-                    <TableHead>
-                        <TableRow style={{border: "none"}}>
-                            <TableCell style={{border: "none"}}>
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows}
-                    </TableBody>
-                </Table>
+                {criticalityRows.length > 0 && (
+                    <React.Fragment>
+                        {impactRows.length > 0 && <Typography variant="subtitle2" className={classes.sectionTitle}>Criticality Questions</Typography>}
+                        <Table className={this.props.table} border={0}>
+                            {/* <TableHead>
+                                <TableRow style={{border: "none"}}>
+                                    <TableCell style={{border: "none"}}>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead> */}
+                            <TableBody>
+                                {criticalityRows}
+                            </TableBody>
+                        </Table>
+                    </React.Fragment>
+                )}
+                {impactRows.length > 0 && (
+                    <React.Fragment>
+                        {criticalityRows.length > 0 && <Typography variant="subtitle2" className={classes.sectionTitle}>Impact Questions</Typography>}
+                        <Table className={this.props.table} border={0}>
+                            {/* <TableHead>
+                                <TableRow style={{border: "none"}}>
+                                    <TableCell style={{border: "none"}}>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead> */}
+                            <TableBody>
+                                {impactRows}
+                            </TableBody>
+                        </Table>
+                    </React.Fragment>
+                )}
                 <div className={classes.buttonContainer}>
                     <Button
                         onClick={this.handleCancel}

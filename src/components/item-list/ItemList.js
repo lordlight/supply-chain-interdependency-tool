@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 
 import { ItemVisualCard, QuestionStatusCard } from '../../components';
 
-import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
+// import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -48,7 +48,7 @@ const styles = theme => ({
         display: 'inline-flex',
     },
     table: {
-        marginBottom: 96
+        // marginBottom: 96
     },
     cell: {
         borderRight: '2px solid #f8f8f8',
@@ -72,6 +72,13 @@ const styles = theme => ({
         width: 72,
         height: 27,
     },
+    scoreColPart: {
+        display: "inline-block",
+        width: "50%"
+    },
+    scoreStars: {
+        letterSpacing: 2
+    }
 });
 
 class ItemList extends Component {
@@ -107,31 +114,32 @@ class ItemList extends Component {
         let list = null;
         let questions = null;
         let responses = null;
-        let riskVal = null;
+        // let riskVal = null;
         let riskSet = null;
         if (type === "suppliers"){
             list = [...this.props.suppliers, ...this.props.suppliersInactive];
-            riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
+            // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
             riskSet = this.props.suppliersRisk;
             questions = this.props.supplierQuestions;
             responses = this.props.supplierResponses;
         } else if (type === "products"){
             list = [...this.props.products, ...this.props.productsInactive];
-            riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
+            // riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
             riskSet = this.props.productsRisk;
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
             list = [...this.props.projects, ...this.props.projectsInactive];
-            riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
+            // riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
             riskSet = this.props.projectsRisk;
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;
-            console.log({projects: list, riskVal, riskSet, questions, responses});
         }
-        console.log("TYPE", type, responses);
 
-        const headerDetails = [
+        const hasImpact = (questions.some(q => q['Type of question'] === "impact"));
+        const hasCriticality = (questions.some(q => q['Type of question'] === "criticality"));
+
+        let headerDetails = [
             {
                 label: type.substring(0, type.length - 1),
                 tooltip: "Sort by name",
@@ -139,19 +147,7 @@ class ItemList extends Component {
                 sortType: 'Name'
             },
             {
-                label: 'Risk',
-                tooltip: "Sort by risk",
-                cssClass: classes.regCol,
-                sortType: 'risk'
-            },
-            {
-                label: 'Risk',
-                tooltip: "Sort by risk",
-                cssClass: classes.regCol,
-                sortType: 'risk'
-            },
-            {
-                label: 'Ques',
+                label: 'Questions Complete',
                 tooltip: "Sort by completion",
                 cssClass: classes.regCol,
                 sortType: 'completion'
@@ -169,6 +165,23 @@ class ItemList extends Component {
                 sortType: 'action'
             },
         ];
+
+        if (hasImpact) {
+            headerDetails.splice(1, 0, {
+                label: 'Questionnaire Score',
+                tooltip: "Sort by questionnaire score",
+                cssClass: classes.regCol,
+                sortType: 'risk.impact'
+            });
+        }
+        if (hasCriticality) {
+            headerDetails.splice(1, 0, {
+                label: "Criticality",
+                tooltip: "Sort by criticality",
+                cssClass: classes.regCol,
+                sortType: 'risk.criticality.max'
+            });
+        }
 
         const rowHeaders = headerDetails.map((col, i) => (
             <TableCell key={i} className={col.cssClass}>
@@ -190,7 +203,10 @@ class ItemList extends Component {
 
         list.forEach((item) => {
             if (item._cscrm_active && riskSet.hasOwnProperty(item.ID) && responses[item.ID]) {
-                item.risk = riskSet[item.ID];
+                item['risk.impact'] = riskSet[item.ID].impact;
+                if (hasCriticality) {
+                    item['risk.criticality.max'] = Math.max(Object.values(riskSet[item.ID].criticality));
+                }
                 item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
                 item.age = 0;
                 item.action = (Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit");
@@ -220,31 +236,40 @@ class ItemList extends Component {
                 <TableCell className={classes.cell}>
                     {row.Name}
                 </TableCell>
+                {hasCriticality && (
+                    <TableCell className={classes.cell}>
+                        {row['risk.criticality.max'] != null ? row['risk.criticality.max'].toFixed(1) : "N/A"}
+                    </TableCell>
+                )}
+                {hasImpact && (
+                    <TableCell className={classes.cell}>
+                        <div className={classes.scoreColPart}>
+                            {(() => {
+                                if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID].impact.toFixed(1);
+                                else return "N/A";
+                            })()}
+                        </div>
+                        <div className={[classes.scoreColPart, classes.scoreStars].join(' ')}>
+                            {(() => {
+                                if (riskSet.hasOwnProperty(row.ID)) {
+                                    if (riskSet[row.ID].impact < 25){
+                                        return "*";
+                                    } else if (riskSet[row.ID].impact < 50){
+                                        return "**";
+                                    } else if (riskSet[row.ID].impact < 75){
+                                        return "***";
+                                    } else {
+                                        return "****";
+                                    }
+                                }
+                                else return "N/A";
+                            })()}
+                        </div>
+                    </TableCell>
+                )}
                 <TableCell className={classes.cell}>
                     {(() => {
-                        if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID].toFixed(1);
-                        else return "N/A";
-                    })()}
-                </TableCell>
-                <TableCell className={classes.cell}>
-                    {(() => {
-                        if (riskSet.hasOwnProperty(row.ID)) {
-                            if (riskSet[row.ID] < 25){
-                                return "*";
-                            } else if (riskSet[row.ID] < 50){
-                                return "**";
-                            } else if (riskSet[row.ID] < 75){
-                                return "***";
-                            } else {
-                                return "****";
-                            }
-                        }
-                        else return "N/A";
-                    })()}
-                </TableCell>
-                <TableCell className={classes.cell}>
-                    {(() => {
-                        return (100 * (Object.keys(responses[row.ID] || []).length / questions.length)).toFixed(1);
+                        return (100 * (Object.keys(responses[row.ID] || {}).length / questions.length)).toFixed(1);
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
@@ -254,12 +279,12 @@ class ItemList extends Component {
                     <Button
                       variant="contained"
                       size="small"
-                      color="primary"
+                      color={Object.keys(responses[row.ID] || {}).length === 0 ? "secondary" : "primary"}
                       className={classes.button}
                       onClick={(e) => this.handleItemSelection(e, row)}
                     >
                         {(() => {
-                            if (Object.keys(responses[row.ID] || []).length === 0){
+                            if (Object.keys(responses[row.ID] || {}).length === 0){
                                 return "Start...";
                             } else {
                                 return "Edit...";
@@ -272,7 +297,6 @@ class ItemList extends Component {
                     <TableCell className={classes.cell} style={{color:"gray", fontStyle:"italic"}}>
                         {row.Name + " (inactive)"}
                     </TableCell>
-                    <TableCell />
                     <TableCell />
                     <TableCell />
                     <TableCell />
@@ -297,7 +321,7 @@ class ItemList extends Component {
                         {rows}
                     </TableBody>
                 </Table>
-                <Snackbar
+                {/* <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
                         horizontal: 'right',
@@ -306,8 +330,8 @@ class ItemList extends Component {
                     ContentProps={{
                         'aria-describedby': 'message-id',
                     }}
-                    message={<span id="message-id">Current {type} risk: {riskVal.toFixed(1)}</span>}
-                />
+                    message={<span id="message-id">Current {type} questionnaire score: {riskVal.toFixed(1)}</span>}
+                /> */}
             </div>
         );
     }

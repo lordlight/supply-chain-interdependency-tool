@@ -1,5 +1,5 @@
-ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Risk Cat
-1.2,ID.AM-5,What is the criticality of this product/service to this project?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10"" | value=100;label=""I don't know""","IF 1, RAISE 100
+ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Risk Cat,Type of question,Question for each
+1.2,ID.AM-5,What is the criticality of this product/service to the project [Project ID]?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10"" | value=100;label=""I don't know""","IF 1, RAISE 100
 IF 2, RAISE 90
 IF 3, RAISE 80
 IF 4, RAISE 70
@@ -8,49 +8,37 @@ IF 6, RAISE 50
 IF 7, RAISE 40
 IF 8, RAISE 30
 IF 9, RAISE 20
-IF 10, RAISE 10;",,Inherent
-1.3,ID.AM-5,Has the final criticality of this product/service to the organization been assessed?,Yes/No,"value=0;label=""Yes"" | value=100;label=""No"" | value=100;label=""I don't know""","IF no, RAISE 100 and skip to next SECTION
-IF yes, no change;",Dave's Bubble,Residual
-1.4,ID.AM-5,What is the final criticality of this product/service to the organization?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10"" | value=100;label=""I don't know""","IF 1, RAISE 100
-IF 2, RAISE 90
-IF 3, RAISE 80
-IF 4, RAISE 70
-IF 5, RAISE 60
-IF 6, RAISE 50
-IF 7, RAISE 40
-IF 8, RAISE 30
-IF 9, RAISE 20
-IF 10, RAISE 10;",Dave's Bubble: Refer to criticality analysis document.,Inherent
+IF 10, RAISE 10;",,Inherent,criticality,projects;Project ID
 2.1,DE.CM-6,Is this product or service connected to or a part of acquirer systems/networks?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",,Inherent
+IF no, no change;",,Inherent,impact,
 2.2,PR.AC-7,Is this product or service connected to or a part of a product or service that acquirer provides to customers?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",,Inherent
+IF no, no change;",,Inherent,impact,
 2.3,PR.AC-7,"Does this product or service process or store regulated data (e.g., PII, PHI, PCI, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",Risk significantly increases with product processing/storing acquirer info,Inherent
+IF no, no change;",Risk significantly increases with product processing/storing acquirer info,Inherent,impact,
 2.4,PR.AC-7,"Does this product or service process or store acquirer-sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",Configurable: could customize different types of info,Inherent
+IF no, no change;",Configurable: could customize different types of info,Inherent,impact,
 3.1,ID.SC-2,What percent of the market share does the supplier control for this product/service?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
 IF 25-50, RAISE 5
 IF 50-75, RAISE 2
 IF 75-100, no change","Dave's Bubble: highlight the scope of the question
 
-There will need to be a behind the scenes calculation if there are multiple products per supplier that impacts supplier risk.  We don't need to ask the question but risk needs to be calculated.",Inherent
+There will need to be a behind the scenes calculation if there are multiple products per supplier that impacts supplier risk.  We don't need to ask the question but risk needs to be calculated.",Inherent,impact,
 3.2,ID.SC-2,What percent of the supplier's sales of this product/service does the acquirer consume?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
 IF 25-50, RAISE 5
 IF 50-75, RAISE 2
 IF 75-100, no change
 
-",,Inherent
+",,Inherent,impact,
 3.3,ID.SC-2,Would switching to alternative product/service constitute significant cost and effort for the acquirer?  ,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",Dave's Bubble: building the capability in-house would count,Inherent
+IF no, no change;",Dave's Bubble: building the capability in-house would count,Inherent,impact,
 3.4,ID.SC-2,Does the acquirer have an existing relationship with another supplier for this product/service?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;
 
-",,Residual
+",,Residual,impact,
 4.1,ID.SC-2,"How confident is the acquirer that they will be able to obtain quality products/services regardless of major supply chain disruptions, both manmade and natural?","Scale of 1 to 5 where 5 is ""low confidence"" and 1 is ""high confidence"" and an ""I don't know"" option","value=10;label=""1 (low confidence)"" | value=7;label=""2"" |  value=5;label=""3"" | value=4;label=""4"" | value=0;label=""5 (high confidence)"" | value=10;label=""I don't know""","IF 1 (low confidence), RAISE 10
 IF 2, RAISE 7 
 IF 3, RAISE 5
 IF 4, RAISE 2
-IF 5 (high confidence), no change;","Dave's Bubble: Give examples from the news, such as tsunamis impacting hard drive costs.",Inherent
+IF 5 (high confidence), no change;","Dave's Bubble: Give examples from the news, such as tsunamis impacting hard drive costs.",Inherent,impact,
 5.1,ID.SC-3,Does the acquirer maintain a reserve of this product/service?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
-IF no, RAISE 10",,Residual
+IF no, RAISE 10",,Residual,impact,

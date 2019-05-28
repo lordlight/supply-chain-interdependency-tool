@@ -129,13 +129,13 @@ class App extends Component {
 
     // TEMP - Do risk calculation (just for testing; will figure out most appropriate place later)
     if (nextProps.suppliers.length > 0){
-      store.dispatch(updateTypeRisk({"type":"suppliers", "itemsRisk":calculateItemRisk(nextProps.supplierResponses, nextProps.supplierQuestions)}));
+      store.dispatch(updateTypeRisk({"type":"suppliers", "itemsRisk":calculateItemRisk("suppliers", nextProps.supplierResponses, nextProps.supplierQuestions, nextProps.suppliers)}));
     }
     if (nextProps.products.length > 0){
-      store.dispatch(updateTypeRisk({"type":"products", "itemsRisk":calculateItemRisk(nextProps.productResponses, nextProps.productQuestions)}));
+      store.dispatch(updateTypeRisk({"type":"products", "itemsRisk":calculateItemRisk("products", nextProps.productResponses, nextProps.productQuestions, nextProps.products)}));
     }
     if (nextProps.projects.length > 0){
-      store.dispatch(updateTypeRisk({"type":"projects", "itemsRisk":calculateItemRisk(nextProps.projectResponses, nextProps.projectQuestions)}));
+      store.dispatch(updateTypeRisk({"type":"projects", "itemsRisk":calculateItemRisk("projects", nextProps.projectResponses, nextProps.projectQuestions, nextProps.projects)}));
     }
   }
 

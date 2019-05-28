@@ -33,12 +33,12 @@ const mapState = state => ({
 
 class Question extends Component {
     handleChange = event => {
-        this.props.updateResponse(this.props.question.ID, event.target.value-1)
+        this.props.updateResponse(this.props.questionId, event.target.value-1)
         /*store.dispatch(
             answerQuestion({
                 type: this.props.currentType,
                 itemId: this.props.currentItem.ID,
-                queId: this.props.question.ID,
+                queId: this.props.questionId,
                 ansInd: event.target.value-1 
             })
         );*/
@@ -61,15 +61,15 @@ class Question extends Component {
         return (
             <TableRow style={{border: "none"}}>
                 <TableCell style={{border: "none"}}>
-                    <FormLabel component="legend">{this.props.question.Question}</FormLabel>
+                    <FormLabel component="legend">{this.props.questionText}</FormLabel>
                     <FormControl component="fieldset" className="question-form">
                         <Select
                             className={classes.input}
                             value={parseInt(response)}
                             onChange={this.handleChange}
                             inputProps={{
-                                name: this.props.question.ID,
-                                id: this.props.question.ID,
+                                name: this.props.questionId,
+                                id: this.props.questionId,
                             }}
                         >
                             <MenuItem value={0}>
