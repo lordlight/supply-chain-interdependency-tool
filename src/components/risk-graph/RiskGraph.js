@@ -12,7 +12,10 @@ const mapState = state => ({
     suppliers: state.suppliers,
     products: state.products,
     projects: state.projects,
-    organizations: state.organizations
+    organizations: state.organizations,
+    suppliersRisk: state.suppliersRisk,
+    productsRisk: state.productsRisk,
+    projectsRisk: state.projectsRisk
 });
 
 class RiskGraph extends Component {
@@ -66,38 +69,79 @@ class RiskGraph extends Component {
         const supplierEdgesSeen = new Set();
         const productEdgesSeen = new Set();
         const projectEdgesSeen = new Set();
+        const supplierImpactScores = {};
+
+        const projectsMap = {};
+        props.projects.forEach(proj => projectsMap[proj.ID] = proj);
+        const suppliersMap = {};
+        props.suppliers.forEach(sup => suppliersMap[sup.ID] = sup);
 
         const projectToProjectEdges = projects.map(proj => {
             projectEdgesSeen.add(proj.ID);
             projectEdgesSeen.add(proj.parent.ID);
-            return {from: "P_" + proj.parent.ID, to: "P_" + proj.ID}
+            const criticality = (((props.projectsRisk[proj.ID] || {}).criticality || {}).default || 0);
+            const title = `<div><p>Project Name:&nbsp${proj.Name}</p><p>Project Criticality:&nbsp;${criticality.toFixed(1)}</p></div>`
+            return {from: "P_" + proj.parent.ID, to: "P_" + proj.ID, title, value: criticality * 5.0, chosen: {edge: values => values.color = "#7f0000"}}
         });
+
         // take into account multiple project edges per product
         const projectToProductEdges = products.map(prod => {
             const projectIds = (prod['Project ID'] || "").split(";").filter(pid => !!pid);
+            const productRisk = (props.productsRisk[prod.ID] || {}).impact || 0;
             const productEdges = projectIds.map(prid => {
                 productEdgesSeen.add(prod.ID);
                 projectEdgesSeen.add(prid);
-                return {from: "P_" + prid, to: "PR_" + prod.ID}
+                const key = `projects|${prid}`;
+                // const projectCriticality = ((props.projectsRisk[prid] || {}).criticality || {}).default || 0;
+                const productCriticality = (((props.productsRisk[prod.ID] || {}).criticality || {})[key] || 0);
+                // const supplierRisk = (props.suppliersRisk[prod['Supplier ID']] || {}).impact || 0;
+                const risk = productCriticality * productRisk;
+                const title = `<div><p>Product Name:&nbsp${prod.Name}</p><p>Project Name:&nbsp;${(projectsMap[prid] || {}).Name}</p><p>Product Risk:&nbsp${risk.toFixed(1)}</p></div>`
+                return {from: "P_" + prid, to: "PR_" + prod.ID, title, value: risk / 2.0, chosen: {edge: values => values.color = "#7f0000"}}
             });
             return productEdges;
         }).flat();
         const productToSupplierEdges = products.map(prod => {
             productEdgesSeen.add(prod.ID);
             supplierEdgesSeen.add(prod['Supplier ID']);
-            return {from: "PR_" + prod.ID, to: "S_" + prod['Supplier ID']}
+            const supId = prod['Supplier ID'];
+            const supplierRisk = (props.suppliersRisk[supId] || {}).impact || 0;
+            const productRisk = (props.productsRisk[prod.ID] || {}).impact || 0;
+            const projectIds = (prod['Project ID'] || "").split(";").filter(pid => !!pid);
+            let totalImpactScore = 0;
+            projectIds.forEach(prid => {
+                const projectCriticality = ((props.projectsRisk[prid] || {}).criticality || {}).default || 0;
+                const key = `projects|${prid}`;
+                const productCriticality = (((props.productsRisk[prod.ID] || {}).criticality || {})[key] || 0);
+                totalImpactScore += (projectCriticality * productCriticality * productRisk * supplierRisk) / 1000;
+            });
+            supplierImpactScores[supId] = (supplierImpactScores[supId] || 0) + totalImpactScore;
+            const title = `<div><p>Supplier Name:&nbsp;${(suppliersMap[supId] || {}).Name}</p><p>Product Name:&nbsp;${prod.Name}</p><p>Supply Chain Impact Score:&nbsp;${totalImpactScore.toFixed(1)}</p></div>`;
+            return {from: "PR_" + prod.ID, to: "S_" + supId, title, value: totalImpactScore, chosen: {edge: values => values.color = "#7f0000"}}
         });
         const organizationNodes = organizations.map(org => {
-            return {id: "P_" + org.ID, title: org.Name}
+            return {shape: "dot", id: "P_" + org.ID, title: "Organization Name: " + org.Name, size: 35, level: 0}
         });
+        let curNodeLevel = 1;
         const projectNodes = projects.filter(pr => HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true).map(proj => {
-            return {id: "P_" + proj.ID, title: proj.Name, group: "projects"}
+            const criticality = (((props.projectsRisk[proj.ID] || {}).criticality || {}).default || 0);
+            const title = `<div><p>Project Name:&nbsp${proj.Name}</p><p>Project Criticality:&nbsp;${criticality.toFixed(1)}</p></div>`
+            const level = Math.max((proj.Level || "").split(".").length - 1, 1);
+            curNodeLevel = Math.max(curNodeLevel, level);
+            return {id: "P_" + proj.ID, title, group: "projects", value: criticality * 10.0, level: level}
         });
+        curNodeLevel++;
         const productNodes = products.filter(p => HIDE_UNCONNECTED_RESOURCES ? productEdgesSeen.has(p.ID) : true).map(prod => {
-            return {id: "PR_" + prod.ID, title: prod.Name, group: "products"}
+            const impact = (props.productsRisk[prod.ID] || {}).impact || 0;
+            const title = `<div><p>Product Name:&nbsp${prod.Name}</p><p>Question Score:&nbsp${impact.toFixed(1)}</p></div>`
+            return {id: "PR_" + prod.ID, title, group: "products", value: impact, level: curNodeLevel}
         });
+        curNodeLevel++;
         const supplierNodes = suppliers.filter(s => HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID): true).map(sup => {
-            return {id: "S_" + sup.ID, title: sup.Name, group: "suppliers", depth:4}
+            // const impact = "" + ((props.suppliersRisk[sup.ID] || {}).impact || 0).toFixed(1);
+            const impact = supplierImpactScores[sup.ID] || 0;
+            const title = `<div><p>Supplier Name:&nbsp${sup.Name}</p><p>Supplier Impact Score:&nbsp${impact.toFixed(1)}</p></div>`
+            return {id: "S_" + sup.ID, label: impact.toFixed(1), title, group: "suppliers", value: impact, level: curNodeLevel}
         });
         const nodes = [...organizationNodes, ...projectNodes, ...productNodes, ...supplierNodes];
         const edges = [...projectToProjectEdges, ...projectToProductEdges, ...productToSupplierEdges];
@@ -233,25 +277,16 @@ class RiskGraph extends Component {
         //     enabled: true
         // },
         groups: {
-            projects: {color: "blue",
-                         hover: {
-                borderColor: '#ffffff',
-                borderWidth: 3,
-                background: '#D2E5FF'
-              }, widthConstraint: {
-                maximum: 40
-            }},
-            products: {color: "green", widthConstraint: {
-                maximum: 60
-            }},
-            suppliers: {color: "orange", widthConstraint: {
-                maximum: 60
-            }}
+            projects: {shape: "dot", color: "blue"},
+            products: {shape: "dot", color: "green"},
+            suppliers: {shape: "circle", color: "orange"}
         },
         nodes: {
-            shape: "dot",
-            // size: 20,
-            // borderWidth: 3
+            scaling: {
+                label: {
+                    enabled: true
+                }
+            }
         },
         layout: {
             hierarchical: {
@@ -265,7 +300,17 @@ class RiskGraph extends Component {
                 // color: "black",
                 inherit: false,
             },
-            arrows: "from"
+            scaling: {
+                max: 10
+            },
+            arrows: {
+                to: {
+                    enabled: false
+                },
+                from: {
+                    enabled: false
+                }
+            }
         }
     };
 
