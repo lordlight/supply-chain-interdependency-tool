@@ -6,6 +6,8 @@ import { ForceGraph2D } from 'react-force-graph';
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
+const HIDE_UNCONNECTED_RESOURCES = true;
+
 const mapState = state => ({
     suppliers: state.suppliers,
     products: state.products,
@@ -61,31 +63,41 @@ class RiskGraph extends Component {
     
     constructGraph = props => {
         const {organizations, projects, products, suppliers} = props;
-        const organizationNodes = organizations.map(org => {
-            return {id: "P_" + org.ID, title: org.Name}
-        });
-        const projectNodes = projects.map(proj => {
-            return {id: "P_" + proj.ID, title: proj.Name, group: "projects"}
-        });
-        const productNodes = products.map(prod => {
-            return {id: "PR_" + prod.ID, title: prod.Name, group: "products"}
-        });
-        const supplierNodes = suppliers.map(sup => {
-            return {id: "S_" + sup.ID, title: sup.Name, group: "suppliers", depth:4}
-        });
+        const supplierEdgesSeen = new Set();
+        const productEdgesSeen = new Set();
+        const projectEdgesSeen = new Set();
+
         const projectToProjectEdges = projects.map(proj => {
+            projectEdgesSeen.add(proj.ID);
+            projectEdgesSeen.add(proj.parent.ID);
             return {from: "P_" + proj.parent.ID, to: "P_" + proj.ID}
         });
         // take into account multiple project edges per product
         const projectToProductEdges = products.map(prod => {
             const projectIds = (prod['Project ID'] || "").split(";").filter(pid => !!pid);
             const productEdges = projectIds.map(prid => {
+                productEdgesSeen.add(prod.ID);
+                projectEdgesSeen.add(prid);
                 return {from: "P_" + prid, to: "PR_" + prod.ID}
             });
             return productEdges;
         }).flat();
         const productToSupplierEdges = products.map(prod => {
+            productEdgesSeen.add(prod.ID);
+            supplierEdgesSeen.add(prod['Supplier ID']);
             return {from: "PR_" + prod.ID, to: "S_" + prod['Supplier ID']}
+        });
+        const organizationNodes = organizations.map(org => {
+            return {id: "P_" + org.ID, title: org.Name}
+        });
+        const projectNodes = projects.filter(pr => HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true).map(proj => {
+            return {id: "P_" + proj.ID, title: proj.Name, group: "projects"}
+        });
+        const productNodes = products.filter(p => HIDE_UNCONNECTED_RESOURCES ? productEdgesSeen.has(p.ID) : true).map(prod => {
+            return {id: "PR_" + prod.ID, title: prod.Name, group: "products"}
+        });
+        const supplierNodes = suppliers.filter(s => HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID): true).map(sup => {
+            return {id: "S_" + sup.ID, title: sup.Name, group: "suppliers", depth:4}
         });
         const nodes = [...organizationNodes, ...projectNodes, ...productNodes, ...supplierNodes];
         const edges = [...projectToProjectEdges, ...projectToProductEdges, ...productToSupplierEdges];
