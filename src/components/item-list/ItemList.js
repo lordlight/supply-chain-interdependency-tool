@@ -27,8 +27,8 @@ function getTimestampDiff(timestamp) {
         return `${rval} ${unit}${rval > 1 ? "s" : ""} ago`;
     }
 
-    if (!timestamp || timestamp < 0) {
-        return "unknown";
+    if (!timestamp || Math.abs(timestamp) === Infinity) {
+        return "---";
     }
 
     const diff = Date.now() - new Date(timestamp);
@@ -235,7 +235,7 @@ class ItemList extends Component {
                     item['risk.criticality.max'] = Math.max(...Object.values(riskSet[item.ID].criticality));
                 }
                 item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
-                item.age = 0;
+                item.age = -Math.max(...Object.values(responses[item.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val));
                 item.action = (Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit");
             }
         });
@@ -300,7 +300,8 @@ class ItemList extends Component {
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
-                    {getTimestampDiff(Math.min(...Object.values(responses[row.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val)))}
+                    {getTimestampDiff(-row.age)}
+                    {/* {getTimestampDiff(Math.max(...Object.values(responses[row.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val)))} */}
                 </TableCell>
                 <TableCell className={classes.cell}>
                     <Button
