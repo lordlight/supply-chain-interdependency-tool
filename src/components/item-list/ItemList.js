@@ -160,12 +160,24 @@ class ItemList extends Component {
         const hasImpact = (questions.some(q => q['Type of question'] === "impact"));
         const hasCriticality = (questions.some(q => q['Type of question'] === "criticality"));
 
-        let headerDetails = [
+        const headerDetails = [
             {
                 label: type.substring(0, type.length - 1),
                 tooltip: "Sort by name",
                 cssClass: classes.titleCol,
                 sortType: 'Name'
+            },
+            hasCriticality && {
+                label: "Criticality",
+                tooltip: "Sort by criticality",
+                cssClass: classes.regCol,
+                sortType: 'risk.criticality.max'
+            },
+            hasImpact && {
+                label: 'Questionnaire Score',
+                tooltip: "Sort by questionnaire score",
+                cssClass: classes.regCol,
+                sortType: 'risk.impact'
             },
             {
                 label: 'Questions Complete',
@@ -185,24 +197,7 @@ class ItemList extends Component {
                 cssClass: classes.regCol,
                 sortType: 'action'
             },
-        ];
-
-        if (hasImpact) {
-            headerDetails.splice(1, 0, {
-                label: 'Questionnaire Score',
-                tooltip: "Sort by questionnaire score",
-                cssClass: classes.regCol,
-                sortType: 'risk.impact'
-            });
-        }
-        if (hasCriticality) {
-            headerDetails.splice(1, 0, {
-                label: "Criticality",
-                tooltip: "Sort by criticality",
-                cssClass: classes.regCol,
-                sortType: 'risk.criticality.max'
-            });
-        }
+        ].filter(Boolean);
 
         const rowHeaders = headerDetails.map((col, i) => (
             <TableCell key={i} className={col.cssClass}>
@@ -237,7 +232,6 @@ class ItemList extends Component {
         });
 
         list.sort((a, b) => {
-            console.log("SORT");
             if (a._cscrm_active > b._cscrm_active) {
                 return -1;
             } else if (a._cscrm_active < b._cscrm_active) {
@@ -297,7 +291,6 @@ class ItemList extends Component {
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {getAge(row.age)}
-                    {/* {getTimestampDiff(Math.max(...Object.values(responses[row.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val)))} */}
                 </TableCell>
                 <TableCell className={classes.cell}>
                     <Button

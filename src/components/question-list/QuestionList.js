@@ -179,10 +179,6 @@ class QuestionList extends Component {
         }
 
         const impactRows = questions.filter(q => q["Type of question"] === "impact").map((q, i) => {
-            const foreachKey = q["Question for each"];
-            if (foreachKey) {
-                const foo = item[foreachKey];
-            }
             return <Question
                 key={i}
                 question={q}
@@ -202,7 +198,6 @@ class QuestionList extends Component {
                 this.props[foreachType].forEach(r => resourcesMap[r.ID] = r)
                 return subkeys.map(sk => {
                     const qid = `${q.ID}|${sk}`;
-                    console.log("PPPP", this.props.projects);
                     const questionText = q.Question.replace(`[${foreachKey}]`, `"${resourcesMap[sk].Name}"`);
                     return <Question
                         key={i}
