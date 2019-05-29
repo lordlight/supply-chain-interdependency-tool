@@ -97,8 +97,10 @@ const styles = theme => ({
         display: "inline-block",
         width: "50%"
     },
-    scoreStars: {
-        letterSpacing: 2
+    scoreBars: {
+        height: 15,
+        backgroundColor: "#7f7f7f",
+        verticalAlign: "middle"
     }
 });
 
@@ -259,29 +261,14 @@ class ItemList extends Component {
                     </TableCell>
                 )}
                 {hasImpact && (
-                    <TableCell className={classes.cell}>
+                    <TableCell className={classes.cell} style={{whiteSpace: "nowrap"}}>
                         <div className={classes.scoreColPart}>
                             {(() => {
                                 if (riskSet.hasOwnProperty(row.ID)) return riskSet[row.ID].impact.toFixed(1);
                                 else return "N/A";
                             })()}
                         </div>
-                        <div className={[classes.scoreColPart, classes.scoreStars].join(' ')}>
-                            {(() => {
-                                if (riskSet.hasOwnProperty(row.ID)) {
-                                    if (riskSet[row.ID].impact < 25){
-                                        return "*";
-                                    } else if (riskSet[row.ID].impact < 50){
-                                        return "**";
-                                    } else if (riskSet[row.ID].impact < 75){
-                                        return "***";
-                                    } else {
-                                        return "****";
-                                    }
-                                }
-                                else return "N/A";
-                            })()}
-                        </div>
+                        <div className={[classes.scoreColPart, classes.scoreBars].join(' ')} style={{width: riskSet[row.ID].impact}}></div>
                     </TableCell>
                 )}
                 <TableCell className={classes.cell}>
