@@ -16,6 +16,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 
+import { getQuestionResponse } from '../../utils/question-responses';
+
 const styles = theme => ({
     questionList: {
         padding: '32px 8px 40px 44px'
@@ -105,9 +107,13 @@ class QuestionList extends Component {
         console.log("current: ", responses);
         console.log("temp: ", this.props.tempResponses);
 
+        const timestamp = Date.now();
         Object.entries(this.props.tempResponses).forEach((resp) => {
             let key = resp[0], val = resp[1];
-            allResponses[key] = val;
+            const oldVal = getQuestionResponse(responses[key]);
+            if (val !== oldVal) {
+                allResponses[key] = [val, timestamp];
+            }
         });
 
         store.dispatch(answerMulti({
@@ -219,7 +225,6 @@ class QuestionList extends Component {
             }
         });
         criticalityRows = [].concat(...criticalityRows);
-        console.log("CCCCCCC", criticalityRows);
 
         return (
             <div className={classes.questionList}>

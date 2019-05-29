@@ -69,6 +69,10 @@ class QuestionStatusCard extends Component {
     }
 
     randomizeAnswers = () => {
+        const randomDate = () => {
+            return Date.now() - Math.random() * 604800000.0 * 2;
+        }
+
         const type = this.props.currentType;
         let items, questions, responses;
         if (type === "suppliers"){
@@ -86,7 +90,8 @@ class QuestionStatusCard extends Component {
         }
         items.forEach(i => {
             const itemId = i.ID;
-            responses = {...responses[itemId] || {}}
+            responses = {...responses[itemId] || {}};
+            const rdate = randomDate();
             questions.forEach(q => {
                 const qtype = q["Type of question"];
                 const qeach = q["Question for each"];
@@ -98,7 +103,7 @@ class QuestionStatusCard extends Component {
                         if (Math.random() < 0.7) {
                             const answer = random(q.Answers.length - 1);
                             console.log(itemId, qid, q.Answers.length, answer);
-                            responses[qid] = answer;
+                            responses[qid] = [answer, rdate];
                         } else {
                             // question not answered
                             delete responses[qid];
@@ -108,7 +113,7 @@ class QuestionStatusCard extends Component {
                     if (Math.random() < 0.7) {
                         const answer = random(q.Answers.length - 1);
                         console.log(itemId, q.ID, q.Answers.length, answer);
-                        responses[q.ID] = answer;
+                        responses[q.ID] = [answer, rdate];
                     } else {
                         // question not answered
                         delete responses[q.ID];

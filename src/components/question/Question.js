@@ -11,6 +11,8 @@ import Select from '@material-ui/core/Select';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 
+import { getQuestionResponse } from '../../utils/question-responses';
+
 const styles = theme => ({
     input: {
         borderRadius: 4,
@@ -53,7 +55,8 @@ class Question extends Component {
         let response = 0;
         if (this.props.hasOwnProperty("response")){
             if (typeof(this.props.response) !== 'undefined'){
-                response = parseInt(this.props.response);
+                const val = getQuestionResponse(this.props.response);
+                response = parseInt(val);
                 // Have to add then remove 1 from the index because the Select only accepts > 0 values (otherwise sets to blank)
                 response += 1;
             }

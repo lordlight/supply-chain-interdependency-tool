@@ -1,3 +1,5 @@
+import { getQuestionResponse } from "./question-responses";
+
 // store here as constant for now, may want to put in data
 const NORMALIZED_VALUES = {
     suppliers_impact: 100,
@@ -38,7 +40,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                         const ckey = `${qrtype}|${qval}`; // for key need type and id, concatenat
                         const qid = `${question.ID}|${qval}`; // key into answers
                         if (itemResponses.hasOwnProperty(qid)) {
-                            const ansInd = Math.max(parseInt(itemResponses[qid]), 0);
+                            const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[qid])), 0);
                             perItemRisk[itemId].criticality[ckey] = (perItemRisk[itemId].criticality[ckey] || 0) + questionVal * (question.Answers[ansInd].val);
                         } else {
                             perItemRisk[itemId].criticality[ckey] = (perItemRisk[itemId].criticality[ckey] || 0) + questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
@@ -47,7 +49,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                 } else {
                     // criticality applies to item overall - store as "default" key
                     if (itemResponses.hasOwnProperty(question.ID)){
-                        const ansInd = Math.max(parseInt(itemResponses[question.ID]), 0);
+                        const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[question.ID])), 0);
                         perItemRisk[itemId].criticality.default = (perItemRisk[itemId].criticality.default || 0) + questionVal * (question.Answers[ansInd].val);
                     } else {
                         perItemRisk[itemId].criticality.default = (perItemRisk[itemId].criticality.default || 0) + questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
@@ -55,7 +57,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                 }
             } else { // impact question
                 if (itemResponses.hasOwnProperty(question.ID)){
-                    const ansInd = Math.max(parseInt(itemResponses[question.ID]), 0);
+                    const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[question.ID])), 0);
                     //console.log("****answer given: ", questionVal * (question.Answers[ansInd].val));
                     // perItemRisk[itemId].impact += questionVal * (question.Answers[ansInd].val);
                     perItemRisk[itemId][qtype] = (perItemRisk[itemId][qtype] || 0) + questionVal * (question.Answers[ansInd].val);

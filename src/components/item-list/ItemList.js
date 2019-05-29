@@ -19,6 +19,33 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
 
+import { getQuestionResponseTimestamp } from '../../utils/question-responses';
+
+function getTimestampDiff(timestamp) {
+    const formatResult = (val, unit) => {
+        const rval = Math.round(val);
+        return `${rval} ${unit}${rval > 1 ? "s" : ""} ago`;
+    }
+
+    if (!timestamp || timestamp < 0) {
+        return "unknown";
+    }
+
+    const diff = Date.now() - new Date(timestamp);
+
+    if (diff >= 604800000.0) {
+        return formatResult(diff / 604800000.0, "week");
+    } else if (diff >= 86400000.0) {
+        return formatResult(diff / 86400000.0, "day");
+    } else if (diff >= 3600000.0) {
+        return formatResult(diff / 3600000.0, "hour");
+    } else if (diff >= 60000.0) {
+        return formatResult(diff / 60000.0, "minute");
+    } else {
+        return "less than 1 minute ago";
+    }
+}
+
 const mapState = state => ({
     currentType: state.currentType,
     suppliers: state.suppliers,
@@ -273,7 +300,7 @@ class ItemList extends Component {
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
-                    <em>age calc</em>
+                    {getTimestampDiff(Math.min(...Object.values(responses[row.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val)))}
                 </TableCell>
                 <TableCell className={classes.cell}>
                     <Button
