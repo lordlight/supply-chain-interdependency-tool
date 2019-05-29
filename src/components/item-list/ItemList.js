@@ -21,17 +21,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 import { getQuestionResponseTimestamp } from '../../utils/question-responses';
 
-function getTimestampDiff(timestamp) {
+function getAge(diff) {
     const formatResult = (val, unit) => {
         const rval = Math.round(val);
         return `${rval} ${unit}${rval > 1 ? "s" : ""} ago`;
     }
-
-    if (!timestamp || Math.abs(timestamp) === Infinity) {
-        return "---";
-    }
-
-    const diff = Date.now() - new Date(timestamp);
 
     if (diff >= 604800000.0) {
         return formatResult(diff / 604800000.0, "week");
@@ -228,6 +222,7 @@ class ItemList extends Component {
             </TableCell>
         ));
 
+        const now = Date.now();
         list.forEach((item) => {
             if (item._cscrm_active && riskSet.hasOwnProperty(item.ID) && responses[item.ID]) {
                 item['risk.impact'] = riskSet[item.ID].impact;
@@ -235,7 +230,8 @@ class ItemList extends Component {
                     item['risk.criticality.max'] = Math.max(...Object.values(riskSet[item.ID].criticality));
                 }
                 item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
-                item.age = -Math.max(...Object.values(responses[item.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val));
+                const lastResponded = Math.max(...Object.values(responses[item.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val));
+                item.age = now - lastResponded; // will be infinity if no responses
                 item.action = (Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit");
             }
         });
@@ -300,7 +296,7 @@ class ItemList extends Component {
                     })()}%
                 </TableCell>
                 <TableCell className={classes.cell}>
-                    {getTimestampDiff(-row.age)}
+                    {getAge(row.age)}
                     {/* {getTimestampDiff(Math.max(...Object.values(responses[row.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val)))} */}
                 </TableCell>
                 <TableCell className={classes.cell}>
