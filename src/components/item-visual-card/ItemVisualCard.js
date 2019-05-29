@@ -5,6 +5,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 
+import SuppliersChart from "../suppliers-chart/SuppliersChart";
+import ProductsChart from '../products-chart/ProductsChart';
+
 import { connect } from "react-redux";
 
 // Images
@@ -35,24 +38,19 @@ class ItemVisualCard extends Component {
 
         const type = this.props.currentType;
 
-        /*if (type === "suppliers"){
-            
-        } else if (type === "products"){
-            
-        } else if (type === "projects"){
-            
-        }*/
-
         return (
             <Card className={classes.card}>
-                <CardMedia
+                {type === "suppliers" && <SuppliersChart></SuppliersChart>}
+                {type === "products" && <ProductsChart></ProductsChart>}
+
+                {type === "projects" && <CardMedia
                         component="img"
                         alt="Projects"
                         className={classes.media}
                         height="194"
                         image={placeholder}
                         title={type}
-                    />
+                    />}
             </Card>
         );
     }

@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { ImportDialog } from '../../components/';
 
+import SuppliersChart from "../suppliers-chart/SuppliersChart";
+import ProductsChart from '../products-chart/ProductsChart';
+
 import { withStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
@@ -104,6 +107,9 @@ class TypeCard extends Component {
         return (
             <div>
                 <Card className={classes.card}>
+                {this.props.type === "suppliers" && <SuppliersChart></SuppliersChart>}
+                {this.props.type === "products" && <ProductsChart></ProductsChart>}
+                {this.props.type === "projects" && 
                     <CardMedia
                         component="img"
                         alt="Projects"
@@ -111,7 +117,7 @@ class TypeCard extends Component {
                         height="194"
                         image={tempImg}
                         title={this.props.type}
-                    />
+                    />}
                     <CardContent>
                         <Typography gutterBottom className={classes.title}>
                             {this.props.type}
