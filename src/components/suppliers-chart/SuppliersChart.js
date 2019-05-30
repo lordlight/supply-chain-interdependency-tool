@@ -91,9 +91,7 @@ class SuppliersChart extends Component {
         });
         data.datasets[0].data = buckets;
         return <div style={{backgroundColor: "#dcdcdc"}}>
-            <Bar data={data} options={options} height={194} width={344}>
-
-            </Bar>
+            <Bar data={data} options={options} height={194} width={344}></Bar>
         </div>
     }
 }

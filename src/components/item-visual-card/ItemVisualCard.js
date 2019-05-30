@@ -11,7 +11,8 @@ import ProductsChart from '../products-chart/ProductsChart';
 import { connect } from "react-redux";
 
 // Images
-import placeholder from "../../imgs/placeholder.png";
+// import placeholder from "../../imgs/placeholder.png";
+import projectsImg from "../../imgs/projects.png";
 
 const mapState = state => ({
     currentType: state.currentType
@@ -48,7 +49,7 @@ class ItemVisualCard extends Component {
                         alt="Projects"
                         className={classes.media}
                         height="194"
-                        image={placeholder}
+                        image={projectsImg}
                         title={type}
                     />}
             </Card>

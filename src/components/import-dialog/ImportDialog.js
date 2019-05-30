@@ -19,7 +19,7 @@ const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 ipcRenderer.on('return-import', (event, response) => {
-    if (response.length > 0){
+    if (response && response.length > 0){
         store.dispatch(updateImportFile({importFile: response[0]}));
         store.dispatch(updateImportState({importState: 'ready'}));
     }

@@ -27,7 +27,9 @@ function getAge(diff) {
         return `${rval} ${unit}${rval > 1 ? "s" : ""} ago`;
     }
 
-    if (diff >= 604800000.0) {
+    if (diff === Infinity) {
+        return "---";
+    } else if (diff >= 604800000.0) {
         return formatResult(diff / 604800000.0, "week");
     } else if (diff >= 86400000.0) {
         return formatResult(diff / 86400000.0, "day");
@@ -126,6 +128,10 @@ class ItemList extends Component {
         }
     }
 
+    componentDidMount = () => {
+        window.scrollTo(0, 0);
+    }
+    
     render() {
         const { classes } = this.props;
         if (this.props.currentType == null){

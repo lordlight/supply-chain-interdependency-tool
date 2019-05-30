@@ -26,8 +26,7 @@ const mapState = state => ({
 class ProductsChart extends Component {
 
     getCellColor = (row, col, buckets, numProducts) => {
-        const alpha = 0.9 * buckets[row][col] / numProducts + 0.05;
-        console.log("DDD", alpha);
+        const alpha = numProducts > 0 ? 0.9 * buckets[row][col] / numProducts + 0.05 : 0;
         return `rgba(255, 0, 0, ${alpha})`;
     }
 
@@ -41,7 +40,7 @@ class ProductsChart extends Component {
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0]
-        ]
+        ];
 
         Object.values(this.props.productsRisk).forEach(risk => {
             const impact = Math.max(risk.impact || 100, 0);
@@ -60,7 +59,7 @@ class ProductsChart extends Component {
                     <div style={{display:"table-cell", height: 48}}>
                         <Typography style={{transform: "rotate(-90deg) translate(-13px, 4px)", fontSize: 12}}>High</Typography>
                     </div>
-                    {[0, 1, 2].map(col => <Tooltip title={this.getCellTooltip(2, col, buckets)}>
+                    {[0, 1, 2].map(col => <Tooltip key={col} title={this.getCellTooltip(2, col, buckets)}>
                         <div className={classes.cell} style={{backgroundColor: this.getCellColor(2, col, buckets, numProducts)}}></div>
                     </Tooltip>)}
                 </div>
@@ -68,7 +67,7 @@ class ProductsChart extends Component {
                     <div style={{display:"table-cell", width: 6, height:48}}>
                         <Typography style={{width: 6, transform: "rotate(-90deg) translate(-48px, 4px)"}}>CRITICALITY</Typography>
                     </div>
-                    {[0, 1, 2].map(col => <Tooltip title={this.getCellTooltip(1, col, buckets)}>
+                    {[0, 1, 2].map(col => <Tooltip key={col} title={this.getCellTooltip(1, col, buckets)}>
                         <div className={classes.cell} style={{backgroundColor: this.getCellColor(1, col, buckets, numProducts)}}></div>
                     </Tooltip>)}
                 </div>
@@ -76,7 +75,7 @@ class ProductsChart extends Component {
                     <div style={{display:"table-cell", height:48}}>
                         <Typography style={{transform: "rotate(-90deg) translate(-13px, 4px)", fontSize: 12}}>Low</Typography>
                     </div>
-                    {[0, 1, 2].map(col => <Tooltip title={this.getCellTooltip(0, col, buckets)}>
+                    {[0, 1, 2].map(col => <Tooltip key={col} title={this.getCellTooltip(0, col, buckets)}>
                         <div className={classes.cell} style={{backgroundColor: this.getCellColor(0, col, buckets, numProducts)}}></div>
                     </Tooltip>)}
                 </div>

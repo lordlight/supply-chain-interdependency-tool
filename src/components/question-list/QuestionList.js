@@ -125,6 +125,10 @@ class QuestionList extends Component {
         this.handleCancel();
     }
 
+    componentDidMount = () => {
+        window.scrollTo(0, 0);
+    }
+
     render() {
         const { classes } = this.props;
         if (this.props.currentType == null || this.props.currentItem == null){
