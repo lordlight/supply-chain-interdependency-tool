@@ -202,7 +202,7 @@ class QuestionList extends Component {
                 this.props[foreachType].forEach(r => resourcesMap[r.ID] = r)
                 return subkeys.map(sk => {
                     const qid = `${q.ID}|${sk}`;
-                    const questionText = q.Question.replace(`[${foreachKey}]`, `"${resourcesMap[sk].Name}"`);
+                    const questionText = q.Question.replace(`[${foreachKey}]`, `"${(resourcesMap[sk] || {}).Name || sk}"`);
                     return <Question
                         key={i}
                         question={q}
@@ -216,7 +216,7 @@ class QuestionList extends Component {
                 return <Question
                     key={i}
                     question={q} 
-                    questionID={q.ID}
+                    questionId={q.ID}
                     questionText={q.Question}
                     response={alteredResponses[q.ID]} 
                     updateResponse={this.updateResponse}
