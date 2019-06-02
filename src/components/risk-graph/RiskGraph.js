@@ -6,7 +6,7 @@ import { ForceGraph2D } from 'react-force-graph';
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
-const HIDE_UNCONNECTED_RESOURCES = true;
+const HIDE_UNCONNECTED_RESOURCES = false;
 
 const mapState = state => ({
     suppliers: state.suppliers,
