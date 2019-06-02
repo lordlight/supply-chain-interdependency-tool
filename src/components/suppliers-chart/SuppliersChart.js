@@ -70,6 +70,8 @@ const options = {
             {
                 ticks: {
                     beginAtZero: true,
+                    stepSize: 1,
+                    maxTicksLimit: 50,
                     display: false
                 },
                 scaleLabel: {
@@ -90,6 +92,7 @@ class SuppliersChart extends Component {
             buckets[bucket]++;
         });
         data.datasets[0].data = buckets;
+        options.scales.yAxes[0].ticks.max = (this.props.suppliers || []).length;
         return <div style={{backgroundColor: "#dcdcdc"}}>
             <Bar data={data} options={options} height={194} width={344}></Bar>
         </div>
