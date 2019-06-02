@@ -56,6 +56,7 @@ const _constructProjectHierarchy = projects => {
 				const parent = level2project[parentLvl];
 				if (parent) {
                     child.parent = parent;
+                    child['Parent ID'] = parent.ID;
                     parent.children.push(child);
 				}
             }

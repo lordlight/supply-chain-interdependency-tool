@@ -37,7 +37,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                     const qvals = ((resourcesMap[itemId] || {})[qkey] || "").split(";").filter(v => !!v);
                     // compute and score criticality by resource key
                     qvals.forEach(qval => {
-                        const ckey = `${qrtype}|${qval}`; // for key need type and id, concatenat
+                        const ckey = `${qrtype}|${qval}`; // for key need type and id, concatenate
                         const qid = `${question.ID}|${qval}`; // key into answers
                         if (itemResponses.hasOwnProperty(qid)) {
                             const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[qid])), 0);
@@ -47,13 +47,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                         }
                     });
                 } else {
-                    // criticality applies to item overall - store as "default" key
-                    if (itemResponses.hasOwnProperty(question.ID)){
-                        const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[question.ID])), 0);
-                        perItemRisk[itemId].criticality.default = (perItemRisk[itemId].criticality.default || 0) + questionVal * (question.Answers[ansInd].val);
-                    } else {
-                        perItemRisk[itemId].criticality.default = (perItemRisk[itemId].criticality.default || 0) + questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
-                    }  
+                    // TODO: need "Relation" to be defined for criticality, otherwise skip; report error in some way?
                 }
             } else { // impact question
                 if (itemResponses.hasOwnProperty(question.ID)){
@@ -73,7 +67,7 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
         perItemRisk[itemId].impact = perItemRisk[itemId].impact / getMaxImpactRisk(questions) * nval;
         // normalize criticality score(s)
         Object.keys(perItemRisk[itemId].criticality || {}).forEach(qkey => {
-            const qrType = qkey === "default" ? "" : qkey.split("|")[0];
+            const qrType = qkey.split("|")[0];
             const nval = NORMALIZED_VALUES[`${resourceType}_criticality`];
             perItemRisk[itemId].criticality[qkey] = perItemRisk[itemId].criticality[qkey] / getMaxCriticalityRisk(questions, qrType) * nval;
         })
@@ -104,7 +98,7 @@ function getMaxImpactRisk(questions) {
     return maxRisk;
 }
 
-// Get maximum possible criticality risk score for an item, given a resource type the criticlity applies to.
+// Get maximum possible criticality risk score for an item, given a resource type the criticality applies to.
 // if no resource type, applies globally to item
 function getMaxCriticalityRisk(questions, resourceType="") {
     let maxRisk = 0;

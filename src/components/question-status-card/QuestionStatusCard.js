@@ -158,7 +158,7 @@ class QuestionStatusCard extends Component {
 
         items.forEach((item) => {
             let numResp = Object.keys(responses[item.ID] || []).length;
-            if (numResp === questions.length){
+            if (numResp >= questions.length){
                 numCompleted += 1;
             } else if (numResp > 0){
                 numPartial += 1;
