@@ -94,20 +94,25 @@ class QuestionStatusCard extends Component {
             questions.forEach(q => {
                 const qtype = q["Type of question"];
                 const qrelation = q.Relation;
-                if (qtype === "criticality" && qrelation) {
-                    const [_, qkey] = qrelation.split(";");
-                    const qvals = (i[qkey] || "").split(";").filter(v => !!v);
-                    qvals.forEach(qval => {
-                        const qid = `${q.ID}|${qval}`;
-                        if (Math.random() < 0.7) {
-                            const answer = random(q.Answers.length - 1);
-                            console.log(itemId, qid, q.Answers.length, answer);
-                            responses[qid] = [answer, randomDate()];
-                        } else {
-                            // question not answered
-                            delete responses[qid];
-                        }
-                    });
+                if (qtype === "criticality") {
+                    if (qrelation) {
+                        const [_, qkey] = qrelation.split(";");
+                        const qvals = (i[qkey] || "").split(";").filter(v => !!v);
+                        qvals.forEach(qval => {
+                            const qid = `${q.ID}|${qval}`;
+                            if (Math.random() < 0.7) {
+                                const answer = random(q.Answers.length - 1);
+                                console.log(itemId, qid, q.Answers.length, answer);
+                                responses[qid] = [answer, randomDate()];
+                            } else {
+                                // question not answered
+                                delete responses[qid];
+                            }
+                        });
+                    } else {
+                        // all criiticality questions should have relation defined..
+                        // skip if otherwise (error?)
+                    }
                 } else {
                     if (Math.random() < 0.7) {
                         const answer = random(q.Answers.length - 1);
