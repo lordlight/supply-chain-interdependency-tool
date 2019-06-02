@@ -27,7 +27,7 @@ function getAge(diff) {
         return `${rval} ${unit}${rval > 1 ? "s" : ""} ago`;
     }
 
-    if (diff === Infinity) {
+    if (diff === Infinity || diff == null) {
         return "---";
     } else if (diff >= 604800000.0) {
         return formatResult(diff / 604800000.0, "week");
@@ -126,6 +126,18 @@ class ItemList extends Component {
             }
             this.setState({ sortDir: newSortDir });
         }
+    }
+
+    getNumQuestionsForResource = (item, questions) => {
+        return questions.map(q => {
+            if (q.Relation) {
+                const [_, rkey] = q.Relation.split(";");
+                const rids = (item[rkey] || "").split(";").filter(i => !!i);
+                return rids.length;
+            } else {
+                return 1;
+            }
+        }).reduce((total, cnt) => total + cnt);
     }
 
     componentDidMount = () => {
@@ -232,7 +244,8 @@ class ItemList extends Component {
                 if (hasCriticality) {
                     item['risk.criticality.max'] = Math.max(...Object.values(riskSet[item.ID].criticality));
                 }
-                item.completion = 100 * (Object.keys(responses[item.ID]).length / questions.length);
+                const numQuestions = this.getNumQuestionsForResource(item, questions);
+                item.completion = 100 * (Object.keys(responses[item.ID]).length / numQuestions);
                 const lastResponded = Math.max(...Object.values(responses[item.ID] || {}).map(val => getQuestionResponseTimestamp(val)).filter(val => !!val));
                 item.age = now - lastResponded; // will be infinity if no responses
                 item.action = (Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit");
@@ -278,9 +291,7 @@ class ItemList extends Component {
                     </TableCell>
                 )}
                 <TableCell className={classes.cell}>
-                    {(() => {
-                        return (100 * (Object.keys(responses[row.ID] || {}).length / questions.length)).toFixed(1);
-                    })()}%
+                    {(row.completion || 0).toFixed(1)}%
                 </TableCell>
                 <TableCell className={classes.cell}>
                     {getAge(row.age)}
