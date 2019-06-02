@@ -28,11 +28,11 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
                 questionVal = Number(question.Weight);
             }
             const qtype = question["Type of question"];
-            const qeach = question["Question for each"]
+            const qrelation = question.Relation;
             if (qtype === "criticality") {
-                if (qeach) {
+                if (qrelation) {
                     // criticality applies to a specific resource
-                    const [ qrtype, qkey ] = qeach.split(";");
+                    const [ qrtype, qkey ] = qrelation.split(";");
                     // values are the ids of the resource criticality applies to
                     const qvals = ((resourcesMap[itemId] || {})[qkey] || "").split(";").filter(v => !!v);
                     // compute and score criticality by resource key
@@ -108,7 +108,7 @@ function getMaxImpactRisk(questions) {
 // if no resource type, applies globally to item
 function getMaxCriticalityRisk(questions, resourceType="") {
     let maxRisk = 0;
-    questions.filter(q => q['Type of question'] === "criticality" && (q['Question for each'] || "").split(";")[0] === resourceType).forEach(question => {
+    questions.filter(q => q['Type of question'] === "criticality" && (q.Relation || "").split(";")[0] === resourceType).forEach(question => {
         const questionVal = question.Weight || 1;
         maxRisk += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
     });

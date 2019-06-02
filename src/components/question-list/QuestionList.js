@@ -193,18 +193,18 @@ class QuestionList extends Component {
             /> 
         });
         let criticalityRows = questions.filter(q => q["Type of question"] === "criticality").map((q, i) => {
-            const foreachInfo = q["Question for each"];
-            const [foreachType, foreachKey] = foreachInfo.split(";");
-            if (foreachKey) {
-                const foreachVal = item[foreachKey] || "";
-                const subkeys = foreachVal.split(";").filter(k => !!k);
+            const relationInfo = q.Relation;
+            const [relationType, relationKey] = relationInfo.split(";");
+            if (relationKey) {
+                const relationVal = item[relationKey] || "";
+                const subkeys = relationVal.split(";").filter(k => !!k);
                 const resourcesMap = {};
-                this.props[foreachType].forEach(r => resourcesMap[r.ID] = r)
+                this.props[relationType].forEach(r => resourcesMap[r.ID] = r)
                 return subkeys.map(sk => {
                     const qid = `${q.ID}|${sk}`;
-                    const questionText = q.Question.replace(`[${foreachKey}]`, `"${(resourcesMap[sk] || {}).Name || sk}"`);
+                    const questionText = q.Question.replace(`[${relationKey}]`, `"${(resourcesMap[sk] || {}).Name || sk}"`);
                     return <Question
-                        key={i}
+                        key={qid}
                         question={q}
                         questionId={qid}
                         questionText={questionText}
@@ -214,7 +214,7 @@ class QuestionList extends Component {
                 });
             } else {
                 return <Question
-                    key={i}
+                    key={q.ID}
                     question={q} 
                     questionId={q.ID}
                     questionText={q.Question}

@@ -93,9 +93,9 @@ class QuestionStatusCard extends Component {
             responses = {...responses[itemId] || {}};
             questions.forEach(q => {
                 const qtype = q["Type of question"];
-                const qeach = q["Question for each"];
-                if (qtype === "criticality" && qeach) {
-                    const [qrtype, qkey] = qeach.split(";");
+                const qrelation = q.Relation;
+                if (qtype === "criticality" && qrelation) {
+                    const [_, qkey] = qrelation.split(";");
                     const qvals = (i[qkey] || "").split(";").filter(v => !!v);
                     qvals.forEach(qval => {
                         const qid = `${q.ID}|${qval}`;
