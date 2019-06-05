@@ -12,7 +12,6 @@ const mapState = state => ({
     suppliers: state.suppliers,
     products: state.products,
     projects: state.projects,
-    organizations: state.organizations,
     suppliersRisk: state.suppliersRisk,
     productsRisk: state.productsRisk,
     projectsRisk: state.projectsRisk
@@ -65,7 +64,7 @@ class RiskGraph extends Component {
     }
     
     constructGraph = props => {
-        const {organizations, projects, products, suppliers} = props;
+        const { projects, products, suppliers} = props;
         const supplierEdgesSeen = new Set();
         const productEdgesSeen = new Set();
         const projectEdgesSeen = new Set();
@@ -75,7 +74,7 @@ class RiskGraph extends Component {
         props.projects.forEach(proj => projectsMap[proj.ID] = proj);
         const suppliersMap = {};
         props.suppliers.forEach(sup => suppliersMap[sup.ID] = sup);
-
+        
         // only one possible parents
         const projectToProjectEdges = projects.map(proj => {
             const parentId = proj['Parent ID'];
@@ -111,10 +110,22 @@ class RiskGraph extends Component {
             const productRisk = (props.productsRisk[prod.ID] || {}).impact || 0;
             const projectIds = (prod['Project ID'] || "").split(";").filter(pid => !!pid);
             let totalImpactScore = 0;
+
             projectIds.forEach(prid => {
-                const parentId = projectsMap[prid]['Parent ID'];
-                const pkey = `projects|${parentId}`;
-                const projectCriticality = ((props.projectsRisk[prid] || {}).criticality || {})[pkey] || 0;
+                let projectCriticality = 10.0;
+                let childId = prid;
+                // follow chain of parent projects, normalizing score to 10
+                while (true) {
+                    const project = projectsMap[childId] || {};
+                    const parentId = project['Parent ID'];
+                    if (!parentId) {
+                        // TODO: also watch for cycles?
+                        break;
+                    }
+                    const pkey = `projects|${parentId}`;
+                    projectCriticality *= (((props.projectsRisk[childId] || {}).criticality || {})[pkey] || 10) / 10;
+                    childId = parentId;
+                }
                 const key = `projects|${prid}`;
                 const productCriticality = (((props.productsRisk[prod.ID] || {}).criticality || {})[key] || 0);
                 totalImpactScore += (projectCriticality * productCriticality * productRisk * supplierRisk) / 1000;
@@ -123,11 +134,11 @@ class RiskGraph extends Component {
             const title = `<div><p>Supplier Name:&nbsp;${(suppliersMap[supId] || {}).Name}</p><p>Product Name:&nbsp;${prod.Name}</p><p>Supply Chain Impact Score:&nbsp;${totalImpactScore.toFixed(1)}</p></div>`;
             return {from: "PR_" + prod.ID, to: "S_" + supId, title, value: totalImpactScore, chosen: {edge: values => values.color = "#7f0000"}}
         });
-        const organizationNodes = organizations.map(org => {
-            return {shape: "dot", id: "P_" + org.ID, title: "Organization Name: " + org.Name, size: 35, level: 0}
+        const organizationNodes = projects.filter(p => !p.parent).map(proj => {
+            return {shape: "dot", id: "P_" + proj.ID, title: "Organization Name: " + proj.Name, size: 35, level: 0}
         });
         let curNodeLevel = 1;
-        const projectNodes = projects.filter(pr => HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true).map(proj => {
+        const projectNodes = projects.filter(pr => !!pr.parent).filter(pr => HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true).map(proj => {
             const parentId = proj["Parent ID"];
             const pkey = `projects|${parentId}`;
             const criticality = (((props.projectsRisk[proj.ID] || {}).criticality || {})[pkey] || 0);

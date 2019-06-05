@@ -70,7 +70,7 @@ class Home extends Component {
             <div className={classes.root}>
                 <TypeCard type="suppliers" items={this.props.suppliers} />
                 <TypeCard type="products" items={this.props.products} />
-                <TypeCard type="projects" items={this.props.projects} />
+                <TypeCard type="projects" items={this.props.projects.filter(proj => !!proj.parent)} />
                 <ActionCard type="checklist" items={testItems} title="To Do" plural="To Do Items" />
                 <ActionCard type="recommendations" items={testRecs} title="Cyber Supply Chain Risk" plural="Recommendations"/>
             </div>

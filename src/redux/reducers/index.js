@@ -85,13 +85,11 @@ function rootReducer(state = initialState, action) {
     } else if (action.type === ADD_PROJECTS){
         let projects = action.payload.filter(p => !!p._cscrm_active);
         projects = _constructProjectHierarchy(projects);
-        const organizations = projects.filter(p => !p.parent);
-        projects = projects.filter(p => !!p.parent);
         const projectsInactive = action.payload.filter(p => !p._cscrm_active);
         // add empty responses for new projects
         const projectResponses = _ensureResponses(projects, state.projectResponses);
         return Object.assign({}, state, {
-            projects, projectsInactive, organizations, projectResponses
+            projects, projectsInactive, projectResponses
         });
     } /*else if (action.type === ANSWER_QUESTION){
         let type = action.payload.type;
@@ -168,8 +166,6 @@ function rootReducer(state = initialState, action) {
     } else if (action.type === INIT_SESSION) {
         let projects = action.payload.projects.filter(p => !!p._cscrm_active);
         projects = _constructProjectHierarchy(projects);
-        const organizations = projects.filter(p => !p.parent);
-        projects = projects.filter(p => !!p.parent);
         const projectsInactive = action.payload.projects.filter(p => !p._cscrm_active);
         return Object.assign({}, state, {
             // suppliers: state.suppliers = action.payload.suppliers,
@@ -179,7 +175,6 @@ function rootReducer(state = initialState, action) {
             productsInactive: action.payload.products.filter(p => !p._cscrm_active),
             projects,
             projectsInactive,
-            organizations,
             supplierQuestions: state.supplierQuestions = action.payload.supplierQuestions,
             productQuestions: state.productQuestions = action.payload.productQuestions,
             projectQuestions: state.projectQuestions = action.payload.projectQuestions,

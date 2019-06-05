@@ -84,7 +84,7 @@ class QuestionStatusCard extends Component {
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
-            items = [...this.props.projects];
+            items = [...this.props.projects].filter(proj => !!proj.parent);
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;
         }
@@ -153,7 +153,7 @@ class QuestionStatusCard extends Component {
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
-            items = [...this.props.projects];
+            items = [...this.props.projects].filter(proj => !!proj.parent);
             itemsInactive = [...this.props.projectsInactive];
             questions = this.props.projectQuestions;
             responses = this.props.projectResponses;

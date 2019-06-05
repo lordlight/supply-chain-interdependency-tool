@@ -170,7 +170,7 @@ class ItemList extends Component {
             questions = this.props.productQuestions;
             responses = this.props.productResponses;
         } else if (type === "projects"){
-            list = [...this.props.projects, ...this.props.projectsInactive];
+            list = [...this.props.projects, ...this.props.projectsInactive].filter(proj => !!proj.parent);
             // riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
             riskSet = this.props.projectsRisk;
             questions = this.props.projectQuestions;
