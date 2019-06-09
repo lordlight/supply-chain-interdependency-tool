@@ -1,6 +1,6 @@
-ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes ,Risk Cat,Type of question,Relation
+ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes ,Risk Cat,Type of question,Relation,Project ID
 1.2,ID.SC-2,Does the supplier have fewer than 10 employees?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",This question targets the stability of the supplier. Using the threshold 10 because of this source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/,Inherent,impact,
+IF no, no change;",This question targets the stability of the supplier. Using the threshold 10 because of this source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/,Inherent,impact,,
 1.3,ID.SC-2,How long has this supplier been in business?,"Range: less than 3 years, less than 5 years, less than 10 years, over 10 years","value=10;label=""< 3 years"" | value=5;label=""3 - 5 years"" | value=2;label=""5 - 10 years"" | value=10;label=""I don't know""","IF < 3, RAISE 10
 IF 3-5, RAISE 5
 IF 5-10, RAISE 2
@@ -8,7 +8,7 @@ IF > 10, no change;
 
 ","Configurable: year ranges
 
-JG will find a basis for these years as we have done for Supplier Question 1.2",Inherent,impact,
+JG will find a basis for these years as we have done for Supplier Question 1.2",Inherent,impact,,
 1.4,ID.SC-2,How much of the supplier's total business is provided by the acquirer?,"Scale: 1-5 where 5 is ""90%+ and 1 is ""under 5%"" 
 
 Include option ""I don't know""","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=0;label=""50 - 100%"" | value=10;label=""I don't know""","IF < 25% , RAISE 10
@@ -17,76 +17,76 @@ IF 50-100, no change;
 
 ","Configurable: Ranges and threshold 
 
-Primarily a factor of control, not stability.",Inherent,impact,
+Primarily a factor of control, not stability.",Inherent,impact,,
 2.1.1,PR.AC-1,Does supplier have access to the acquirer's portal for payment?,"Checkboxes: 1) Portal for Payment, 2) Inventory information, 3) Networks and/or systems, 4) Physical facilities","value=2;label=""Yes"" | value=0;label=""No"" | value=2;label=""I don't know""","IF Portal for payment, RAISE 2
 IF Inventory, RAISE 4
 IF Networks and/or systems, RAISE 9
 IF Physical, RAISE 10;
 
-",Dave's Bubble: Include examples,Inherent,impact,
+",Dave's Bubble: Include examples,Inherent,criticality,projects;Project ID,_2_SDA
 2.1.2,PR.AC-1,Does supplier have access to the acquirer's inventory information?,"Checkboxes: 1) Portal for Payment, 2) Inventory information, 3) Networks and/or systems, 4) Physical facilities","value=4;label=""Yes"" | value=0;label=""No"" | value=4;label=""I don't know""","IF Portal for payment, RAISE 2
 IF Inventory, RAISE 4
 IF Networks and/or systems, RAISE 9
 IF Physical, RAISE 10;
 
-",Dave's Bubble: Include examples,Inherent,impact,
+",Dave's Bubble: Include examples,Inherent,criticality,projects;Project ID,_2_SDA
 2.1.3,PR.AC-1,Does supplier have access to the acquirer's networks and/or systems?,"Checkboxes: 1) Portal for Payment, 2) Inventory information, 3) Networks and/or systems, 4) Physical facilities","value=9;label=""Yes"" | value=0;label=""No"" | value=9;label=""I don't know""","IF Portal for payment, RAISE 2
 IF Inventory, RAISE 4
 IF Networks and/or systems, RAISE 9
 IF Physical, RAISE 10;
 
-",Dave's Bubble: Include examples,Inherent,impact,
+",Dave's Bubble: Include examples,Inherent,criticality,projects;Project ID,_3_ICTA
 2.1.4,PR.AC-1,Does supplier have access to the acquirer's physical facilities?,"Checkboxes: 1) Portal for Payment, 2) Inventory information, 3) Networks and/or systems, 4) Physical facilities","value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF Portal for payment, RAISE 2
 IF Inventory, RAISE 4
 IF Networks and/or systems, RAISE 9
 IF Physical, RAISE 10;
 
-",Dave's Bubble: Include examples,Inherent,impact,
+",Dave's Bubble: Include examples,Inherent,criticality,projects;Project ID,_1_PA
 2.2,PR.AC-4,"Does supplier have access to acquirer-sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
-",,Inherent,impact,
+",,Inherent,criticality,projects;Project ID,_2_SDA
 2.3,PR.AC-7,"Does the supplier have access to the acquirer's regulated data (e.g., PII, PHI, PCI, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
-",Include in NIST IR that they may want to customize if they want to separate these questions,Inherent,impact,
+",Include in NIST IR that they may want to customize if they want to separate these questions,Inherent,criticality,projects;Project ID,_2_SDA
 3.1,ID.SC-4,Does this supplier follow relevant industry standards?,"Dropdown: N/A, No, self-attestation, self-attestation with proof, self-attestation with third party assessment, conformity assessment","value=10;label=""no"" | value=7;label=""self-attestation"" | value=5;label=""self-attestation with proof"" | value=3;label=""self-attestation with third-party assessment"" | value=0;label=""conformity assessment"" | value=10;label=""I don't know""","IF no, RAISE 10
 IF self-attestation, RAISE 7
 IF self-attestation with proof, RAISE 5
 IF self attestation with third party assessment, RAISE 3
 IF conformity assessment, no change
-IF N/A, no change",,Residual,impact,
+IF N/A, no change",,Residual,impact,,
 3.2,ID.RM-1,"Does this supplier operate in highly regulated industries or provides products/services to highly regulated industries (e.g., Financial services, Energy)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
-IF no, 10; ",,Inherent,impact,
+IF no, 10; ",,Inherent,impact,,
 4.1,ID.GV-3,"Is the supplier owned, controlled, or influenced in full or in part by an entity of concern (e.g. foreign nation state, competitors)?","Scale: 1-5 where 1 is ""great concern"" and 5 is ""no concern at all""
 
 Include option ""I don't know""","value=10;label=""1 (great concern)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (no concern)"" | value=10;label=""I don't know""","IF 1 (great concern), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
-IF 5 (no concern), no change; ","Dave's Bubble: more detail for potential entities, as well as descriptions of ownership, control, and influence",Inherent,impact,
+IF 5 (no concern), no change; ","Dave's Bubble: more detail for potential entities, as well as descriptions of ownership, control, and influence",Inherent,impact,,
 5.1,ID.SC-3,"How sensitive is the supplier's ability to provide quality products/services to supply chain disruptions, both manmade and natural?","Scale: 1-5 where 1 is ""Very sensitive"" and 5 is ""Very robust""
 
 Include option ""I don't know""","value=10;label=""1 (very sensitive)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (very robust)"" | value=10;label=""I don't know""","IF 1 (very sensitive), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
-IF 5 (very robust), no change; ",,Inherent,impact,
+IF 5 (very robust), no change; ",,Inherent,impact,,
 6.1,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to the acquirer?,Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;
-",,Residual,impact,
+",,Residual,impact,,
 6.2,ID.GV-4,Has the acquirer verified the information provided by the supplier on their supplier questionnaire?,"Not verified (self-attestation), documentation review (self-attestation with proof), third party assessment, acquirer audit","value=10;label=""not provided"" | value=9;label=""not verified"" |  value=5;label=""doc review"" | value=3;label=""third-party audit"" | value=0;label=""acquirer audit"" | value=10;label=""I don't know""","IF not provided, RAISE 10
 IF not verified, RAISE 9
 IF doc review, RAISE 5
 IF third party audit, RAISE 3
 IF acquirer audit, no change; 
 
-",,Residual,impact,
+",,Residual,impact,,
 6.3,ID.SC-3,Is the acquirer able to influence this supplier's security practices through supplier agreements?,"Scale: 1-5 where 1 is ""not at all"" and 5 is ""yes, for all products and services""","value=10;label=""1 (not at all)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (yes, for all product)"" | value=10;label=""I don't know""","IF 1 (not at all), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
-IF 5 (yes, for all product), no change; ",,Inherent,impact,
+IF 5 (yes, for all product), no change; ",,Inherent,impact,,
 7.1,ID.SC-2,Does the acquirer know this supplier's sub-suppliers?,Yes/No,"value=5;label=""No existing relationships"" | value=10;label=""No"" | value=5;label=""Some"" | value=0;label=""All"" | value=10;label=""I don't know""","IF yes, offer sub-supplier list import. RAISE 5 if there are no existing relationships. 
 IF no, RAISE 10
 
@@ -98,6 +98,6 @@ IF All, no change;
 
 ","Yes/No - ""No"" invokes risk, ""yes"" invokes sub-supplier import. Tool should dynamically check whether relationships exist. If there is a relationship, positively impact risk score. Import not required for risk score benefit. No form available to fill out in v1.
 
-",Residual,impact,
+",Residual,impact,,
 8.1,ID.SC-5,"Has the supplier provided the acquirer with mitigation assurances (e.g. insurance, fallback partnerships with other vendors, etc)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
-IF no, RAISE 10;",,Inherent,impact,
+IF no, RAISE 10;",,Inherent,impact,,

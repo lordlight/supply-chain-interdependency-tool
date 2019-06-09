@@ -2,78 +2,137 @@ import { getQuestionResponse } from "./question-responses";
 
 // store here as constant for now, may want to put in data
 const NORMALIZED_VALUES = {
-    suppliers_impact: 100,
-    products_impact: 100,
-    products_criticality: 1,
-    projects_criticality: 10
-}
+  suppliers_impact: 100,
+  products_impact: 100,
+  suppliers_criticality: 1,
+  products_criticality: 1,
+  projects_criticality: 10
+};
 
-export function calculateItemRisk(resourceType, responses, questions, resources) {
-    let perItemRisk = {};
-    const resourcesMap = {};
-    resources.forEach(r => resourcesMap[r.ID] = r);
+export function calculateItemRisk(
+  resourceType,
+  responses,
+  questions,
+  resources
+) {
+  let perItemRisk = {};
+  const resourcesMap = {};
+  resources.forEach(r => (resourcesMap[r.ID] = r));
 
-    // For each item (supplier, product, project) with responses
-    Object.entries(responses).forEach((responseEntry) => {
-        let itemId = responseEntry[0];
-        let itemResponses = responseEntry[1];
+  // For each item (supplier, product, project) with responses
+  Object.entries(responses).forEach(responseEntry => {
+    let itemId = responseEntry[0];
+    let itemResponses = responseEntry[1];
 
-        // impact score, criticality is dictionary keyed by related resource type & id
-        perItemRisk[itemId] = {impact: 0, criticality: {}};
+    // impact score, criticality is dictionary keyed by related resource type & id
+    perItemRisk[itemId] = { impact: 0, criticality: {} };
 
-        questions.forEach((question) => {
-            // SJR will there be a separate weight, or is weight implicit?
-            let questionVal = 1;
-            if (question.hasOwnProperty("Weight")) {
-                questionVal = Number(question.Weight);
+    questions.forEach(question => {
+      // SJR will there be a separate weight, or is weight implicit?
+      let questionVal = 1;
+      if (question.hasOwnProperty("Weight")) {
+        questionVal = Number(question.Weight);
+      }
+      const qtype = question["Type of question"];
+      const qrelation = question.Relation;
+      if (qtype === "criticality") {
+        if (qrelation) {
+          // criticality applies to a specific resource
+          const [qrtype, qkey] = qrelation.split(";");
+          // values are the ids of the resource criticality applies to
+          const qvals = (
+            question[qkey] ||
+            (resourcesMap[itemId] || {})[qkey] ||
+            ""
+          )
+            .split(";")
+            .filter(v => !!v);
+          // compute and score criticality by resource key
+          qvals.forEach(qval => {
+            const ckey = `${qrtype}|${qval}`; // for key need type and id, concatenate
+            const qid = `${question.ID}|${qval}`; // key into answers
+            if (itemResponses.hasOwnProperty(qid)) {
+              const ansInd = Math.max(
+                parseInt(getQuestionResponse(itemResponses[qid])),
+                0
+              );
+              perItemRisk[itemId].criticality[ckey] =
+                (perItemRisk[itemId].criticality[ckey] || 0) +
+                questionVal * question.Answers[ansInd].val;
+            } else {
+              perItemRisk[itemId].criticality[ckey] =
+                (perItemRisk[itemId].criticality[ckey] || 0) +
+                questionVal *
+                  Math.max.apply(
+                    Math,
+                    question.Answers.map(ans => {
+                      return ans.val;
+                    })
+                  );
+              //   console.log(
+              //     ">>>>",
+              //     resourceType,
+              //     itemId,
+              //     ckey,
+              //     qid,
+              //     getQuestionResponse(itemResponses[qid]),
+              //     perItemRisk[itemId].criticality[ckey]
+              //   );
             }
-            const qtype = question["Type of question"];
-            const qrelation = question.Relation;
-            if (qtype === "criticality") {
-                if (qrelation) {
-                    // criticality applies to a specific resource
-                    const [ qrtype, qkey ] = qrelation.split(";");
-                    // values are the ids of the resource criticality applies to
-                    const qvals = ((resourcesMap[itemId] || {})[qkey] || "").split(";").filter(v => !!v);
-                    // compute and score criticality by resource key
-                    qvals.forEach(qval => {
-                        const ckey = `${qrtype}|${qval}`; // for key need type and id, concatenate
-                        const qid = `${question.ID}|${qval}`; // key into answers
-                        if (itemResponses.hasOwnProperty(qid)) {
-                            const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[qid])), 0);
-                            perItemRisk[itemId].criticality[ckey] = (perItemRisk[itemId].criticality[ckey] || 0) + questionVal * (question.Answers[ansInd].val);
-                        } else {
-                            perItemRisk[itemId].criticality[ckey] = (perItemRisk[itemId].criticality[ckey] || 0) + questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
-                        }
-                    });
-                } else {
-                    // TODO: need "Relation" to be defined for criticality, otherwise skip; report error in some way?
-                }
-            } else { // impact question
-                if (itemResponses.hasOwnProperty(question.ID)){
-                    const ansInd = Math.max(parseInt(getQuestionResponse(itemResponses[question.ID])), 0);
-                    //console.log("****answer given: ", questionVal * (question.Answers[ansInd].val));
-                    // perItemRisk[itemId].impact += questionVal * (question.Answers[ansInd].val);
-                    perItemRisk[itemId][qtype] = (perItemRisk[itemId][qtype] || 0) + questionVal * (question.Answers[ansInd].val);
-                } else {
-                    //console.log("no answer given: ",  Math.max.apply(Math, question.Answers.map(ans => { return ans.val})))
-                    // perItemRisk[itemId].impact += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
-                    perItemRisk[itemId][qtype] = (perItemRisk[itemId][qtype] || 0) + questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
-                }
-            }
-        });
-        // normalize impact score
-        const nval = NORMALIZED_VALUES[`${resourceType}_impact`];
-        perItemRisk[itemId].impact = perItemRisk[itemId].impact / getMaxImpactRisk(questions) * nval;
-        // normalize criticality score(s)
-        Object.keys(perItemRisk[itemId].criticality || {}).forEach(qkey => {
-            const qrType = qkey.split("|")[0];
-            const nval = NORMALIZED_VALUES[`${resourceType}_criticality`];
-            perItemRisk[itemId].criticality[qkey] = perItemRisk[itemId].criticality[qkey] / getMaxCriticalityRisk(questions, qrType) * nval;
-        })
+          });
+        } else {
+          // TODO: need "Relation" to be defined for criticality, otherwise skip; report error in some way?
+        }
+      } else {
+        // impact question
+        if (itemResponses.hasOwnProperty(question.ID)) {
+          const ansInd = Math.max(
+            parseInt(getQuestionResponse(itemResponses[question.ID])),
+            0
+          );
+          //console.log("****answer given: ", questionVal * (question.Answers[ansInd].val));
+          // perItemRisk[itemId].impact += questionVal * (question.Answers[ansInd].val);
+          perItemRisk[itemId][qtype] =
+            (perItemRisk[itemId][qtype] || 0) +
+            questionVal * question.Answers[ansInd].val;
+        } else {
+          //console.log("no answer given: ",  Math.max.apply(Math, question.Answers.map(ans => { return ans.val})))
+          // perItemRisk[itemId].impact += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
+          perItemRisk[itemId][qtype] =
+            (perItemRisk[itemId][qtype] || 0) +
+            questionVal *
+              Math.max.apply(
+                Math,
+                question.Answers.map(ans => {
+                  return ans.val;
+                })
+              );
+        }
+      }
     });
-    // console.log("per item risk: ", perItemRisk);
-    return perItemRisk;
+    // normalize impact score
+    const nval = NORMALIZED_VALUES[`${resourceType}_impact`];
+    perItemRisk[itemId].impact =
+      (perItemRisk[itemId].impact / getMaxImpactRisk(questions)) * nval;
+    // normalize criticality score(s)
+    Object.keys(perItemRisk[itemId].criticality || {}).forEach(qkey => {
+      const [qrType, qrId] = qkey.split("|");
+      const nval = NORMALIZED_VALUES[`${resourceType}_criticality`];
+      //   console.log(
+      //     "RRRRR",
+      //     qrType,
+      //     qrId,
+      //     perItemRisk[itemId].criticality[qkey],
+      //     getMaxCriticalityRisk(questions, qrType, qrId)
+      //   );
+      perItemRisk[itemId].criticality[qkey] =
+        (perItemRisk[itemId].criticality[qkey] /
+          getMaxCriticalityRisk(questions, qrType, qrId)) *
+        nval;
+    });
+  });
+  //   console.log("per item risk: ", perItemRisk);
+  return perItemRisk;
 }
 
 // export function calculateTypeRiskFromItemsRisk(itemsRisk){
@@ -81,30 +140,64 @@ export function calculateItemRisk(resourceType, responses, questions, resources)
 //     if (Object.values(itemsRisk).length > 0) {
 //         return Object.values(itemsRisk).map(r => r.impact).reduce((a, b) => a + b) / Object.keys(itemsRisk).length;
 //     }
-    
+
 //     return 0;
 // }
 
 function getMaxImpactRisk(questions) {
-    let maxRisk = 0;
-    questions.filter(q => q['Type of question'] === "impact").forEach(question => {
-        let questionVal = 1;
-        if (question.hasOwnProperty("Weight")){
-            questionVal = Number(question.Weight);
-        }
-        maxRisk += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
+  let maxRisk = 0;
+  questions
+    .filter(q => q["Type of question"] === "impact")
+    .forEach(question => {
+      let questionVal = 1;
+      if (question.hasOwnProperty("Weight")) {
+        questionVal = Number(question.Weight);
+      }
+      maxRisk +=
+        questionVal *
+        Math.max.apply(
+          Math,
+          question.Answers.map(ans => {
+            return ans.val;
+          })
+        );
     });
 
-    return maxRisk;
+  return maxRisk;
 }
 
 // Get maximum possible criticality risk score for an item, given a resource type the criticality applies to.
 // if no resource type, applies globally to item
-function getMaxCriticalityRisk(questions, resourceType="") {
-    let maxRisk = 0;
-    questions.filter(q => q['Type of question'] === "criticality" && (q.Relation || "").split(";")[0] === resourceType).forEach(question => {
-        const questionVal = question.Weight || 1;
-        maxRisk += questionVal * Math.max.apply(Math, question.Answers.map(ans => { return ans.val}));
+function getMaxCriticalityRisk(questions, resourceType = "", resourceId = "") {
+  let maxRisk = 0;
+  questions
+    .filter(q => {
+      const [rtype, rkey] = (q.Relation || "").split(";");
+      let resourceMatch;
+      if (q[rkey]) {
+        // override on question relations
+        const qids = q[rkey].split(";");
+        resourceMatch = qids.indexOf(resourceId) !== -1;
+      } else {
+        // "wildcard" applies to all relations on resource
+        resourceMatch = !resourceId.startsWith("_");
+      }
+      return (
+        q["Type of question"] === "criticality" &&
+        rtype === resourceType &&
+        resourceMatch
+      );
+    })
+    .forEach(question => {
+      const questionVal = question.Weight || 1;
+      maxRisk +=
+        questionVal *
+        Math.max.apply(
+          Math,
+          question.Answers.map(ans => {
+            return ans.val;
+          })
+        );
     });
-    return maxRisk;
+  return maxRisk;
 }

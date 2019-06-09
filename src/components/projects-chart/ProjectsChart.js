@@ -138,7 +138,6 @@ const ProjectNodeComponent = ({ node }) => {
 class ProjectsChart extends Component {
   initChartData = () => {
     const traverse = parent => {
-      console.log(parent.Name);
       const node = {
         project: parent,
         projectRisk: this.props.projectsRisk[parent.ID]
@@ -157,7 +156,6 @@ class ProjectsChart extends Component {
 
   render = () => {
     const chartData = this.initChartData();
-    console.log(chartData);
     // const buckets = [0, 0, 0, 0, 0];
     // Object.values(this.props.projectsRisk).map(risk => Object.values(risk.criticality).reduce((total, x) => total + x, 0) || 10).forEach(crit => {
     //     const bucket = Math.min(Math.floor(crit / 2), 4);
