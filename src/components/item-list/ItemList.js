@@ -10,7 +10,6 @@ import { ItemVisualCard, QuestionStatusCard } from "../../components";
 
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Snackbar from "@material-ui/core/Snackbar";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -185,7 +184,7 @@ class ItemList extends Component {
       responses = this.props.projectResponses;
     }
 
-    const hasImpact = questions.some(q => q["Type of question"] === "impact");
+    const hasScore = questions.some(q => q["Type of question"] === "score");
     const hasCriticality = questions.some(
       q => q["Type of question"] === "criticality"
     );
@@ -203,11 +202,11 @@ class ItemList extends Component {
         cssClass: classes.regCol,
         sortType: "risk.criticality.max"
       },
-      hasImpact && {
+      hasScore && {
         label: "Questionnaire Score",
         tooltip: "Sort by questionnaire score",
         cssClass: classes.regCol,
-        sortType: "risk.impact"
+        sortType: "risk.score"
       },
       {
         label: "Questions Complete",
@@ -254,7 +253,7 @@ class ItemList extends Component {
         riskSet.hasOwnProperty(item.ID) &&
         responses[item.ID]
       ) {
-        item["risk.impact"] = riskSet[item.ID].impact;
+        item["risk.score"] = riskSet[item.ID].score;
         if (hasCriticality) {
           item["risk.criticality.max"] = Math.max(
             ...Object.values(riskSet[item.ID].criticality)
@@ -302,7 +301,7 @@ class ItemList extends Component {
                 : "N/A"}
             </TableCell>
           )}
-          {hasImpact && (
+          {hasScore && (
             <TableCell
               className={classes.cell}
               style={{ whiteSpace: "nowrap" }}
@@ -310,13 +309,13 @@ class ItemList extends Component {
               <div className={classes.scoreColPart}>
                 {(() => {
                   if (riskSet.hasOwnProperty(row.ID))
-                    return riskSet[row.ID].impact.toFixed(1);
+                    return riskSet[row.ID].score.toFixed(1);
                   else return "N/A";
                 })()}
               </div>
               <div
                 className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-                style={{ width: riskSet[row.ID].impact }}
+                style={{ width: riskSet[row.ID].score }}
               />
             </TableCell>
           )}

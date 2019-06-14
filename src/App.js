@@ -38,6 +38,9 @@ const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true
+  },
   palette: {
     primary: {
       main: "#12659c"
@@ -185,33 +188,35 @@ class App extends Component {
     }
     if (nextProps.shadowProjects.length > 0) {
       const organizations = nextProps.projects.filter(proj => !proj.parent);
-      const parentId = organizations[0].ID;
-      const projectResponses = {};
-      nextProps.shadowProjects.forEach(proj => {
-        const responses = {};
-        Object.entries(proj.default_responses).forEach(entry => {
-          responses[`${entry[0]}|${parentId}`] = entry[1];
+      if (organizations.length > 0) {
+        const parentId = organizations[0].ID;
+        const projectResponses = {};
+        nextProps.shadowProjects.forEach(proj => {
+          const responses = {};
+          Object.entries(proj.default_responses).forEach(entry => {
+            responses[`${entry[0]}|${parentId}`] = entry[1];
+          });
+          projectResponses[proj.ID] = responses;
         });
-        projectResponses[proj.ID] = responses;
-      });
-      const projects = nextProps.shadowProjects.map(pr => {
-        return {
-          ...pr,
-          parent: organizations[0],
-          "Parent ID": organizations[0].ID
-        };
-      });
-      store.dispatch(
-        updateTypeRisk({
-          type: "projects",
-          itemsRisk: calculateItemRisk(
-            "projects",
-            projectResponses,
-            nextProps.projectQuestions,
-            projects
-          )
-        })
-      );
+        const projects = nextProps.shadowProjects.map(pr => {
+          return {
+            ...pr,
+            parent: organizations[0],
+            "Parent ID": organizations[0].ID
+          };
+        });
+        store.dispatch(
+          updateTypeRisk({
+            type: "projects",
+            itemsRisk: calculateItemRisk(
+              "projects",
+              projectResponses,
+              nextProps.projectQuestions,
+              projects
+            )
+          })
+        );
+      }
     }
   }
 

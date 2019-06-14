@@ -18,7 +18,7 @@ const SHADOW_RESOURCES = {
   // projects directly off of top-level (organization)
   projects: [
     {
-      ID: "_1_PA",
+      ID: "PA",
       Name: "Physical Access",
       type: "shadow",
       default_responses: {
@@ -26,7 +26,7 @@ const SHADOW_RESOURCES = {
       }
     },
     {
-      ID: "_2_SDA",
+      ID: "SDA",
       Name: "Sensitive Data Access",
       type: "shadow",
       default_responses: {
@@ -34,7 +34,7 @@ const SHADOW_RESOURCES = {
       }
     },
     {
-      ID: "_3_ICTA",
+      ID: "ICTA",
       Name: "ICT Access",
       type: "shadow",
       default_responses: {

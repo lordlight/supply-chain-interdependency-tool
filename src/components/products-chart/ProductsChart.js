@@ -38,8 +38,8 @@ class ProductsChart extends Component {
     const buckets = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
 
     Object.values(this.props.productsRisk).forEach(risk => {
-      const impact = Math.max(risk.impact || 100, 0);
-      const col = Math.min(Math.floor(impact * 0.03), 2);
+      const score = Math.max(risk.score || 100, 0);
+      const col = Math.min(Math.floor(score * 0.03), 2);
       const criticality = Math.max(...Object.values(risk.criticality), 0);
       const row = Math.min(Math.floor(criticality * 3.0), 2);
       buckets[row][col]++;
