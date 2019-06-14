@@ -397,19 +397,13 @@ class RiskGraph extends Component {
       ...new Set(
         this.props.productQuestions
           .filter(q => !!q["Project ID"])
-          .map(q => q["Project ID"].split(";"))
+          .map(q => getCellMultiples(q["Project ID"]))
           .flat()
       )
     ];
     const projectToProductEdges = products
       .map(prod => {
-        // const projectIds = [
-        //   ...(prod["Project ID"] || "").split(";").filter(pid => !!pid),
-        //   ...productQuestionProjectIds
-        // ];
-        const projectIds = (prod["Project ID"] || "")
-          .split(";")
-          .filter(pid => !!pid);
+        const projectIds = getCellMultiples(prod["Project ID"] || "");
         const productScore = (props.productsRisk[prod.ID] || {}).score || 0;
         const productEdges = projectIds.map(prid => {
           const key = `projects|${prid}`;
@@ -475,7 +469,7 @@ class RiskGraph extends Component {
       ...new Set(
         this.props.supplierQuestions
           .filter(q => !!q["Project ID"])
-          .map(q => q["Project ID"].split(";"))
+          .map(q => getCellMultiples(q["Project ID"]))
           .flat()
       )
     ];
@@ -558,9 +552,7 @@ class RiskGraph extends Component {
       const supId = prod["Supplier ID"];
       const supplierRisk = (props.suppliersRisk[supId] || {}).score || 0;
       const productRisk = (props.productsRisk[prod.ID] || {}).score || 0;
-      const projectIds = (prod["Project ID"] || "")
-        .split(";")
-        .filter(pid => !!pid);
+      const projectIds = getCellMultiples(prod["Project ID"] || "");
       let totalImpactScore = 0;
 
       projectIds.forEach(prid => {
