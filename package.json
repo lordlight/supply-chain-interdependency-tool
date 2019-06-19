@@ -10,6 +10,7 @@
 		"@material-ui/lab": "^3.0.0-alpha.30",
 		"chart.js": "^2.8.0",
 		"chartjs-plugin-datalabels": "^0.6.0",
+		"clsx": "^1.0.4",
 		"csv-parse": "^4.4.0",
 		"csv-parser": "^2.2.0",
 		"d3": "^5.9.2",

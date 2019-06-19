@@ -219,7 +219,7 @@ class QuestionStatusCard extends Component {
         </CardActions>
         <Dialog
           onClose={() => this.setState({ dialogOpen: false })}
-          aria-labelledby="simple-dialog-title"
+          aria-labelledby="simulation-dialog-title"
           open={this.state.dialogOpen}
         >
           <DialogTitle id="simulation-dialog-title">

@@ -11,7 +11,8 @@ import {
   UPDATE_IMPORT_STATE,
   UPDATE_NAV_STATE,
   UPDATE_TEMP_RESPONSES,
-  UPDATE_TYPE_RISK
+  UPDATE_TYPE_RISK,
+  RESET
 } from "../actions";
 
 const SHADOW_RESOURCES = {
@@ -290,6 +291,13 @@ function rootReducer(state = initialState, action) {
       //     projectsRisk: action.payload.itemsRisk
       //   });
     }
+  } else if (action.type === RESET) {
+    return {
+      ...initialState,
+      supplierQuestions: state.supplierQuestions,
+      productQuestions: state.productQuestions,
+      projectQuestions: state.projectQuestions
+    };
   }
   return state;
 }

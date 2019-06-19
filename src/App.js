@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import clsx from "clsx";
 import "./App.css";
 import {
   /*Breadcrumb,*/ Home,
@@ -14,7 +15,8 @@ import {
   updateCurrentItem,
   updateNavState,
   updateTempResponses,
-  updateTypeRisk
+  updateTypeRisk,
+  reset
 } from "./redux/actions";
 
 // Risk calculation
@@ -23,15 +25,28 @@ import { calculateItemRisk } from "./utils/risk-calculations";
 import { withStyles } from "@material-ui/core/styles";
 import {
   AppBar,
+  Drawer,
   IconButton,
   Tab,
   Tabs,
   Toolbar,
-  Typography
+  Typography,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Button
 } from "@material-ui/core";
+
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeft from "@material-ui/icons/ChevronLeft";
+import ChevronRight from "@material-ui/icons/ChevronRight";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
@@ -58,8 +73,21 @@ const theme = createMuiTheme({
 });
 
 const styles = theme => ({
+  appbar: {
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  },
+  appbarShift: {
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    }),
+    marginLeft: 240
+  },
   toolbar: {
-    paddingLeft: "0px"
+    paddingLeft: 0
   },
   questionsToolbar: {
     paddingLeft: "0px",
@@ -93,7 +121,40 @@ const styles = theme => ({
       color: "#12659c"
     }
   },
-  tabSelected: {}
+  tabSelected: {},
+  drawer: {
+    width: 240,
+    flexShrink: 0
+  },
+  drawerPaper: {
+    width: 240
+  },
+  drawerHeader: {
+    display: "flex",
+    alignItems: "center",
+    padding: "0 8px",
+    ...theme.mixins.toolbar,
+    justifyContent: "flex-end"
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing.unit * 3,
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    }),
+    marginLeft: 0
+  },
+  contentShift: {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    }),
+    marginLeft: 240
+  },
+  hide: {
+    display: "none"
+  }
 });
 
 const mapState = state => ({
@@ -113,9 +174,18 @@ const mapState = state => ({
 });
 
 class App extends Component {
+  state = {
+    drawerOpen: false,
+    clearDialogOpen: false
+  };
+
   componentDidMount() {
     // Let the main/server know the app has started.
     ipcRenderer.send("renderer-loaded");
+    ipcRenderer.on("clear-all-data-response", (event, arg) => {
+      store.dispatch(reset());
+      this.handleDrawerClose();
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -233,6 +303,15 @@ class App extends Component {
     store.dispatch(updateTempResponses({ tempResponses: {} }));
   };
 
+  handleDrawerOpen = event => this.setState({ drawerOpen: true });
+  handleDrawerClose = event => this.setState({ drawerOpen: false });
+  handleQuit = event => window.close();
+  handleClearAllData = event => ipcRenderer.send("clear-all-data");
+
+  handleClearDialogClose = () => {
+    this.setState({ clearDialogOpen: false });
+  };
+
   render() {
     const { classes } = this.props;
     const value = this.props.navState;
@@ -242,12 +321,21 @@ class App extends Component {
     const projProps = { currentType: "projects" };
     return (
       <MuiThemeProvider theme={theme}>
-        <AppBar position="static">
+        <AppBar
+          position="static"
+          className={clsx(classes.appbar, {
+            [classes.appbarShift]: this.state.drawerOpen
+          })}
+        >
           <Toolbar className={classes.toolbar}>
             <IconButton
-              className={this.props.menuButton}
+              className={clsx(
+                this.props.menuButton,
+                this.state.drawerOpen && classes.hide
+              )}
               color="inherit"
               aria-label="Open drawer"
+              onClick={this.handleDrawerOpen}
             >
               <MenuIcon />
             </IconButton>
@@ -336,11 +424,86 @@ class App extends Component {
             </Toolbar>
           )}
         </AppBar>
-        {value === "home" && <Home />}
-        {value === "projects" && <ItemOverview />}
-        {value === "products" && <ItemOverview />}
-        {value === "suppliers" && <ItemOverview />}
-        {value === "network" && <RiskGraph />}
+        <Drawer
+          className={classes.drawer}
+          variant="persistent"
+          anchor="left"
+          open={this.state.drawerOpen}
+          classes={{
+            paper: classes.drawerPaper
+          }}
+        >
+          <div className={classes.drawerHeader}>
+            <IconButton onClick={this.handleDrawerClose}>
+              {theme.direction === "ltr" ? <ChevronLeft /> : <ChevronRight />}
+            </IconButton>
+          </div>
+          <Divider />
+          <List>
+            <ListItem button>
+              <ListItemText primary="About..." />
+            </ListItem>
+            <ListItem button>
+              <ListItemText primary="Edit Question Weightings..." />
+            </ListItem>
+            <ListItem button>
+              <ListItemText primary="Preferences..." />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <ListItem
+              button
+              onClick={() => this.setState({ clearDialogOpen: true })}
+            >
+              <ListItemText primary="Clear All Data..." />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <ListItem button onClick={this.handleQuit}>
+              <ListItemText primary="Close" />
+            </ListItem>
+          </List>
+        </Drawer>
+        <div
+          className={clsx(classes.content, {
+            [classes.contentShift]: this.state.drawerOpen
+          })}
+        >
+          {value === "home" && <Home />}
+          {value === "projects" && <ItemOverview />}
+          {value === "products" && <ItemOverview />}
+          {value === "suppliers" && <ItemOverview />}
+          {value === "network" && <RiskGraph />}
+        </div>
+        <Dialog
+          onClose={() => this.setState({ clearDialogOpen: false })}
+          aria-labelledby="clear-dialog-title"
+          open={this.state.clearDialogOpen}
+        >
+          <DialogTitle id="clear-dialog-title">Clear All Data</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Warning: this will permanently remove all supplier, product and
+              project data, as well as any question responses. Continue?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClearDialogClose} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                this.handleClearAllData();
+                this.handleClearDialogClose();
+              }}
+              color="primary"
+            >
+              Continue
+            </Button>
+          </DialogActions>
+        </Dialog>
       </MuiThemeProvider>
     );
   }
