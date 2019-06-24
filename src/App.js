@@ -45,12 +45,20 @@ import {
 
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
+import CloseIcon from "@material-ui/icons/Close";
 import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import ChevronRight from "@material-ui/icons/ChevronRight";
+
+import { version, versiondate, fullname } from "../package.json";
+import About from "./imgs/about.png";
+// import About from "./components/about/About";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
+
+const ABOUT_HEIGHT = 480;
+const ABOUT_WIDTH = 960;
 
 const theme = createMuiTheme({
   typography: {
@@ -154,6 +162,31 @@ const styles = theme => ({
   },
   hide: {
     display: "none"
+  },
+  about: {
+    backgroundImage: `url(${About}), none`,
+    backgroundSize: "contain",
+    height: ABOUT_HEIGHT,
+    width: ABOUT_WIDTH,
+    maxWidth: ABOUT_WIDTH
+  },
+  aboutName: {
+    fontFamily: "sans-serif",
+    fontWeight: "bold",
+    color: "white",
+    fontSize: "2em",
+    position: "absolute",
+    left: 40,
+    bottom: 103
+  },
+  aboutVersion: {
+    fontFamily: "sans-serif",
+    fontWeight: "bold",
+    color: "#d8d8d8",
+    fontSize: "1.5em",
+    position: "absolute",
+    left: 40,
+    bottom: 72
   }
 });
 
@@ -176,7 +209,8 @@ const mapState = state => ({
 class App extends Component {
   state = {
     drawerOpen: false,
-    clearDialogOpen: false
+    clearDialogOpen: false,
+    aboutOpen: false
   };
 
   componentDidMount() {
@@ -306,6 +340,9 @@ class App extends Component {
   handleDrawerOpen = event => this.setState({ drawerOpen: true });
   handleDrawerClose = event => this.setState({ drawerOpen: false });
   handleQuit = event => window.close();
+  handleAboutOpen = event =>
+    this.setState({ aboutOpen: true, drawerOpen: false });
+  handleAboutClose = event => this.setState({ aboutOpen: false });
   handleClearAllData = event => ipcRenderer.send("clear-all-data");
 
   handleClearDialogClose = () => {
@@ -345,7 +382,7 @@ class App extends Component {
               color="inherit"
               style={{ fontWeight: "regular" }}
             >
-              NIST Cyber Supply Chain Management
+              {fullname}
             </Typography>
           </Toolbar>
           {this.props.currentItem == null ? (
@@ -440,7 +477,7 @@ class App extends Component {
           </div>
           <Divider />
           <List>
-            <ListItem button>
+            <ListItem button onClick={this.handleAboutOpen}>
               <ListItemText primary="About..." />
             </ListItem>
             <ListItem button>
@@ -503,6 +540,25 @@ class App extends Component {
               Continue
             </Button>
           </DialogActions>
+        </Dialog>
+        <Dialog
+          classes={{ paper: classes.about }}
+          open={this.state.aboutOpen}
+          onClose={this.handleAboutClose}
+        >
+          <div style={{ color: "white" }}>
+            <IconButton
+              onClick={this.handleAboutClose}
+              color="inherit"
+              style={{ float: "right" }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <Typography className={classes.aboutName}>{fullname}</Typography>
+          <Typography className={classes.aboutVersion}>
+            {`Version ${version} - ${versiondate}`}
+          </Typography>
         </Dialog>
       </MuiThemeProvider>
     );
