@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import store from "../../redux/store";
-
 import { withStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -10,6 +8,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
+import Typography from "@material-ui/core/Typography";
+
+import AssignmentLateIcon from "@material-ui/icons/AssignmentLate";
 
 import { getQuestionResponse } from "../../utils/question-responses";
 
@@ -73,17 +74,41 @@ class Question extends Component {
           }}
         >
           <FormLabel component="legend">
-            <span
+            <div style={{ display: "flex" }}>
+              {response === 0 && (
+                // <span
+                //   style={{
+                //     verticalAlign: "middle"
+                //     // color: "primary"
+                //   }}
+                // >
+                <Typography
+                  color="primary"
+                  style={{
+                    float: "left",
+                    verticalAlign: "middle",
+                    marginRight: 6
+                  }}
+                >
+                  <AssignmentLateIcon />
+                </Typography>
+                // </span>
+              )}
+
+              {/* <span
               style={{
                 fontWeight: "bolder",
                 fontSize: "larger",
                 verticalAlign: "middle",
-                color: "red"
+                color: "blue"
               }}
             >
-              {response === 0 ? "* " : ""}
-            </span>
-            <span>{this.props.questionText}</span>
+              {response === 0 ? "! " : ""}
+            </span> */}
+              <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
+                {this.props.questionText}
+              </span>
+            </div>
           </FormLabel>
           <FormControl component="fieldset" className="question-form">
             <Select
