@@ -9,7 +9,7 @@ import {
   updateTempResponses
 } from "../../redux/actions";
 
-import { Question } from "../../components/";
+import { Question, SupplierDetails } from "../../components/";
 
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -20,12 +20,13 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
 
 import { getQuestionResponse } from "../../utils/question-responses";
 
 const styles = theme => ({
   questionList: {
-    padding: "32px 8px 40px 44px"
+    padding: "32px 8px 32px 44px"
   },
   buttonContainer: {
     marginLeft: "24px",
@@ -253,61 +254,76 @@ class QuestionList extends Component {
     criticalityRows = [].concat(...criticalityRows);
 
     return (
-      <div className={classes.questionList}>
-        {criticalityRows.length > 0 && (
+      <React.Fragment>
+        {type === "suppliers" && (
           <React.Fragment>
-            {impactRows.length > 0 && (
-              <Typography variant="subtitle2" className={classes.sectionTitle}>
-                Criticality Questions
-              </Typography>
-            )}
-            <Table className={this.props.table} border={0}>
-              {/* <TableHead>
+            <div className={classes.questionList}>
+              <SupplierDetails supplier={item} />
+            </div>
+            <Divider />
+          </React.Fragment>
+        )}
+        <div className={classes.questionList}>
+          {criticalityRows.length > 0 && (
+            <React.Fragment>
+              {impactRows.length > 0 && (
+                <Typography
+                  variant="subtitle2"
+                  className={classes.sectionTitle}
+                >
+                  Criticality Questions
+                </Typography>
+              )}
+              <Table className={this.props.table} border={0}>
+                {/* <TableHead>
                                 <TableRow style={{border: "none"}}>
                                     <TableCell style={{border: "none"}}>
                                     </TableCell>
                                 </TableRow>
                             </TableHead> */}
-              <TableBody>{criticalityRows}</TableBody>
-            </Table>
-          </React.Fragment>
-        )}
-        {impactRows.length > 0 && (
-          <React.Fragment>
-            {criticalityRows.length > 0 && (
-              <Typography variant="subtitle2" className={classes.sectionTitle}>
-                Impact Questions
-              </Typography>
-            )}
-            <Table className={this.props.table} border={0}>
-              {/* <TableHead>
+                <TableBody>{criticalityRows}</TableBody>
+              </Table>
+            </React.Fragment>
+          )}
+          {impactRows.length > 0 && (
+            <React.Fragment>
+              {criticalityRows.length > 0 && (
+                <Typography
+                  variant="subtitle2"
+                  className={classes.sectionTitle}
+                >
+                  Impact Questions
+                </Typography>
+              )}
+              <Table className={this.props.table} border={0}>
+                {/* <TableHead>
                                 <TableRow style={{border: "none"}}>
                                     <TableCell style={{border: "none"}}>
                                     </TableCell>
                                 </TableRow>
                             </TableHead> */}
-              <TableBody>{impactRows}</TableBody>
-            </Table>
-          </React.Fragment>
-        )}
-        <div className={classes.buttonContainer}>
-          <Button
-            onClick={this.handleCancel}
-            variant="contained"
-            className={classes.tertiaryButton}
-          >
-            CANCEL
-          </Button>
-          <Button
-            onClick={this.handleSave}
-            variant="contained"
-            color="primary"
-            className={classes.button}
-          >
-            OK
-          </Button>
-        </div>
-        {/*<Snackbar
+                <TableBody>{impactRows}</TableBody>
+              </Table>
+            </React.Fragment>
+          )}
+          <div className={classes.buttonContainer}>
+            <Button
+              onClick={this.handleCancel}
+              variant="contained"
+              className={classes.tertiaryButton}
+            >
+              CANCEL
+            </Button>
+            <Button
+              onClick={this.handleSave}
+              variant="contained"
+              color="primary"
+              className={classes.button}
+            >
+              OK
+            </Button>
+          </div>
+          {/*<Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
                         horizontal: 'right',
@@ -318,7 +334,8 @@ class QuestionList extends Component {
                     }}
                     message={<span id="message-id">Current Risk: {riskVal}</span>}
                 />*/}
-      </div>
+        </div>
+      </React.Fragment>
     );
   }
 }

@@ -157,25 +157,25 @@ class ItemList extends Component {
 
     let type = this.props.currentType;
 
-    let list = null;
+    let items = null;
     let questions = null;
     let responses = null;
     // let riskVal = null;
     let riskSet = null;
     if (type === "suppliers") {
-      list = [...this.props.suppliers, ...this.props.suppliersInactive];
+      items = [...this.props.suppliers, ...this.props.suppliersInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
       riskSet = this.props.suppliersRisk;
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
     } else if (type === "products") {
-      list = [...this.props.products, ...this.props.productsInactive];
+      items = [...this.props.products, ...this.props.productsInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
       riskSet = this.props.productsRisk;
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
     } else if (type === "projects") {
-      list = [...this.props.projects, ...this.props.projectsInactive].filter(
+      items = [...this.props.projects, ...this.props.projectsInactive].filter(
         proj => !!proj.parent
       );
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
@@ -247,30 +247,33 @@ class ItemList extends Component {
     ));
 
     const now = Date.now();
-    list.forEach(item => {
+    const list = items.map(item => {
+      // shouldn't modify items in place; keep reference to original item
+      const listItem = { ...item, item };
       if (
         item._cscrm_active &&
         riskSet.hasOwnProperty(item.ID) &&
         responses[item.ID]
       ) {
-        item["risk.score"] = riskSet[item.ID].score;
+        listItem["risk.score"] = riskSet[item.ID].score;
         if (hasCriticality) {
-          item["risk.criticality.max"] = Math.max(
+          listItem["risk.criticality.max"] = Math.max(
             ...Object.values(riskSet[item.ID].criticality)
           );
         }
         const numQuestions = this.getNumQuestionsForResource(item, questions);
-        item.completion =
+        listItem.completion =
           100 * (Object.keys(responses[item.ID]).length / numQuestions);
         const lastResponded = Math.max(
           ...Object.values(responses[item.ID] || {})
             .map(val => getQuestionResponseTimestamp(val))
             .filter(val => !!val)
         );
-        item.age = now - lastResponded; // will be infinity if no responses
-        item.action =
+        listItem.age = now - lastResponded; // will be infinity if no responses
+        listItem.action =
           Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit";
       }
+      return listItem;
     });
 
     list.sort((a, b) => {
@@ -333,7 +336,7 @@ class ItemList extends Component {
                   : "primary"
               }
               className={classes.button}
-              onClick={e => this.handleItemSelection(e, row)}
+              onClick={e => this.handleItemSelection(e, row.item)}
             >
               {(() => {
                 if (Object.keys(responses[row.ID] || {}).length === 0) {
