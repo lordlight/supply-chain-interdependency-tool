@@ -128,7 +128,6 @@ class ItemList extends Component {
   };
 
   getNumQuestionsForResource = (item, questions) => {
-    console.log("QUESTIONS LENGTH", questions.length);
     return questions
       .map(q => {
         if (q.Relation) {
@@ -136,7 +135,6 @@ class ItemList extends Component {
           const rids = (q[rkey] || item[rkey] || "")
             .split(";")
             .filter(i => !!i);
-          console.log("RIDS", rkey, rids);
           return rids.length;
         } else {
           return 1;
@@ -171,7 +169,6 @@ class ItemList extends Component {
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
       riskSet = this.props.suppliersRisk;
       questions = this.props.supplierQuestions;
-      console.log("QQQQ", questions);
       responses = this.props.supplierResponses;
     } else if (type === "products") {
       items = [...this.props.products, ...this.props.productsInactive];
@@ -267,7 +264,6 @@ class ItemList extends Component {
           );
         }
         const numQuestions = this.getNumQuestionsForResource(item, questions);
-        console.log("NUM QUESTIONS", numQuestions, responses[item.ID]);
         listItem.completion =
           100 * (Object.keys(responses[item.ID]).length / numQuestions);
         const lastResponded = Math.max(
