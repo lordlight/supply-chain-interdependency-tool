@@ -1,60 +1,62 @@
 {
-	"name": "CSCRM",
-	"version": "0.1.0",
-	"private": true,
-	"homepage": "./",
-	"main": "public/electron.js",
-	"dependencies": {
-		"@material-ui/core": "^3.9.2",
-		"@material-ui/icons": "^3.0.2",
-		"@material-ui/lab": "^3.0.0-alpha.30",
-		"chart.js": "^2.8.0",
-		"chartjs-plugin-datalabels": "^0.6.0",
-		"clsx": "^1.0.4",
-		"csv-parse": "^4.4.0",
-		"csv-parser": "^2.2.0",
-		"d3": "^5.9.2",
-		"electron-devtools-installer": "^2.2.4",
-		"electron-is-dev": "^1.0.1",
-		"json2csv": "^4.5.1",
-		"react": "^16.8.5",
-		"react-chartjs-2": "^2.7.6",
-		"react-dev-utils": "^8.0.0",
-		"react-dom": "^16.8.5",
-		"react-force-graph": "^1.21.1",
-		"react-graph-vis": "^1.0.2",
-		"react-orgchart": "^1.0.5",
-		"react-redux": "^7.0.1",
-		"react-router-dom": "^5.0.0",
-		"redux": "^4.0.1",
-		"strip-bom": "^3.0.0",
-		"strip-bom-stream": "^3.0.0",
-		"survey-react": "^1.0.76"
-	},
-	"scripts": {
-		"dev": "yarn react-scripts start",
-		"build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; cp -a ./assets/. ./build/assets/; npm --prefix ./build install ./build",
-		"start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-		"pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.'",
-		"pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite",
-		"pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
-	},
-	"eslintConfig": {
-		"extends": "react-app"
-	},
-	"browserslist": [
-		">0.2%",
-		"not dead",
-		"not ie <= 11",
-		"not op_mini all"
-	],
-	"devDependencies": {
-		"concurrently": "^4.1.0",
-		"cross-env": "^5.2.0",
-		"electron": "^4.1.4",
-		"electron-builder": "^20.39.0",
-		"electron-packager": "^13.1.1",
-		"react-scripts": "^2.1.8",
-		"version-bump-prompt": "^5.0.1"
-	}
+  "name": "CSCRM",
+  "fullname": "Supply Chain Cybersecurity Risk Management Tool",
+  "version": "0.2.0",
+  "versiondate": "24 June 2019",
+  "private": true,
+  "homepage": "./",
+  "main": "public/electron.js",
+  "dependencies": {
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "@material-ui/lab": "^3.0.0-alpha.30",
+    "chart.js": "^2.8.0",
+    "chartjs-plugin-datalabels": "^0.6.0",
+    "clsx": "^1.0.4",
+    "csv-parse": "^4.4.0",
+    "csv-parser": "^2.2.0",
+    "d3": "^5.9.2",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-is-dev": "^1.0.1",
+    "json2csv": "^4.5.1",
+    "react": "^16.8.5",
+    "react-chartjs-2": "^2.7.6",
+    "react-dev-utils": "^8.0.0",
+    "react-dom": "^16.8.5",
+    "react-force-graph": "^1.21.1",
+    "react-graph-vis": "^1.0.2",
+    "react-orgchart": "^1.0.5",
+    "react-redux": "^7.0.1",
+    "react-router-dom": "^5.0.0",
+    "redux": "^4.0.1",
+    "strip-bom": "^3.0.0",
+    "strip-bom-stream": "^3.0.0",
+    "survey-react": "^1.0.76"
+  },
+  "scripts": {
+    "dev": "yarn react-scripts start",
+    "build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; cp -a ./assets/. ./build/assets/; npm --prefix ./build install ./build",
+    "start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
+    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.'",
+    "pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite",
+    "pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "cross-env": "^5.2.0",
+    "electron": "^4.1.4",
+    "electron-builder": "^20.39.0",
+    "electron-packager": "^13.1.1",
+    "react-scripts": "^2.1.8",
+    "version-bump-prompt": "^5.0.1"
+  }
 }
