@@ -12,38 +12,36 @@ import {
   UPDATE_NAV_STATE,
   UPDATE_TEMP_RESPONSES,
   UPDATE_TYPE_RISK,
-  RESET
+  RESET,
+  UPDATE_SCORES
 } from "../actions";
 
-const SHADOW_RESOURCES = {
-  // projects directly off of top-level (organization)
-  projects: [
-    {
-      ID: "PA",
-      Name: "Physical Access",
-      type: "shadow",
-      default_responses: {
-        "1.2": 0
-      }
-    },
-    {
-      ID: "SDA",
-      Name: "Sensitive Data Access",
-      type: "shadow",
-      default_responses: {
-        "1.2": 0
-      }
-    },
-    {
-      ID: "ICTA",
-      Name: "ICT Access",
-      type: "shadow",
-      default_responses: {
-        "1.2": 0
-      }
+const ASSETS = [
+  {
+    ID: "PA",
+    Name: "Physical Access",
+    type: "asset",
+    default_responses: {
+      "1.2": 0
     }
-  ]
-};
+  },
+  {
+    ID: "SDA",
+    Name: "Sensitive Data Access",
+    type: "asset",
+    default_responses: {
+      "1.2": 0
+    }
+  },
+  {
+    ID: "ICTA",
+    Name: "ICT Access",
+    type: "asset",
+    default_responses: {
+      "1.2": 0
+    }
+  }
+];
 
 const initialState = {
   currentType: null,
@@ -52,17 +50,16 @@ const initialState = {
   importState: null,
   navState: "home",
   suppliers: [],
-  shadowSuppliers: SHADOW_RESOURCES.suppliers || [],
   suppliersInactive: [],
   products: [],
-  shadowProducts: SHADOW_RESOURCES.products || [],
   productsInactive: [],
   projects: [],
-  shadowProjects: SHADOW_RESOURCES.projects || [],
+  assets: ASSETS,
   projectsInactive: [],
   suppliersRisk: {},
   productsRisk: {},
   projectsRisk: {},
+  scores: {},
   supplierQuestions: [],
   productQuestions: [],
   projectQuestions: [],
@@ -291,6 +288,8 @@ function rootReducer(state = initialState, action) {
       //     projectsRisk: action.payload.itemsRisk
       //   });
     }
+  } else if (action.type === UPDATE_SCORES) {
+    return { ...state, scores: action.payload };
   } else if (action.type === RESET) {
     return {
       ...initialState,

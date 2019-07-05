@@ -19,6 +19,8 @@ import { connect } from "react-redux";
 import store from "../../redux/store";
 import { answerMulti } from "../../redux/actions";
 
+import { getNumQuestionsForResource } from "../../utils/general-utils";
+
 import { random } from "lodash";
 
 const mapState = state => ({
@@ -92,15 +94,13 @@ class QuestionStatusCard extends Component {
       responses = { ...(responses[itemId] || {}) };
       questions.forEach(q => {
         const qtype = q["Type of question"];
-        const qrelation = q.Relation;
-        if (qtype === "criticality") {
-          if (qrelation) {
-            const [_, qkey] = qrelation.split(";");
-            const qvals = (q[qkey] || i[qkey] || "")
-              .split(";")
-              .filter(v => !!v);
-            qvals.forEach(qval => {
-              const qid = `${q.ID}|${qval}`;
+        const qkey = q.Relation;
+        if (qtype === "Access") {
+          const assetVal = q["Asset ID"];
+          if (assetVal) {
+            const assetIds = (assetVal || "").split(";").filter(v => !!v);
+            assetIds.forEach(aid => {
+              const qid = `${q.ID}|${aid}`;
               if (Math.random() < 0.7) {
                 const answer = random(q.Answers.length - 1);
                 responses[qid] = [answer, randomDate()];
@@ -110,9 +110,21 @@ class QuestionStatusCard extends Component {
               }
             });
           } else {
-            // all criiticality questions should have relation defined..
+            // all asset questions should have asset defined..
             // skip if otherwise (error?)
           }
+        } else if (qkey) {
+          const qvals = (i[qkey] || "").split(";").filter(v => !!v);
+          qvals.forEach(qval => {
+            const qid = `${q.ID}|${qval}`;
+            if (Math.random() < 0.7) {
+              const answer = random(q.Answers.length - 1);
+              responses[qid] = [answer, randomDate()];
+            } else {
+              // question not answered
+              delete responses[qid];
+            }
+          });
         } else {
           if (Math.random() < 0.7) {
             const answer = random(q.Answers.length - 1);
@@ -166,7 +178,8 @@ class QuestionStatusCard extends Component {
 
     items.forEach(item => {
       let numResp = Object.keys(responses[item.ID] || []).length;
-      if (numResp >= questions.length) {
+      const numQuestions = getNumQuestionsForResource(item, questions);
+      if (numResp >= numQuestions) {
         numCompleted += 1;
       } else if (numResp > 0) {
         numPartial += 1;

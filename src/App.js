@@ -16,11 +16,12 @@ import {
   updateNavState,
   updateTempResponses,
   updateTypeRisk,
+  updateScores,
   reset
 } from "./redux/actions";
 
 // Risk calculation
-import { calculateItemRisk } from "./utils/risk-calculations";
+import { calculateItemRisk, computeImpacts } from "./utils/risk-calculations";
 // Material UI
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -197,7 +198,7 @@ const mapState = state => ({
   suppliers: state.suppliers,
   products: state.products,
   projects: state.projects,
-  shadowProjects: state.shadowProjects,
+  assets: state.assets,
   supplierQuestions: state.supplierQuestions,
   productQuestions: state.productQuestions,
   projectQuestions: state.projectQuestions,
@@ -250,17 +251,40 @@ class App extends Component {
       ipcRenderer.send("response-update", diff);
     }
 
-    // TEMP - Do risk calculation (just for testing; will figure out most appropriate place later)
-    if (nextProps.suppliers.length > 0) {
-      store.dispatch(
-        updateTypeRisk({
-          type: "suppliers",
-          itemsRisk: calculateItemRisk(
+    const suppliersRisk =
+      nextProps.suppliers.length > 0
+        ? calculateItemRisk(
             "suppliers",
             nextProps.supplierResponses,
             nextProps.supplierQuestions,
             nextProps.suppliers
           )
+        : null;
+    const productsRisk =
+      nextProps.products.length > 0
+        ? calculateItemRisk(
+            "products",
+            nextProps.productResponses,
+            nextProps.productQuestions,
+            nextProps.products
+          )
+        : null;
+    const projectsRisk =
+      nextProps.projects.length > 0
+        ? calculateItemRisk(
+            "projects",
+            nextProps.projectResponses,
+            nextProps.projectQuestions,
+            nextProps.projects
+          )
+        : null;
+
+    // TEMP - Do risk calculation (just for testing; will figure out most appropriate place later)
+    if (nextProps.suppliers.length > 0) {
+      store.dispatch(
+        updateTypeRisk({
+          type: "suppliers",
+          itemsRisk: suppliersRisk
         })
       );
     }
@@ -268,12 +292,7 @@ class App extends Component {
       store.dispatch(
         updateTypeRisk({
           type: "products",
-          itemsRisk: calculateItemRisk(
-            "products",
-            nextProps.productResponses,
-            nextProps.productQuestions,
-            nextProps.products
-          )
+          itemsRisk: productsRisk
         })
       );
     }
@@ -281,46 +300,58 @@ class App extends Component {
       store.dispatch(
         updateTypeRisk({
           type: "projects",
-          itemsRisk: calculateItemRisk(
-            "projects",
-            nextProps.projectResponses,
-            nextProps.projectQuestions,
-            nextProps.projects
-          )
+          itemsRisk: projectsRisk
         })
       );
     }
-    if (nextProps.shadowProjects.length > 0) {
+
+    let assetsRisk = null;
+    if (nextProps.assets.length > 0) {
       const organizations = nextProps.projects.filter(proj => !proj.parent);
       if (organizations.length > 0) {
         const parentId = organizations[0].ID;
         const projectResponses = {};
-        nextProps.shadowProjects.forEach(proj => {
+        nextProps.assets.forEach(proj => {
           const responses = {};
           Object.entries(proj.default_responses).forEach(entry => {
             responses[`${entry[0]}|${parentId}`] = entry[1];
           });
           projectResponses[proj.ID] = responses;
         });
-        const projects = nextProps.shadowProjects.map(pr => {
+        const assets = nextProps.assets.map(pr => {
           return {
             ...pr,
             parent: organizations[0],
             "Parent ID": organizations[0].ID
           };
         });
+        assetsRisk = calculateItemRisk(
+          "assets",
+          projectResponses,
+          nextProps.projectQuestions,
+          assets
+        );
         store.dispatch(
           updateTypeRisk({
-            type: "projects",
-            itemsRisk: calculateItemRisk(
-              "projects",
-              projectResponses,
-              nextProps.projectQuestions,
-              projects
-            )
+            type: "assets",
+            itemsRisk: assetsRisk
           })
         );
       }
+    }
+
+    if (suppliersRisk && productsRisk && projectsRisk && assetsRisk) {
+      const scores = computeImpacts(
+        projectsRisk,
+        productsRisk,
+        suppliersRisk,
+        assetsRisk,
+        nextProps.projects,
+        nextProps.products,
+        nextProps.suppliers,
+        nextProps.assets
+      );
+      store.dispatch(updateScores(scores));
     }
   }
 

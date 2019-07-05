@@ -18,5 +18,18 @@ export function getQuestionResponseTimestamp(val) {
 }
 
 export function getCellMultiples(val) {
-  return val.split(";").filter(v => !!v);
+  return (val || "").split(";").filter(v => !!v);
+}
+
+export function getNumQuestionsForResource(item, questions) {
+  return questions
+    .map(q => {
+      if (q.Relation) {
+        const rids = (item[q.Relation] || "").split(";").filter(i => !!i);
+        return rids.length;
+      } else {
+        return 1;
+      }
+    })
+    .reduce((total, cnt) => total + cnt);
 }

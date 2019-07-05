@@ -12,7 +12,7 @@ import Typography from "@material-ui/core/Typography";
 
 import AssignmentLateIcon from "@material-ui/icons/AssignmentLate";
 
-import { getQuestionResponse } from "../../utils/question-responses";
+import { getQuestionResponse } from "../../utils/general-utils";
 
 const styles = theme => ({
   input: {

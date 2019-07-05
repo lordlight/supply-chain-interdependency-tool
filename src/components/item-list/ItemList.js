@@ -18,7 +18,10 @@ import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 
-import { getQuestionResponseTimestamp } from "../../utils/question-responses";
+import {
+  getQuestionResponseTimestamp,
+  getNumQuestionsForResource
+} from "../../utils/general-utils";
 
 function getAge(diff) {
   const formatResult = (val, unit) => {
@@ -127,22 +130,6 @@ class ItemList extends Component {
     }
   };
 
-  getNumQuestionsForResource = (item, questions) => {
-    return questions
-      .map(q => {
-        if (q.Relation) {
-          const [_, rkey] = q.Relation.split(";");
-          const rids = (q[rkey] || item[rkey] || "")
-            .split(";")
-            .filter(i => !!i);
-          return rids.length;
-        } else {
-          return 1;
-        }
-      })
-      .reduce((total, cnt) => total + cnt);
-  };
-
   componentDidMount = () => {
     window.scrollTo(0, 0);
   };
@@ -186,9 +173,15 @@ class ItemList extends Component {
       responses = this.props.projectResponses;
     }
 
-    const hasScore = questions.some(q => q["Type of question"] === "score");
+    const hasAssurance = questions.some(
+      q => q["Type of question"] === "Assurance"
+    );
+    const hasAccess = questions.some(q => q["Type of question"] === "Access");
     const hasCriticality = questions.some(
-      q => q["Type of question"] === "criticality"
+      q => q["Type of question"] === "Criticality"
+    );
+    const hasDependency = questions.some(
+      q => q["Type of question"] === "Dependency"
     );
 
     const headerDetails = [
@@ -202,13 +195,25 @@ class ItemList extends Component {
         label: "Criticality",
         tooltip: "Sort by criticality",
         cssClass: classes.regCol,
-        sortType: "risk.criticality.max"
+        sortType: "score.criticality.max"
       },
-      hasScore && {
-        label: "Questionnaire Score",
-        tooltip: "Sort by questionnaire score",
+      hasAssurance && {
+        label: "Assurance",
+        tooltip: "Sort by assurance",
         cssClass: classes.regCol,
-        sortType: "risk.score"
+        sortType: "score.assurance"
+      },
+      hasAccess && {
+        label: "Access",
+        tooltip: "Sort by access",
+        cssClass: classes.regCol,
+        sortType: "score.access.max"
+      },
+      hasDependency && {
+        label: "Dependency",
+        tooltip: "Sort by dependency",
+        cssClass: classes.regCol,
+        sortType: "score.dependency.max"
       },
       {
         label: "Questions Complete",
@@ -257,13 +262,23 @@ class ItemList extends Component {
         riskSet.hasOwnProperty(item.ID) &&
         responses[item.ID]
       ) {
-        listItem["risk.score"] = riskSet[item.ID].score;
-        if (hasCriticality) {
-          listItem["risk.criticality.max"] = Math.max(
-            ...Object.values(riskSet[item.ID].criticality)
+        listItem["score.assurance"] = riskSet[item.ID].Assurance;
+        if (hasAccess) {
+          listItem["score.access.max"] = Math.max(
+            ...Object.values(riskSet[item.ID].Access)
           );
         }
-        const numQuestions = this.getNumQuestionsForResource(item, questions);
+        if (hasDependency) {
+          listItem["score.dependency.max"] = Math.max(
+            ...Object.values(riskSet[item.ID].Dependency)
+          );
+        }
+        if (hasCriticality) {
+          listItem["score.criticality.max"] = Math.max(
+            ...Object.values(riskSet[item.ID].Criticality)
+          );
+        }
+        const numQuestions = getNumQuestionsForResource(item, questions);
         listItem.completion =
           100 * (Object.keys(responses[item.ID]).length / numQuestions);
         const lastResponded = Math.max(
@@ -301,12 +316,26 @@ class ItemList extends Component {
           <TableCell className={classes.cell}>{row.Name}</TableCell>
           {hasCriticality && (
             <TableCell className={classes.cell}>
-              {row["risk.criticality.max"] != null
-                ? row["risk.criticality.max"].toFixed(1)
+              {row["score.criticality.max"] != null
+                ? row["score.criticality.max"].toFixed(1)
                 : "N/A"}
             </TableCell>
           )}
-          {hasScore && (
+          {hasAccess && (
+            <TableCell className={classes.cell}>
+              {row["score.access.max"] != null
+                ? row["score.access.max"].toFixed(1)
+                : "N/A"}
+            </TableCell>
+          )}
+          {hasDependency && (
+            <TableCell className={classes.cell}>
+              {row["score.dependency.max"] != null
+                ? row["score.dependency.max"].toFixed(1)
+                : "N/A"}
+            </TableCell>
+          )}
+          {hasAssurance && (
             <TableCell
               className={classes.cell}
               style={{ whiteSpace: "nowrap" }}
@@ -314,13 +343,13 @@ class ItemList extends Component {
               <div className={classes.scoreColPart}>
                 {(() => {
                   if (riskSet.hasOwnProperty(row.ID))
-                    return riskSet[row.ID].score.toFixed(1);
+                    return riskSet[row.ID].Assurance.toFixed(1);
                   else return "N/A";
                 })()}
               </div>
               <div
                 className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-                style={{ width: riskSet[row.ID].score }}
+                style={{ width: riskSet[row.ID].Assurance }}
               />
             </TableCell>
           )}

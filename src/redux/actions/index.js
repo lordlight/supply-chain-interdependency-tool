@@ -12,6 +12,7 @@ export const UPDATE_IMPORT_STATE = "UPDATE_IMPORT_STATE";
 export const UPDATE_NAV_STATE = "UPDATE_NAV_STATE";
 export const UPDATE_TEMP_RESPONSES = "UPDATE_TEMP_RESPONSES";
 export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
+export const UPDATE_SCORES = "UPDATE_SCORES";
 export const RESET = "RESET";
 
 // Action creators
@@ -65,6 +66,10 @@ export function updateTempResponses(payload) {
 
 export function updateTypeRisk(payload) {
   return { type: UPDATE_TYPE_RISK, payload };
+}
+
+export function updateScores(payload) {
+  return { type: UPDATE_SCORES, payload };
 }
 
 export function reset() {

@@ -18,7 +18,7 @@ import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 
-import { getQuestionResponse } from "../../utils/question-responses";
+import { getQuestionResponse } from "../../utils/general-utils";
 
 const styles = theme => ({
   questionList: {
@@ -77,7 +77,8 @@ const mapState = state => ({
   productResponses: state.productResponses,
   projectResponses: state.projectResponses,
   tempResponses: state.tempResponses,
-  projects: state.projects
+  projects: state.projects,
+  suppliers: state.suppliers
 });
 
 class QuestionList extends Component {
@@ -192,8 +193,8 @@ class QuestionList extends Component {
       );
     }
 
-    const impactRows = questions
-      .filter(q => q["Type of question"] === "score")
+    const assuranceRows = questions
+      .filter(q => q["Type of question"] === "Assurance")
       .map((q, i) => {
         return (
           <Question
@@ -206,17 +207,84 @@ class QuestionList extends Component {
           />
         );
       });
-    let criticalityRows = questions
-      .filter(q => q["Type of question"] === "criticality")
+
+    let accessRows = questions
+      .filter(q => q["Type of question"] === "Access")
       .map((q, i) => {
-        const relationInfo = q.Relation;
-        if (relationInfo) {
-          const [relationType, relationKey] = relationInfo.split(";");
-          // question may have relation override if question about "shadow" resource
-          const relationVal = q[relationKey] || item[relationKey] || "";
+        const assetIdVal = q["Asset ID"];
+        const assetIds = assetIdVal.split(";").filter(k => !!k);
+        const assetsMap = {};
+        this.props.projects.forEach(r => (assetsMap[r.ID] = r));
+        return assetIds.map(aid => {
+          const qid = `${q.ID}|${aid}`;
+          const questionText = q.Question.replace(
+            "[Asset ID]",
+            `"${(assetsMap[aid] || {}).Name || aid}"`
+          );
+          return (
+            <Question
+              key={qid}
+              question={q}
+              questionId={qid}
+              questionText={questionText}
+              response={alteredResponses[qid]}
+              updateResponse={this.updateResponse}
+            />
+          );
+        });
+      });
+    accessRows = [].concat(...accessRows);
+
+    let dependencyRows = questions
+      .filter(q => q["Type of question"] === "Dependency")
+      .map((q, i) => {
+        const relationKey = q.Relation;
+        if (relationKey) {
+          const relationVal = item[relationKey] || "";
           const subkeys = relationVal.split(";").filter(k => !!k);
           const resourcesMap = {};
-          this.props[relationType].forEach(r => (resourcesMap[r.ID] = r));
+          this.props.suppliers.forEach(r => (resourcesMap[r.ID] = r));
+          return subkeys.map(sk => {
+            const qid = `${q.ID}|${sk}`;
+            const questionText = q.Question.replace(
+              `[${relationKey}]`,
+              `"${(resourcesMap[sk] || {}).Name || sk}"`
+            );
+            return (
+              <Question
+                key={qid}
+                question={q}
+                questionId={qid}
+                questionText={questionText}
+                response={alteredResponses[qid]}
+                updateResponse={this.updateResponse}
+              />
+            );
+          });
+        } else {
+          return (
+            <Question
+              key={q.ID}
+              question={q}
+              questionId={q.ID}
+              questionText={q.Question}
+              response={alteredResponses[q.ID]}
+              updateResponse={this.updateResponse}
+            />
+          );
+        }
+      });
+    dependencyRows = [].concat(...dependencyRows);
+
+    let criticalityRows = questions
+      .filter(q => q["Type of question"] === "Criticality")
+      .map((q, i) => {
+        const relationKey = q.Relation;
+        if (relationKey) {
+          const relationVal = item[relationKey] || "";
+          const subkeys = relationVal.split(";").filter(k => !!k);
+          const resourcesMap = {};
+          this.props.projects.forEach(r => (resourcesMap[r.ID] = r));
           return subkeys.map(sk => {
             const qid = `${q.ID}|${sk}`;
             const questionText = q.Question.replace(
@@ -260,45 +328,43 @@ class QuestionList extends Component {
           </React.Fragment>
         )}
         <div className={classes.questionList}>
+          {accessRows.length > 0 && (
+            <React.Fragment>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
+                Access Questions
+              </Typography>
+              <Table className={this.props.table} border={0}>
+                <TableBody>{accessRows}</TableBody>
+              </Table>
+            </React.Fragment>
+          )}
           {criticalityRows.length > 0 && (
             <React.Fragment>
-              {impactRows.length > 0 && (
-                <Typography
-                  variant="subtitle2"
-                  className={classes.sectionTitle}
-                >
-                  Criticality Questions
-                </Typography>
-              )}
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
+                Criticality Questions
+              </Typography>
               <Table className={this.props.table} border={0}>
-                {/* <TableHead>
-                                <TableRow style={{border: "none"}}>
-                                    <TableCell style={{border: "none"}}>
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead> */}
                 <TableBody>{criticalityRows}</TableBody>
               </Table>
             </React.Fragment>
           )}
-          {impactRows.length > 0 && (
+          {dependencyRows.length > 0 && (
             <React.Fragment>
-              {criticalityRows.length > 0 && (
-                <Typography
-                  variant="subtitle2"
-                  className={classes.sectionTitle}
-                >
-                  Impact Questions
-                </Typography>
-              )}
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
+                Dependency Questions
+              </Typography>
               <Table className={this.props.table} border={0}>
-                {/* <TableHead>
-                                <TableRow style={{border: "none"}}>
-                                    <TableCell style={{border: "none"}}>
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead> */}
-                <TableBody>{impactRows}</TableBody>
+                <TableBody>{dependencyRows}</TableBody>
+              </Table>
+            </React.Fragment>
+          )}
+          {assuranceRows.length > 0 && (
+            <React.Fragment>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
+                Assurance Questions
+              </Typography>
+              <Table className={this.props.table} border={0}>
+                <TableBody>{assuranceRows}</TableBody>
               </Table>
             </React.Fragment>
           )}

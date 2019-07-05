@@ -88,7 +88,7 @@ const options = {
 const ProjectNodeComponent = ({ node }) => {
   const project = node.project || {};
   const risk = node.projectRisk || {};
-  const criticality = Math.max(Object.values(risk.criticality || {})) || 10;
+  const criticality = Math.max(Object.values(risk.Criticality || {})) || 10;
   const alarm = criticality => {
     if (criticality >= 7.5) {
       return "!!!";
