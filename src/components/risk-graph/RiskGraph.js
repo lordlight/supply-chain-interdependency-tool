@@ -707,12 +707,21 @@ class RiskGraph extends Component {
         };
       });
     const organizationNodes = organizations.map(proj => {
+      const impact = this.props.scores.project[proj.ID].impact;
+      const exposure = this.props.scores.project[proj.ID].exposure;
+      const title = `<div><p>Organization Name:&nbsp${
+        proj.Name
+      }</p><p>Organization Impact Score:&nbsp;${impact.toFixed(
+        1
+      )}</p><p>Organization Exposure Score:&nbsp;${exposure.toFixed(
+        1
+      )}</p></div>`;
       return {
         shape: "circle",
         id: "P_" + proj.ID,
-        title: "Organization Name: " + proj.Name,
-        label: organizationImpactScore.toFixed(1),
-        value: organizationImpactScore * 10,
+        title,
+        label: impact.toFixed(1),
+        value: impact * 10,
         level: 0
       };
     });

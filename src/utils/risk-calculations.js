@@ -322,6 +322,10 @@ export function computeImpacts(
     scores.supplier[entry.supplierId].supplyLines.push(entry);
   });
 
+  // find top-level org "project"
+  const orgs = projects.filter(p => !p.parent);
+  orgs.forEach(org => (scores.project[org.ID].supplyLines = supplyLineScores));
+
   Object.values(scores).forEach(resourceInfo =>
     Object.values(resourceInfo).forEach(info => {
       info.impact = Math.max(...info.supplyLines.map(sl => sl.score), 0);
@@ -331,6 +335,7 @@ export function computeImpacts(
     })
   );
 
+  console.log("SCORES", scores);
   return scores;
 }
 
