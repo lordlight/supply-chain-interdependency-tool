@@ -3,6 +3,9 @@ import Typography from "@material-ui/core/Typography";
 import Graph from "react-graph-vis";
 import { ForceGraph2D } from "react-force-graph";
 
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
@@ -24,6 +27,10 @@ const mapState = state => ({
 });
 
 class RiskGraph extends Component {
+  state = {
+    metric: "impact"
+  };
+
   graph = {
     nodes: [],
     edges: []
@@ -48,8 +55,11 @@ class RiskGraph extends Component {
   componentDidMount() {
     console.log("did mount");
     // this.drawChart();
-    const dimensions = this.treeContainer.getBoundingClientRect();
-    window.addEventListener("resize", this.resize);
+    // const dimensions = this.treeContainer.getBoundingClientRect();
+    // window.addEventListener("resize", this.resize);
+    // this.network.on("stabilizationIterationsDone", () => {
+    //   this.network.setOptions({ physics: false });
+    // });
     // this.setState({
     //     translate: {
     //       x: dimensions.width / 2,
@@ -64,8 +74,80 @@ class RiskGraph extends Component {
     clearTimeout(this.resizeTimeout);
   }
 
-  componentDidUpdate = () => {
-    this.constructGraph(this.props);
+  // shouldComponentUpdate = (nextProps, nextState) => {
+  //   console.log(this.state.metric, nextState.metric);
+  //   if (nextState.metric != this.state.metric) {
+  //     Object.entries(this.props.scores).forEach(entry => {
+  //       const [key, scores] = entry;
+  //       Object.entries(scores).forEach(subentry => {
+  //         const [eid, subscores] = subentry;
+  //         let nodeid;
+  //         if (key === "project") {
+  //           nodeid = "P_" + eid;
+  //         } else if (key === "product") {
+  //           nodeid = "PR_" + eid;
+  //         } else if (key === "supplier") {
+  //           nodeid = "S_" + eid;
+  //         }
+  //         console.log("DDDDDDDDDD", nodeid, subscores[nextState.metric] * 10);
+  //         console.log(this.network.body);
+  //         this.network.body.data.nodes.update({
+  //           id: nodeid,
+  //           label: subscores[nextState.metric].toFixed(1),
+  //           value: subscores[nextState.metric]
+  //         });
+  //       });
+  //     });
+  //     return true;
+  //   }
+  //   return true;
+  // };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevState.metric != this.state.metric && this.network) {
+      // this.network.setData(this.graph.nodes, this.graph.edges);
+      Object.entries(this.props.scores).forEach(entry => {
+        const [key, scores] = entry;
+        Object.entries(scores).forEach(subentry => {
+          const [eid, subscores] = subentry;
+          let nodeid, group;
+          if (key === "project") {
+            nodeid = "P_" + eid;
+            // group = "projects";
+          } else if (key === "product") {
+            nodeid = "PR_" + eid;
+            // group = "products";
+          } else if (key === "supplier") {
+            nodeid = "S_" + eid;
+            // group = "suppliers";
+          }
+          this.network.body.data.nodes.update({
+            id: nodeid,
+            // group,
+            // label: subscores[this.state.metric].toFixed(1),
+            value: subscores[this.state.metric]
+            // scaling: {
+            //   label: {
+            //     enabled: true
+            //   },
+            //   min: 10,
+            //   max: 50
+            //   // customScalingFuncion: (min, max, total, value) => {
+            //   //   if (max === min) {
+            //   //     return 0.5;
+            //   //   } else {
+            //   //     var scale = 1 / (max - min);
+            //   //     return Math.max(0, (value - min) * scale);
+            //   //   }
+            //   // }
+            // }
+          });
+        });
+      });
+      // console.log(this.network);
+      // this.network.redraw();
+    }
+    // this.constructGraph(this.props);
     // console.log(this.option);
   };
 
@@ -99,255 +181,6 @@ class RiskGraph extends Component {
     assets.forEach(asset => (assetsMap[asset.ID] = asset));
     suppliers.forEach(sup => (suppliersMap[sup.ID] = sup));
 
-    // const supplierSupplyLines = {};
-    // const productSupplyLines = {};
-    // const projectSupplyLines = {};
-    // const productAccessLines = {};
-    // const supplierAccessLines = {};
-    // const shadowProjectAccessLines = {};
-    let organizationImpactScore = 0;
-
-    // suppliers.forEach(sup => {
-    //   supplierSupplyLines[sup.ID] = { supplyLines: [], score: 0 };
-    //   supplierAccessLines[sup.ID] = { accessLines: [], score: 0 };
-    // });
-    // products.forEach(prod => {
-    //   productSupplyLines[prod.ID] = { supplyLines: [], score: 0 };
-    //   productAccessLines[prod.ID] = { accessLines: [], score: 0 };
-    // });
-    // projects.forEach(proj => {
-    //   projectSupplyLines[proj.ID] = { supplyLines: [], score: 0 };
-    // });
-    // assets.forEach(asset => {
-    //   shadowProjectAccessLines[asset.ID] = { accessLines: [], score: 0 };
-    // });
-
-    // these are tuples of (Project(s), Product, Supplier)
-    // const supplyLineImpactScores = props.products
-    //   .map(prod => {
-    //     const projectScore = (props.productsRisk[prod.ID] || {}).score;
-    //     const supplierId = prod["Supplier ID"];
-    //     const supplierScore = (props.suppliersRisk[supplierId] || {}).score;
-    //     const projectAndSupplierScore = projectScore * supplierScore;
-    //     const projectIds = getCellMultiples(prod["Project ID"] || "");
-    //     const supplierLines = projectIds.map(prid => {
-    //       const pkey = `projects|${prid}`;
-    //       const productCriticality = ((props.productsRisk[prod.ID] || {})
-    //         .criticality || {})[pkey];
-    //       let score = projectAndSupplierScore * productCriticality;
-    //       let projectChain = [];
-    //       let childId = prid;
-    //       // follow chain of parent projects, normalizing score to 10
-    //       let projectCriticality = 10;
-    //       while (true) {
-    //         projectChain.push(childId);
-    //         const project = projectsMap[childId] || {};
-    //         const parentId = project["Parent ID"];
-    //         if (!parentId) {
-    //           // TODO: also watch for cycles?
-    //           break;
-    //         }
-    //         const pkey = `projects|${parentId}`;
-    //         projectCriticality *=
-    //           (((props.projectsRisk[childId] || {}).criticality || {})[pkey] ||
-    //             10) / 10;
-    //         childId = parentId;
-    //       }
-    //       score *= projectCriticality;
-    //       score /= 1000;
-    //       // only keep first project
-    //       projectChain = projectChain.slice(0, 1);
-    //       const supplierLine = {
-    //         supplyLine: [supplierId, prod.ID, ...projectChain],
-    //         score
-    //       };
-    //       return supplierLine;
-    //     });
-    //     return supplierLines;
-    //   })
-    //   .flat();
-    // supplyLineImpactScores.forEach(is => {
-    //   const [supplierId, productId, projectId] = is.supplyLine;
-    //   addSupplyLine(supplierSupplyLines[supplierId], is);
-    //   addSupplyLine(productSupplyLines[productId], is);
-    //   addSupplyLine(projectSupplyLines[projectId], is);
-    //   organizationImpactScore += is.score;
-    // });
-
-    // const productAccessImpactScores = props.products
-    //   .map(prod => {
-    //     // part of supply line, but not part of score
-    //     const supplierId = prod["Supplier ID"];
-    //     const productCriticalities =
-    //       (props.productsRisk[prod.ID] || {}).criticality || {};
-    //     const accessLines = Object.entries(productCriticalities)
-    //       .map(entry => {
-    //         const akey = entry[0];
-    //         if (akey.startsWith("projects.shadow")) {
-    //           const [_, prid] = akey.split("|");
-    //           console.log("AKEY", akey, prid);
-    //           const accessCriticality = entry[1];
-    //           const parentId = (projectsMap[prid] || {})["Parent ID"];
-    //           const pkey = `projects|${parentId}`;
-    //           const projectCriticality = ((props.projectsRisk[prid] || {})
-    //             .criticality || {})[pkey];
-    //           const score = accessCriticality * projectCriticality * 10.0;
-    //           if (score === 0) {
-    //             return null;
-    //           }
-    //           const supplyLine = {
-    //             supplyLine: [supplierId, prod.ID, prid],
-    //             score
-    //           };
-    //           return supplyLine;
-    //         } else {
-    //           return null;
-    //         }
-    //       })
-    //       .filter(Boolean);
-    //     return accessLines;
-    //   })
-    //   .flat();
-    // console.log("PRODUCT ACCESS LINES", productAccessImpactScores);
-
-    // props.products.forEach(prod => {
-    //   // part of supply line, but not part of score
-    //   const productCriticalities =
-    //     (props.productsRisk[prod.ID] || {}).criticality || {};
-    //   Object.entries(productCriticalities).forEach(entry => {
-    //     const akey = entry[0];
-    //     if (akey.startsWith("projects.shadow")) {
-    //       const [_, prid] = akey.split("|");
-    //       const accessCriticality = entry[1];
-    //       const parentId = (projectsMap[prid] || {})["Parent ID"];
-    //       const pkey = `projects|${parentId}`;
-    //       const projectCriticality = ((props.projectsRisk[prid] || {})
-    //         .criticality || {})[pkey];
-    //       const score = accessCriticality * projectCriticality * 10.0;
-    //       if (score === 0) {
-    //         return null;
-    //       }
-    //       const supplyLine = {
-    //         supplyLine: [prod.ID, prid],
-    //         score
-    //       };
-    //       productAccessLines[prod.ID].accessLines.push(supplyLine);
-    //       shadowProjectAccessLines[prid].accessLines.push(supplyLine);
-    //       organizationImpactScore += score;
-    //     }
-    //   });
-    // });
-
-    // const supplierAccessScores = props.suppliers
-    //   .map(sup => {
-    //     const supplierCriticalities =
-    //       (props.suppliersRisk[sup.ID] || {}).criticality || {};
-    //     const accessCriticalities = Object.entries(supplierCriticalities)
-    //       .map(entry => {
-    //         const akey = entry[0];
-    //         if (akey.startsWith("projects.shadow")) {
-    //           const [_, prid] = akey.split("|");
-    //           console.log("AKEY", akey, prid);
-    //           const accessCriticality = entry[1];
-    //           const parentId = (projectsMap[prid] || {})["Parent ID"];
-    //           const pkey = `projects|${parentId}`;
-    //           const projectCriticality = ((props.projectsRisk[prid] || {})
-    //             .criticality || {})[pkey];
-    //           const score = accessCriticality * projectCriticality * 10.0;
-    //           if (score === 0) {
-    //             return null;
-    //           }
-    //           return { projectId: prid, score };
-    //         } else {
-    //           return null;
-    //         }
-    //       })
-    //       .filter(Boolean);
-    //     const matchingProducts = props.products.filter(
-    //       prod => prod["Supplier ID"] === sup.ID
-    //     );
-    //     const accessLines = matchingProducts
-    //       .map(prod =>
-    //         accessCriticalities.map(ac => {
-    //           const supplyLine = {
-    //             supplyLine: [sup.ID, prod.ID, ac.projectId],
-    //             score: ac.score
-    //           };
-    //           return supplyLine;
-    //         })
-    //       )
-    //       .flat();
-    //     return accessLines;
-    //   })
-    //   .flat();
-    // console.log("SUPPLIER ACCESS LINES", supplierAccessScores);
-
-    // props.suppliers.forEach(sup => {
-    //   const supplierCriticalities =
-    //     (props.suppliersRisk[sup.ID] || {}).criticality || {};
-    //   Object.entries(supplierCriticalities).forEach(entry => {
-    //     const akey = entry[0];
-    //     if (akey.startsWith("projects.shadow")) {
-    //       const [_, prid] = akey.split("|");
-    //       const accessCriticality = entry[1];
-    //       const parentId = (projectsMap[prid] || {})["Parent ID"];
-    //       const pkey = `projects|${parentId}`;
-    //       const projectCriticality = ((props.projectsRisk[prid] || {})
-    //         .criticality || {})[pkey];
-    //       const score = accessCriticality * projectCriticality * 10.0;
-    //       if (score === 0) {
-    //         return null;
-    //       }
-    //       const supplyLine = {
-    //         supplyLine: [sup.ID, prid],
-    //         score
-    //       };
-    //       supplierAccessLines[sup.ID].accessLines.push(supplyLine);
-    //       shadowProjectAccessLines[prid].accessLines.push(supplyLine);
-    //       organizationImpactScore += score;
-    //     }
-    //   });
-    // });
-
-    // Object.values(productSupplyLines).forEach(entry => {
-    //   entry.supplyLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // Object.values(supplierSupplyLines).forEach(entry => {
-    //   entry.supplyLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // Object.values(projectSupplyLines).forEach(entry => {
-    //   entry.supplyLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // Object.values(productAccessLines).forEach(entry => {
-    //   entry.accessLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // Object.values(supplierAccessLines).forEach(entry => {
-    //   entry.accessLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // Object.values(shadowProjectAccessLines).forEach(entry => {
-    //   entry.accessLines.forEach(line => {
-    //     entry.score += line.score;
-    //   });
-    // });
-    // console.log("ALL SUPPLY/Access LINES", {
-    //   supplierSupplyLines,
-    //   productSupplyLines,
-    //   projectSupplyLines,
-    //   supplierAccessLines,
-    //   productAccessLines,
-    //   shadowProjectAccessLines
-    // });
-
     const supplierEdgesSeen = new Set();
     const productEdgesSeen = new Set();
     const projectEdgesSeen = new Set();
@@ -374,35 +207,7 @@ class RiskGraph extends Component {
         // chosen: { edge: values => (values.color = "#7f0000") }
       };
     });
-    // const shadowProjectToProjectEdges = assets.map(asset => {
-    //   const parentId = asset["Parent ID"];
-    //   projectEdgesSeen.add(asset.ID);
-    //   projectEdgesSeen.add(parentId);
-    //   const key = `projects|${parentId}`;
-    //   const criticality =
-    //     ((props.projectsRisk[asset.ID] || {}).criticality || {})[key] || 0;
-    //   const title = `<div><p>Access Name:&nbsp${
-    //     asset.Name
-    //   }</p><p>Access Criticality:&nbsp;${criticality.toFixed(1)}</p></div>`;
-    //   // const title = `<div><p>Project Name:&nbsp${proj.Name}</div>`;
-    //   return {
-    //     from: "P_" + parentId,
-    //     to: "P_" + asset.ID,
-    //     title
-    //     // value: criticality * 5.0
-    //     // value: criticality
-    //     // chosen: { edge: values => (values.color = "#7f0000") }
-    //   };
-    // });
-    // // take into account multiple project edges per product
-    // const shadowProjectIds = [
-    //   ...new Set(
-    //     this.props.productQuestions
-    //       .filter(q => !!q["Asset ID"])
-    //       .map(q => getCellMultiples(q["Asset ID"]))
-    //       .flat()
-    //   )
-    // ];
+
     const projectToProductEdges = products
       .map(prod => {
         const projectIds = getCellMultiples(prod["Project ID"] || "");
@@ -434,166 +239,15 @@ class RiskGraph extends Component {
             // value: risk / 2.0
           };
         });
-        // const shadowProjectEdges = shadowProjectIds.map(prid => {
-        //   const key = `asset|${prid}`;
-        //   const productCriticality =
-        //     ((props.productsRisk[prod.ID] || {}).Access || {})[key] || 0;
-        //   if (productCriticality === 0) {
-        //     return null;
-        //   }
-        //   productEdgesSeen.add(prod.ID);
-        //   projectEdgesSeen.add(prid);
-        //   // for shadow projects don't use questionnaire score,
-        //   // normalize independently
-        //   const risk = productCriticality * 100.0;
-        //   // const title = `<div><p>Product Name:&nbsp${
-        //   //   prod.Name
-        //   // }</p><p>Project Name:&nbsp;${
-        //   //   (projectsMap[prid] || {}).Name
-        //   // }</p><p>Product Impact:&nbsp${risk.toFixed(1)}</p></div>`;
-        //   const title = `<div><p>Product Name:&nbsp${
-        //     prod.Name
-        //   }</p><p>Access Name:&nbsp;${
-        //     (projectsMap[prid] || {}).Name
-        //   }</p></div>`;
-        //   return {
-        //     from: "P_" + prid,
-        //     to: "PR_" + prod.ID,
-        //     title
-        //     // value: risk / 2.0
-        //   };
-        // });
-        // return [...productEdges, ...shadowProjectEdges].filter(Boolean);
-        // return [];
         return productEdges.filter(Boolean);
       })
       .flat();
-    // const supplierQuestionProjectIds = [
-    //   ...new Set(
-    //     this.props.supplierQuestions
-    //       .filter(q => !!q["Asset ID"])
-    //       .map(q => getCellMultiples(q["Asset ID"]))
-    //       .flat()
-    //   )
-    // ];
-    // const projectToSupplierEdges = suppliers
-    //   .map(sup => {
-    //     const shadowProjectEdges = supplierQuestionProjectIds.map(prid => {
-    //       const key = `asset|${prid}`;
-    //       const supplierCriticality =
-    //         ((props.suppliersRisk[sup.ID] || {}).Access || {})[key] || 0;
-    //       if (supplierCriticality === 0) {
-    //         return null;
-    //       }
-    //       supplierEdgesSeen.add(sup.ID);
-    //       projectEdgesSeen.add(prid);
-    //       // for shadow projects don't use questionnaire score,
-    //       // normalize independently
-    //       const risk = supplierCriticality * 100.0;
-    //       // const title = `<div><p>Supplier Name:&nbsp${
-    //       //   sup.Name
-    //       // }</p><p>Project Name:&nbsp;${
-    //       //   (projectsMap[prid] || {}).Name
-    //       // }</p><p>Supplier Impact:&nbsp${risk.toFixed(1)}</p></div>`;
-    //       const title = `<div><p>Supplier Name:&nbsp${
-    //         sup.Name
-    //       }</p><p>Access Name:&nbsp;${
-    //         (projectsMap[prid] || {}).Name
-    //       }</p></div>`;
-    //       return {
-    //         from: "P_" + prid,
-    //         to: "S_" + sup.ID,
-    //         title
-    //         // value: risk / 2.0
-    //       };
-    //     });
 
-    //     // const supplierRisk = (props.suppliersRisk[sup.ID] || {}).score || 0;
-    //     // const supplierEdges = supplierQuestionProjectIds.map(prid => {
-    //     //   const project = projectsMap[prid] || {};
-    //     //   const parentId = project["Parent ID"];
-    //     //   const pkey = `projects|${parentId}`;
-    //     //   const projectCriticality =
-    //     //     ((props.projectsRisk[prid] || {}).criticality || {})[pkey] || 10;
-    //     //   const key = `projects|${prid}`;
-    //     //   // const projectCriticality = ((props.projectsRisk[prid] || {}).criticality || {}).default || 0;
-    //     //   const supplierCriticality =
-    //     //     ((props.suppliersRisk[sup.ID] || {}).criticality || {})[key] || 0;
-    //     //   if (supplierCriticality === 0) {
-    //     //     return null;
-    //     //   }
-    //     //   supplierEdgesSeen.add(sup.ID);
-    //     //   projectEdgesSeen.add(prid);
-    //     //   const risk = supplierCriticality * supplierRisk;
-    //     //   const title = `<div><p>Supplier Name:&nbsp${
-    //     //     sup.Name
-    //     //   }</p><p>Project Name:&nbsp;${
-    //     //     (projectsMap[prid] || {}).Name
-    //     //   }</p><p>Supplier Risk:&nbsp${risk.toFixed(1)}</p></div>`;
-    //     //   const totalImpactScore = (risk * projectCriticality) / 10;
-    //     //   supplierImpactScores[sup.ID] =
-    //     //     (supplierImpactScores[sup.ID] || 0) + totalImpactScore;
-    //     //   return {
-    //     //     from: "P_" + prid,
-    //     //     to: "S_" + sup.ID,
-    //     //     title,
-    //     //     value: risk / 2.0
-    //     //     // chosen: {
-    //     //     //   edge: values => {
-    //     //     //     values.color = "#7f0000";
-    //     //     //   }
-    //     //     // }
-    //     //   };
-    //     // });
-    //     return shadowProjectEdges.filter(Boolean);
-    //     // return [];
-    //   })
-    //   .flat();
     const productToSupplierEdges = products.map(prod => {
       productEdgesSeen.add(prod.ID);
       supplierEdgesSeen.add(prod["Supplier ID"]);
       const supId = prod["Supplier ID"];
-      // const supplierRisk = (props.suppliersRisk[supId] || {}).score || 0;
-      // const productRisk = (props.productsRisk[prod.ID] || {}).score || 0;
-      // const projectIds = getCellMultiples(prod["Project ID"] || "");
-      // let totalImpactScore = 0;
 
-      // projectIds.forEach(prid => {
-      //   let projectCriticality = 10.0;
-      //   let childId = prid;
-      //   // follow chain of parent projects, normalizing score to 10
-      //   while (true) {
-      //     const project = projectsMap[childId] || {};
-      //     const parentId = project["Parent ID"];
-      //     if (!parentId) {
-      //       // TODO: also watch for cycles?
-      //       break;
-      //     }
-      //     const pkey = `projects|${parentId}`;
-      //     projectCriticality *=
-      //       (((props.projectsRisk[childId] || {}).criticality || {})[pkey] ||
-      //         10) / 10;
-      //     childId = parentId;
-      //   }
-      //   const key = `projects|${prid}`;
-      //   const productCriticality =
-      //     ((props.productsRisk[prod.ID] || {}).criticality || {})[key] || 0;
-      //   totalImpactScore +=
-      //     (projectCriticality *
-      //       productCriticality *
-      //       productRisk *
-      //       supplierRisk) /
-      //     1000;
-      // });
-      // supplierImpactScores[supId] =
-      //   (supplierImpactScores[supId] || 0) + totalImpactScore;
-      // const title = `<div><p>Supplier Name:&nbsp;${
-      //   (suppliersMap[supId] || {}).Name
-      // }</p><p>Product Name:&nbsp;${
-      //   prod.Name
-      // }</p><p>Supply Chain Impact Score:&nbsp;${totalImpactScore.toFixed(
-      //   1
-      // )}</p></div>`;
       const title = `<div><p>Supplier Name:&nbsp;${
         (suppliersMap[supId] || {}).Name
       }</p><p>Product Name:&nbsp;${prod.Name}</p></div>`;
@@ -629,33 +283,12 @@ class RiskGraph extends Component {
           id: "P_" + proj.ID,
           title,
           group: "projects",
-          value: impact * 10.0,
-          level: level,
-          label: impact.toFixed(1)
+          value: impact,
+          level: level
+          // label: impact.toFixed(1)
         };
       });
-    // const shadowProjectNodes = assets
-    //   .filter(assets =>
-    //     HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(assets.ID) : true
-    //   )
-    //   .map(proj => {
-    //     // const parentId = proj["Parent ID"];
-    //     // const pkey = `projects|${parentId}`;
-    //     // const score = shadowProjectAccessLines[proj.ID].score;
-    //     const title = `<div><p>Access Name:&nbsp${
-    //       proj.Name
-    //     }</p><p>Access Impact Score:&nbsp;${score.toFixed(1)}</p></div>`;
-    //     const level = Math.max((proj.Level || "").split(".").length - 1, 1);
-    //     curNodeLevel = Math.max(curNodeLevel, level);
-    //     return {
-    //       id: "P_" + proj.ID,
-    //       title,
-    //       group: "shadow",
-    //       value: score * 10.0,
-    //       level: level,
-    //       label: score.toFixed(1)
-    //     };
-    //   });
+
     curNodeLevel++;
     const productNodes = products
       .filter(p =>
@@ -677,8 +310,8 @@ class RiskGraph extends Component {
           title,
           group: "products",
           value: impact,
-          level: curNodeLevel,
-          label: impact.toFixed(1)
+          level: curNodeLevel
+          // label: impact.toFixed(1)
         };
       });
     curNodeLevel++;
@@ -699,7 +332,7 @@ class RiskGraph extends Component {
         )}</p><p>Supplier Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
         return {
           id: "S_" + sup.ID,
-          label: impact.toFixed(1),
+          // label: impact.toFixed(1),
           title,
           group: "suppliers",
           value: impact,
@@ -717,11 +350,11 @@ class RiskGraph extends Component {
         1
       )}</p></div>`;
       return {
-        shape: "circle",
+        group: "organizations",
         id: "P_" + proj.ID,
         title,
-        label: impact.toFixed(1),
-        value: impact * 10,
+        // label: impact.toFixed(1),
+        value: impact,
         level: 0
       };
     });
@@ -875,16 +508,18 @@ class RiskGraph extends Component {
     //     enabled: true
     // },
     groups: {
-      projects: { shape: "circle", color: "lightblue" },
-      shadow: { shape: "circle", borderWidth: 4, color: { border: "blue" } },
-      products: { shape: "circle", color: "lightgreen" },
-      suppliers: { shape: "circle", color: "orange" }
+      organizations: { shape: "dot" },
+      projects: { shape: "dot", color: "lightblue" },
+      products: { shape: "dot", color: "lightgreen" },
+      suppliers: { shape: "dot", color: "orange" }
     },
     nodes: {
       scaling: {
         label: {
           enabled: true
-        }
+        },
+        min: 5,
+        max: 50
       }
     },
     layout: {
@@ -892,7 +527,7 @@ class RiskGraph extends Component {
         direction: "UD",
         sortMethod: "directed",
         levelSeparation: 300,
-        nodeSpacing: 200,
+        nodeSpacing: 150,
         parentCentralization: false
       }
     },
@@ -915,6 +550,12 @@ class RiskGraph extends Component {
     }
   };
 
+  handleMetric = (event, newMetric) => {
+    if (newMetric != null) {
+      this.setState({ metric: newMetric });
+    }
+  };
+
   render() {
     return (
       <div
@@ -922,6 +563,20 @@ class RiskGraph extends Component {
         style={{ width: "100%", height: "100%", position: "fixed" }}
         ref={tc => (this.treeContainer = tc)}
       >
+        <div style={{ display: "inline-flex" }}>
+          <ToggleButtonGroup
+            value={this.state.metric}
+            exclusive
+            onChange={this.handleMetric}
+          >
+            <ToggleButton value="impact">
+              <Typography>Impact</Typography>
+            </ToggleButton>
+            <ToggleButton value="exposure">
+              <Typography>Exposure</Typography>
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
         {/* <div style={{position:"absolute", margin:24}}>
                     <Typography style={{color:"blue"}}>Projects</Typography>
                     <Typography style={{color:"green"}}>Products</Typography>
@@ -943,7 +598,11 @@ class RiskGraph extends Component {
           linkDirectionalParticleWidth={2}
           d3VelocityDecay={0.3}
         /> */}
-        <Graph graph={this.graph} options={this.options} />
+        <Graph
+          graph={this.graph}
+          options={this.options}
+          getNetwork={network => (this.network = network)}
+        />
         {/* // <ReactEcharts option={this.option} /> */}
       </div>
     );

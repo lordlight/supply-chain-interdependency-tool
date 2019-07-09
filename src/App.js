@@ -530,7 +530,7 @@ class App extends Component {
           <Divider />
           <List>
             <ListItem button onClick={this.handleQuit}>
-              <ListItemText primary="Close" />
+              <ListItemText primary="Close Application" />
             </ListItem>
           </List>
         </Drawer>

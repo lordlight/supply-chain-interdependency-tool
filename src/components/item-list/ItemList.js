@@ -321,6 +321,22 @@ class ItemList extends Component {
                 : "N/A"}
             </TableCell>
           )}
+          {hasAssurance && (
+            <TableCell
+              className={classes.cell}
+              style={{ whiteSpace: "nowrap" }}
+            >
+              <div className={classes.scoreColPart}>
+                {row["score.assurance"] != null
+                  ? row["score.assurance"].toFixed(1)
+                  : "N/A"}
+              </div>
+              <div
+                className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+                style={{ width: row["score.assurance"] }}
+              />
+            </TableCell>
+          )}
           {hasAccess && (
             <TableCell className={classes.cell}>
               {row["score.access.max"] != null
@@ -333,24 +349,6 @@ class ItemList extends Component {
               {row["score.dependency.max"] != null
                 ? row["score.dependency.max"].toFixed(1)
                 : "N/A"}
-            </TableCell>
-          )}
-          {hasAssurance && (
-            <TableCell
-              className={classes.cell}
-              style={{ whiteSpace: "nowrap" }}
-            >
-              <div className={classes.scoreColPart}>
-                {(() => {
-                  if (riskSet.hasOwnProperty(row.ID))
-                    return riskSet[row.ID].Assurance.toFixed(1);
-                  else return "N/A";
-                })()}
-              </div>
-              <div
-                className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-                style={{ width: riskSet[row.ID].Assurance }}
-              />
             </TableCell>
           )}
           <TableCell className={classes.cell}>

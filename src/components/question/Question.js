@@ -11,6 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 
 import AssignmentLateIcon from "@material-ui/icons/AssignmentLate";
+import Bookmark from "@material-ui/icons/Bookmark";
 
 import { getQuestionResponse } from "../../utils/general-utils";
 
@@ -90,7 +91,7 @@ class Question extends Component {
                     marginRight: 6
                   }}
                 >
-                  <AssignmentLateIcon />
+                  <Bookmark />
                 </Typography>
                 // </span>
               )}
