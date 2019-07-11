@@ -29,6 +29,9 @@ const styles = theme => ({
     height: "45px",
     padding: "0px 8px 0px 12px",
     margin: "24px 0px 24px 40px"
+  },
+  typography: {
+    padding: theme.spacing.unit
   }
 });
 
