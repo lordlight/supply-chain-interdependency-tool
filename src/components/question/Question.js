@@ -9,9 +9,11 @@ import Select from "@material-ui/core/Select";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import Popover from "@material-ui/core/Popover";
 
-import AssignmentLateIcon from "@material-ui/icons/AssignmentLate";
-import Bookmark from "@material-ui/icons/Bookmark";
+import BookmarkIcon from "@material-ui/icons/Bookmark";
+import InfoIcon from "@material-ui/icons/Info";
 
 import { getQuestionResponse } from "../../utils/general-utils";
 
@@ -36,6 +38,10 @@ const mapState = state => ({
 });
 
 class Question extends Component {
+  state = {
+    anchorEl: null
+  };
+
   handleChange = event => {
     this.props.updateResponse(this.props.questionId, event.target.value - 1);
     /*store.dispatch(
@@ -46,6 +52,14 @@ class Question extends Component {
                 ansInd: event.target.value-1 
             })
         );*/
+  };
+
+  handleInfoClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleInfoClose = event => {
+    this.setState({ anchorEl: null });
   };
 
   render() {
@@ -67,6 +81,9 @@ class Question extends Component {
         response += 1;
       }
     }
+
+    const open = Boolean(this.state.anchorEl);
+
     return (
       <TableRow style={{ border: "none" }}>
         <TableCell
@@ -75,7 +92,7 @@ class Question extends Component {
           }}
         >
           <FormLabel component="legend">
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               {response === 0 && (
                 // <span
                 //   style={{
@@ -83,16 +100,16 @@ class Question extends Component {
                 //     // color: "primary"
                 //   }}
                 // >
-                <Typography
-                  color="primary"
-                  style={{
-                    float: "left",
-                    verticalAlign: "middle",
-                    marginRight: 6
-                  }}
-                >
-                  <Bookmark />
-                </Typography>
+                // <Typography
+                //   color="primary"
+                //   style={{
+                //     float: "left",
+                //     verticalAlign: "middle",
+                //     marginRight: 6
+                //   }}
+                // >
+                <BookmarkIcon color="primary" />
+                // </Typography>
                 // </span>
               )}
 
@@ -109,6 +126,48 @@ class Question extends Component {
               <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
                 {this.props.questionText}
               </span>
+              {this.props.question.Notes && (
+                <React.Fragment>
+                  <IconButton
+                    disableRipple
+                    size="small"
+                    onClick={this.handleInfoClick}
+                    style={{
+                      minWidth: 0,
+                      padding: 0,
+                      width: 24,
+                      height: 24,
+                      marginLeft: 12
+                    }}
+                  >
+                    {/* <InfoIcon color="primary" style={{ width: 16, height: 16 }} /> */}
+                    <InfoIcon color="primary" style={{ fontSize: 20 }} />
+
+                    {/* <Typography color="primary" style={{ fontSize: 12 }}>
+                    <InfoIcon style={{ width: 16, height: 16 }} />
+                    <div style={{ float: "right" }}>details</div>
+                  </Typography> */}
+                  </IconButton>
+                  <Popover
+                    // id={id}
+                    open={open}
+                    anchorEl={this.state.anchorEl}
+                    onClose={this.handleInfoClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "center"
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "center"
+                    }}
+                  >
+                    <Typography className={classes.typography}>
+                      {this.props.question.Notes}
+                    </Typography>
+                  </Popover>
+                </React.Fragment>
+              )}
             </div>
           </FormLabel>
           <FormControl component="fieldset" className="question-form">

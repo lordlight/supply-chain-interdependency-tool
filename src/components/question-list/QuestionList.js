@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import clsx from "clsx";
+
 import store from "../../redux/store";
 import { connect } from "react-redux";
 import {
@@ -22,11 +24,23 @@ import { getQuestionResponse } from "../../utils/general-utils";
 
 const styles = theme => ({
   questionList: {
-    padding: "32px 8px 32px 44px"
+    padding: "32px 8px 80px 44px"
+  },
+  footer: {
+    marginLeft: "24px",
+    marginTop: "36px",
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    padding: 24,
+    width: "calc(100% - 96px)",
+    background: "#f8f8f8",
+    borderTop: "2px solid #dcdcdc"
   },
   buttonContainer: {
-    marginLeft: "24px",
-    marginTop: "36px"
+    width: 400,
+    justifyContent: "space-around",
+    display: "flex"
   },
   button: {
     color: "primary",
@@ -368,22 +382,24 @@ class QuestionList extends Component {
               </Table>
             </React.Fragment>
           )}
-          <div className={classes.buttonContainer}>
-            <Button
-              onClick={this.handleCancel}
-              variant="contained"
-              className={classes.tertiaryButton}
-            >
-              CANCEL
-            </Button>
-            <Button
-              onClick={this.handleSave}
-              variant="contained"
-              color="primary"
-              className={classes.button}
-            >
-              OK
-            </Button>
+          <div className={classes.footer}>
+            <div className={classes.buttonContainer}>
+              <Button
+                onClick={this.handleCancel}
+                variant="contained"
+                className={classes.tertiaryButton}
+              >
+                CANCEL
+              </Button>
+              <Button
+                onClick={this.handleSave}
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                SAVE
+              </Button>
+            </div>
           </div>
           {/*<Snackbar
                     anchorOrigin={{

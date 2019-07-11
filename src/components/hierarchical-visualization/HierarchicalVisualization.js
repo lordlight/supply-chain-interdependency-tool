@@ -3,15 +3,115 @@ import Typography from "@material-ui/core/Typography";
 import Graph from "react-graph-vis";
 import { ForceGraph2D } from "react-force-graph";
 
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
 import { getCellMultiples } from "../../utils/general-utils";
 
 const HIDE_UNCONNECTED_RESOURCES = false;
+
+const IMPACT_COLORS = [
+  "#FF00FF",
+  "#FC03FC",
+  "#FA05FA",
+  "#F708F7",
+  "#F50AF5",
+  "#F20DF2",
+  "#F00FF0",
+  "#ED12ED",
+  "#EA15EA",
+  "#E817E8",
+  "#E51AE5",
+  "#E31CE3",
+  "#E01FE0",
+  "#DE21DE",
+  "#DB24DB",
+  "#D827D8",
+  "#D629D6",
+  "#D32CD3",
+  "#D12ED1",
+  "#CE31CE",
+  "#CB34CB",
+  "#C936C9",
+  "#C639C6",
+  "#C43BC4",
+  "#C13EC1",
+  "#BF40BF",
+  "#BC43BC",
+  "#B946B9",
+  "#B748B7",
+  "#B44BB4",
+  "#B24DB2",
+  "#AF50AF",
+  "#AD52AD",
+  "#AA55AA",
+  "#A758A7",
+  "#A55AA5",
+  "#A25DA2",
+  "#A05FA0",
+  "#9D629D",
+  "#9B649B",
+  "#986798",
+  "#956A95",
+  "#936C93",
+  "#906F90",
+  "#8E718E",
+  "#8B748B",
+  "#897689",
+  "#867986",
+  "#837C83",
+  "#817E81",
+  "#7E817E",
+  "#7C837C",
+  "#798679",
+  "#768976",
+  "#748B74",
+  "#718E71",
+  "#6F906F",
+  "#6C936C",
+  "#6A956A",
+  "#679867",
+  "#649B64",
+  "#629D62",
+  "#5FA05F",
+  "#5DA25D",
+  "#5AA55A",
+  "#58A758",
+  "#55AA55",
+  "#52AD52",
+  "#50AF50",
+  "#4DB24D",
+  "#4BB44B",
+  "#48B748",
+  "#46B946",
+  "#43BC43",
+  "#40BF40",
+  "#3EC13E",
+  "#3BC43B",
+  "#39C639",
+  "#36C936",
+  "#34CB34",
+  "#31CE31",
+  "#2ED12E",
+  "#2CD32C",
+  "#29D629",
+  "#27D827",
+  "#24DB24",
+  "#21DE21",
+  "#1FE01F",
+  "#1CE31C",
+  "#1AE51A",
+  "#17E817",
+  "#15EA15",
+  "#12ED12",
+  "#0FF00F",
+  "#0DF20D",
+  "#0AF50A",
+  "#08F708",
+  "#05FA05",
+  "#03FC03",
+  "#00FF00"
+];
 
 const mapState = state => ({
   suppliers: state.suppliers,
@@ -26,11 +126,7 @@ const mapState = state => ({
   supplierQuestions: state.supplierQuestions
 });
 
-class RiskGraph extends Component {
-  state = {
-    metric: "impact"
-  };
-
+class HierarchicalVisualization extends Component {
   graph = {
     nodes: [],
     edges: []
@@ -104,58 +200,17 @@ class RiskGraph extends Component {
   // };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevState.metric != this.state.metric && this.network) {
-      // this.network.setData(this.graph.nodes, this.graph.edges);
-      Object.entries(this.props.scores).forEach(entry => {
-        const [key, scores] = entry;
-        Object.entries(scores).forEach(subentry => {
-          const [eid, subscores] = subentry;
-          let nodeid, group;
-          if (key === "project") {
-            nodeid = "P_" + eid;
-            // group = "projects";
-          } else if (key === "product") {
-            nodeid = "PR_" + eid;
-            // group = "products";
-          } else if (key === "supplier") {
-            nodeid = "S_" + eid;
-            // group = "suppliers";
-          }
-          this.network.body.data.nodes.update({
-            id: nodeid,
-            // group,
-            // label: subscores[this.state.metric].toFixed(1),
-            value: subscores[this.state.metric]
-            // scaling: {
-            //   label: {
-            //     enabled: true
-            //   },
-            //   min: 10,
-            //   max: 50
-            //   // customScalingFuncion: (min, max, total, value) => {
-            //   //   if (max === min) {
-            //   //     return 0.5;
-            //   //   } else {
-            //   //     var scale = 1 / (max - min);
-            //   //     return Math.max(0, (value - min) * scale);
-            //   //   }
-            //   // }
-            // }
-          });
-        });
-      });
-      // console.log(this.network);
-      // this.network.redraw();
-    }
-    // this.constructGraph(this.props);
-    // console.log(this.option);
+    this.constructGraph(this.props);
   };
 
   constructGraph = props => {
-    const addSupplyLine = (allSupplyLines, supplyLine) => {
-      if (allSupplyLines) {
-        allSupplyLines.supplyLines.push(supplyLine);
-      }
+    const getImpactColor = impactPct => {
+      const colorIdx = Math.min(
+        Math.floor((1 - impactPct) * IMPACT_COLORS.length),
+        IMPACT_COLORS.length - 1
+      );
+      const impactColor = IMPACT_COLORS[colorIdx];
+      return impactColor;
     };
 
     const { products, suppliers, projects } = props;
@@ -260,85 +315,122 @@ class RiskGraph extends Component {
       };
     });
     let curNodeLevel = 1;
-    const projectNodes = projects
+    const activeProjects = projects
       .filter(pr => !!pr.parent)
       .filter(pr =>
         HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true
-      )
-      .map(proj => {
-        const parentId = proj["Parent ID"];
-        // const pkey = `projects|${parentId}`;
-        const impact = this.props.scores.project[proj.ID].impact;
-        const exposure = this.props.scores.project[proj.ID].exposure;
-        // const criticality =
-        //   ((props.projectsRisk[proj.ID] || {}).criticality || {})[pkey] || 0;
-        const title = `<div><p>Project Name:&nbsp${
-          proj.Name
-        }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
-          1
-        )}</p><p>Project Exposure Score:&nbsp;${exposure.toFixed(1)}</p></div>`;
-        const level = Math.max((proj.Level || "").split(".").length - 1, 1);
-        curNodeLevel = Math.max(curNodeLevel, level);
-        return {
-          id: "P_" + proj.ID,
-          title,
-          group: "projects",
-          value: impact,
-          level: level
-          // label: impact.toFixed(1)
-        };
-      });
+      );
+    let maxExposure = Math.max(
+      ...(activeProjects.map(
+        proj => this.props.scores.project[proj.ID].exposure
+      ) || 0)
+    );
+    let maxImpact = Math.max(
+      ...(activeProjects.map(
+        proj => this.props.scores.project[proj.ID].impact
+      ) || 0)
+    );
+    const projectNodes = activeProjects.map(proj => {
+      const parentId = proj["Parent ID"];
+      // const pkey = `projects|${parentId}`;
+      const impact = this.props.scores.project[proj.ID].impact;
+      const impactColor = getImpactColor(impact / maxImpact);
+      const exposure = this.props.scores.project[proj.ID].exposure;
+      // const criticality =
+      //   ((props.projectsRisk[proj.ID] || {}).criticality || {})[pkey] || 0;
+      const title = `<div><p>Project Name:&nbsp${
+        proj.Name
+      }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
+        1
+      )}</p><p>Project Exposure Score:&nbsp;${exposure.toFixed(1)}</p></div>`;
+      const level = Math.max((proj.Level || "").split(".").length - 1, 1);
+      curNodeLevel = Math.max(curNodeLevel, level);
+      return {
+        id: "P_" + proj.ID,
+        title,
+        color: impactColor,
+        group: "projects",
+        value: exposure / maxExposure,
+        // value: impact,
+        level: level
+        // label: impact.toFixed(1)
+      };
+    });
 
     curNodeLevel++;
-    const productNodes = products
-      .filter(p =>
-        HIDE_UNCONNECTED_RESOURCES ? productEdgesSeen.has(p.ID) : true
-      )
-      .map(prod => {
-        // const qscore = (props.productsRisk[prod.ID] || {}).score || 0;
-        // const score =
-        //   productSupplyLines[prod.ID].score + productAccessLines[prod.ID].score;
-        const impact = this.props.scores.product[prod.ID].impact;
-        const exposure = this.props.scores.product[prod.ID].exposure;
-        const title = `<div><p>Product Name:&nbsp${
-          prod.Name
-        }</p><p>Product Impact Score:&nbsp${impact.toFixed(
-          1
-        )}</p><p>Product Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
-        return {
-          id: "PR_" + prod.ID,
-          title,
-          group: "products",
-          value: impact,
-          level: curNodeLevel
-          // label: impact.toFixed(1)
-        };
-      });
+    const activeProducts = products.filter(p =>
+      HIDE_UNCONNECTED_RESOURCES ? productEdgesSeen.has(p.ID) : true
+    );
+    maxExposure = Math.max(
+      ...(activeProducts.map(
+        prod => this.props.scores.product[prod.ID].exposure
+      ) || 0)
+    );
+    maxImpact = Math.max(
+      ...(activeProjects.map(
+        proj => this.props.scores.project[proj.ID].impact
+      ) || 0)
+    );
+    const productNodes = activeProducts.map(prod => {
+      // const qscore = (props.productsRisk[prod.ID] || {}).score || 0;
+      // const score =
+      //   productSupplyLines[prod.ID].score + productAccessLines[prod.ID].score;
+      const impact = this.props.scores.product[prod.ID].impact;
+      const impactColor = getImpactColor(impact / maxImpact);
+      const exposure = this.props.scores.product[prod.ID].exposure;
+      const title = `<div><p>Product Name:&nbsp${
+        prod.Name
+      }</p><p>Product Impact Score:&nbsp${impact.toFixed(
+        1
+      )}</p><p>Product Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
+      return {
+        id: "PR_" + prod.ID,
+        title,
+        color: impactColor,
+        group: "products",
+        // value: impact,
+        value: exposure / maxExposure,
+        level: curNodeLevel
+        // label: impact.toFixed(1)
+      };
+    });
     curNodeLevel++;
-    const supplierNodes = suppliers
-      .filter(s =>
-        HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID) : true
-      )
-      .map(sup => {
-        // const impact = supplierImpactScores[sup.ID] || 0;
-        // const score =
-        //   supplierSupplyLines[sup.ID].score + supplierAccessLines[sup.ID].score;
-        const impact = this.props.scores.supplier[sup.ID].impact;
-        const exposure = this.props.scores.supplier[sup.ID].exposure;
-        const title = `<div><p>Supplier Name:&nbsp${
-          sup.Name
-        }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
-          1
-        )}</p><p>Supplier Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
-        return {
-          id: "S_" + sup.ID,
-          // label: impact.toFixed(1),
-          title,
-          group: "suppliers",
-          value: impact,
-          level: curNodeLevel
-        };
-      });
+    const activeSuppliers = suppliers.filter(s =>
+      HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID) : true
+    );
+    maxExposure = Math.max(
+      ...(activeSuppliers.map(
+        sup => this.props.scores.supplier[sup.ID].exposure
+      ) || 0)
+    );
+    maxImpact = Math.max(
+      ...(activeProjects.map(
+        proj => this.props.scores.project[proj.ID].impact
+      ) || 0)
+    );
+    const supplierNodes = activeSuppliers.map(sup => {
+      // const impact = supplierImpactScores[sup.ID] || 0;
+      // const score =
+      //   supplierSupplyLines[sup.ID].score + supplierAccessLines[sup.ID].score;
+      const impact = this.props.scores.supplier[sup.ID].impact;
+      const impactColor = getImpactColor(impact / maxImpact);
+      const exposure = this.props.scores.supplier[sup.ID].exposure;
+      const title = `<div><p>Supplier Name:&nbsp${
+        sup.Name
+      }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
+        1
+      )}</p><p>Supplier Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
+      return {
+        id: "S_" + sup.ID,
+        // label: impact.toFixed(1),
+        title,
+        color: impactColor,
+        group: "suppliers",
+        // value: impact,
+        value: exposure / maxExposure,
+        level: curNodeLevel
+      };
+    });
     const organizationNodes = organizations.map(proj => {
       const impact = this.props.scores.project[proj.ID].impact;
       const exposure = this.props.scores.project[proj.ID].exposure;
@@ -354,7 +446,8 @@ class RiskGraph extends Component {
         id: "P_" + proj.ID,
         title,
         // label: impact.toFixed(1),
-        value: impact,
+        // value: impact,
+        value: 1,
         level: 0
       };
     });
@@ -508,10 +601,10 @@ class RiskGraph extends Component {
     //     enabled: true
     // },
     groups: {
-      organizations: { shape: "dot" },
-      projects: { shape: "dot", color: "lightblue" },
-      products: { shape: "dot", color: "lightgreen" },
-      suppliers: { shape: "dot", color: "orange" }
+      organizations: { shape: "dot", color: "gray" },
+      projects: { shape: "dot" },
+      products: { shape: "dot" },
+      suppliers: { shape: "dot" }
     },
     nodes: {
       scaling: {
@@ -519,7 +612,7 @@ class RiskGraph extends Component {
           enabled: true
         },
         min: 5,
-        max: 50
+        max: 60
       }
     },
     layout: {
@@ -556,14 +649,20 @@ class RiskGraph extends Component {
     }
   };
 
+  handleVisualizationChange = (event, viz) => {
+    this.setState({ visualization: viz });
+  };
+
   render() {
+    const { classes } = this.props;
+
     return (
       <div
         id="risk-graph"
         style={{ width: "100%", height: "100%", position: "fixed" }}
         ref={tc => (this.treeContainer = tc)}
       >
-        <div style={{ display: "inline-flex" }}>
+        {/* <div style={{ display: "inline-flex" }}>
           <ToggleButtonGroup
             value={this.state.metric}
             exclusive
@@ -576,7 +675,7 @@ class RiskGraph extends Component {
               <Typography>Exposure</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
-        </div>
+        </div> */}
         {/* <div style={{position:"absolute", margin:24}}>
                     <Typography style={{color:"blue"}}>Projects</Typography>
                     <Typography style={{color:"green"}}>Products</Typography>
@@ -609,4 +708,4 @@ class RiskGraph extends Component {
   }
 }
 
-export default connect(mapState)(RiskGraph);
+export default connect(mapState)(HierarchicalVisualization);

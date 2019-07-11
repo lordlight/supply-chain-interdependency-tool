@@ -9,6 +9,7 @@ import { ItemVisualCard, QuestionStatusCard } from "../../components";
 // import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
 import { withStyles } from "@material-ui/core/styles";
+
 import Button from "@material-ui/core/Button";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -60,7 +61,8 @@ const mapState = state => ({
   projectsRisk: state.projectsRisk,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses
+  projectResponses: state.projectResponses,
+  scores: state.scores
 });
 
 const styles = theme => ({
@@ -78,6 +80,9 @@ const styles = theme => ({
   cell: {
     borderRight: "2px solid #f8f8f8"
   },
+  lastOfCell: {
+    borderRight: "2px solid #dcdcdc"
+  },
   cellInactive: {
     color: "gray"
   },
@@ -85,12 +90,34 @@ const styles = theme => ({
     textTransform: "uppercase",
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
-    minWidth: 467
+    // borderRight: "2px solid #dcdcdc",
+    paddingLeft: 12,
+    paddingRight: 12,
+    minWidth: 180
   },
-  regCol: {
+  metricCol: {
+    textTransform: "capitalize",
+    backgroundColor: "#cbcbcb",
+    borderRight: "2px solid #f8f8f8",
+    paddingLeft: 12,
+    paddingRight: 12,
+    "&:last-child": {
+      borderRight: "2px solid black"
+    }
+  },
+  scoreCol: {
     textTransform: "capitalize",
     backgroundColor: "#dcdcdc",
-    borderRight: "2px solid #f8f8f8"
+    borderRight: "2px solid #f8f8f8",
+    paddingLeft: 12,
+    paddingRight: 12
+  },
+  questionCol: {
+    textTransform: "capitalize",
+    backgroundColor: "#ededed",
+    borderRight: "2px solid #f8f8f8",
+    paddingLeft: 12,
+    paddingRight: 12
   },
   button: {
     textTransform: "uppercase",
@@ -151,18 +178,21 @@ class ItemList extends Component {
     let responses = null;
     // let riskVal = null;
     let riskSet = null;
+    let scores = null;
     if (type === "suppliers") {
       items = [...this.props.suppliers, ...this.props.suppliersInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
       riskSet = this.props.suppliersRisk;
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
+      scores = this.props.scores.supplier;
     } else if (type === "products") {
       items = [...this.props.products, ...this.props.productsInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
       riskSet = this.props.productsRisk;
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
+      scores = this.props.scores.product;
     } else if (type === "projects") {
       items = [...this.props.projects, ...this.props.projectsInactive].filter(
         proj => !!proj.parent
@@ -171,15 +201,17 @@ class ItemList extends Component {
       riskSet = this.props.projectsRisk;
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
+      scores = this.props.scores.project;
     }
+    console.log("SCORES", scores);
 
+    const hasCriticality = questions.some(
+      q => q["Type of question"] === "Criticality"
+    );
     const hasAssurance = questions.some(
       q => q["Type of question"] === "Assurance"
     );
     const hasAccess = questions.some(q => q["Type of question"] === "Access");
-    const hasCriticality = questions.some(
-      q => q["Type of question"] === "Criticality"
-    );
     const hasDependency = questions.some(
       q => q["Type of question"] === "Dependency"
     );
@@ -191,46 +223,58 @@ class ItemList extends Component {
         cssClass: classes.titleCol,
         sortType: "Name"
       },
+      {
+        label: "Impact",
+        tooltip: "Sort by impact",
+        cssClass: classes.metricCol,
+        sortType: "score.impact"
+      },
+      {
+        label: "Exposure",
+        tooltip: "Sort by exposure",
+        cssClass: classes.metricCol,
+        sortType: "score.exposure"
+      },
       hasCriticality && {
         label: "Criticality",
         tooltip: "Sort by criticality",
-        cssClass: classes.regCol,
+        cssClass: classes.scoreCol,
         sortType: "score.criticality.max"
       },
       hasAssurance && {
         label: "Assurance",
         tooltip: "Sort by assurance",
-        cssClass: classes.regCol,
+        cssClass: classes.scoreCol,
         sortType: "score.assurance"
       },
       hasAccess && {
         label: "Access",
         tooltip: "Sort by access",
-        cssClass: classes.regCol,
+        cssClass: classes.scoreCol,
         sortType: "score.access.max"
       },
       hasDependency && {
         label: "Dependency",
         tooltip: "Sort by dependency",
-        cssClass: classes.regCol,
+        cssClass: classes.scoreCol,
         sortType: "score.dependency.max"
       },
       {
         label: "Questions Complete",
         tooltip: "Sort by completion",
-        cssClass: classes.regCol,
+        cssClass: classes.questionCol,
         sortType: "completion"
       },
       {
         label: "Question Age",
         tooltip: "Sort by age",
-        cssClass: classes.regCol,
+        cssClass: classes.questionCol,
         sortType: "age"
       },
       {
         label: "Action",
         tooltip: "Sort by action",
-        cssClass: classes.regCol,
+        cssClass: classes.questionCol,
         sortType: "action"
       }
     ].filter(Boolean);
@@ -262,7 +306,18 @@ class ItemList extends Component {
         riskSet.hasOwnProperty(item.ID) &&
         responses[item.ID]
       ) {
-        listItem["score.assurance"] = riskSet[item.ID].Assurance;
+        listItem["score.impact"] = scores[item.ID].impact;
+        listItem["score.exposure"] = scores[item.ID].exposure;
+
+        // the following must be in this order
+        if (hasCriticality) {
+          listItem["score.criticality.max"] = Math.max(
+            ...Object.values(riskSet[item.ID].Criticality)
+          );
+        }
+        if (hasAssurance) {
+          listItem["score.assurance"] = riskSet[item.ID].Assurance;
+        }
         if (hasAccess) {
           listItem["score.access.max"] = Math.max(
             ...Object.values(riskSet[item.ID].Access)
@@ -273,11 +328,7 @@ class ItemList extends Component {
             ...Object.values(riskSet[item.ID].Dependency)
           );
         }
-        if (hasCriticality) {
-          listItem["score.criticality.max"] = Math.max(
-            ...Object.values(riskSet[item.ID].Criticality)
-          );
-        }
+
         const numQuestions = getNumQuestionsForResource(item, questions);
         listItem.completion =
           100 * (Object.keys(responses[item.ID]).length / numQuestions);
@@ -310,51 +361,80 @@ class ItemList extends Component {
       }
     });
 
-    const rows = list.map((row, i) =>
-      row._cscrm_active ? (
+    const maxImpact = Math.max(...list.map(row => row["score.impact"] || 0));
+    const maxExposure = Math.max(
+      ...list.map(row => row["score.exposure"] || 0)
+    );
+    console.log({ maxImpact, maxExposure });
+    const rows = list.map((row, i) => {
+      const scoreValues = [
+        hasCriticality &&
+          (row["score.criticality.max"] != null
+            ? row["score.criticality.max"].toFixed(1)
+            : "N/A"),
+        hasAssurance &&
+          (row["score.assurance"] != null
+            ? row["score.assurance"].toFixed(1)
+            : "N/A"),
+        hasAccess &&
+          (row["score.access.max"] != null
+            ? row["score.access.max"].toFixed(1)
+            : "N/A"),
+        hasDependency &&
+          (row["score.dependency.max"] != null
+            ? row["score.dependency.max"].toFixed(1)
+            : "N/A")
+      ].filter(Boolean);
+      return row._cscrm_active ? (
         <TableRow key={row.ID}>
-          <TableCell className={classes.cell}>{row.Name}</TableCell>
-          {hasCriticality && (
-            <TableCell className={classes.cell}>
-              {row["score.criticality.max"] != null
-                ? row["score.criticality.max"].toFixed(1)
-                : "N/A"}
-            </TableCell>
-          )}
-          {hasAssurance && (
+          <TableCell className={classes.lastOfCell}>{row.Name}</TableCell>
+          <TableCell className={classes.cell} style={{ whiteSpace: "nowrap" }}>
+            <div className={classes.scoreColPart}>
+              {row["score.impact"] != null
+                ? row["score.impact"].toFixed(1)
+                : "---"}
+            </div>
+            <div
+              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              // style={{ width: row["score.impact"] || 0 }}
+              style={{ width: ((row["score.impact"] || 0) / maxImpact) * 40 }}
+            />
+          </TableCell>
+          <TableCell
+            className={classes.lastOfCell}
+            style={{ whiteSpace: "nowrap", borderRight: "2px solid #dcdcdc" }}
+          >
+            <div className={classes.scoreColPart}>
+              {row["score.exposure"] != null
+                ? row["score.exposure"].toFixed(1)
+                : "---"}
+            </div>
+            <div
+              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              // style={{ width: row["score.impact"] || 0 }}
+              style={{
+                width: ((row["score.exposure"] || 0) / maxExposure) * 40
+              }}
+            />
+          </TableCell>
+
+          {scoreValues.map((val, i) => (
             <TableCell
-              className={classes.cell}
-              style={{ whiteSpace: "nowrap" }}
+              key={i}
+              className={
+                i === scoreValues.length - 1 ? classes.lastOfCell : classes.cell
+              }
             >
-              <div className={classes.scoreColPart}>
-                {row["score.assurance"] != null
-                  ? row["score.assurance"].toFixed(1)
-                  : "N/A"}
-              </div>
-              <div
-                className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-                style={{ width: row["score.assurance"] }}
-              />
+              {val}
             </TableCell>
-          )}
-          {hasAccess && (
-            <TableCell className={classes.cell}>
-              {row["score.access.max"] != null
-                ? row["score.access.max"].toFixed(1)
-                : "N/A"}
-            </TableCell>
-          )}
-          {hasDependency && (
-            <TableCell className={classes.cell}>
-              {row["score.dependency.max"] != null
-                ? row["score.dependency.max"].toFixed(1)
-                : "N/A"}
-            </TableCell>
-          )}
+          ))}
+
           <TableCell className={classes.cell}>
             {(row.completion || 0).toFixed(1)}%
           </TableCell>
-          <TableCell className={classes.cell}>{getAge(row.age)}</TableCell>
+          <TableCell className={classes.cell} style={{ whiteSpace: "nowrap" }}>
+            {getAge(row.age)}
+          </TableCell>
           <TableCell className={classes.cell}>
             <Button
               variant="contained"
@@ -390,8 +470,8 @@ class ItemList extends Component {
           <TableCell />
           <TableCell />
         </TableRow>
-      )
-    );
+      );
+    });
 
     return (
       <div className={classes.itemList}>

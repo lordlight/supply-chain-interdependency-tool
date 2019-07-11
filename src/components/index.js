@@ -12,5 +12,11 @@ export {
   default as QuestionStatusCard
 } from "./question-status-card/QuestionStatusCard";
 export { default as SupplierDetails } from "./supplier-details/SupplierDetails";
-export { default as RiskGraph } from "./risk-graph/RiskGraph";
+export { default as Visualizations } from "./visualizations/Visualizations";
+export {
+  default as HierarchicalVisualization
+} from "./hierarchical-visualization/HierarchicalVisualization";
+export {
+  default as TreemapVisualization
+} from "./treemap-visualization/TreemapVisualization";
 export { default as TypeCard } from "./type-card/TypeCard";

@@ -1,4 +1,4 @@
-ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes ,Type of question,Asset ID
+ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Asset ID
 1.2,ID.SC-2,Does the supplier have fewer than 10 employees?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;",This question targets the stability of the supplier. Using the threshold 10 because of this source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/,Assurance,
 1.3,ID.SC-2,How long has this supplier been in business?,"Range: less than 3 years, less than 5 years, less than 10 years, over 10 years","value=10;label=""< 3 years"" | value=5;label=""3 - 5 years"" | value=2;label=""5 - 10 years"" | value=10;label=""I don't know""","IF < 3, RAISE 10

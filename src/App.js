@@ -4,7 +4,8 @@ import "./App.css";
 import {
   /*Breadcrumb,*/ Home,
   ItemOverview,
-  /*QuestionList,*/ RiskGraph
+  /*QuestionList,*/ RiskGraph,
+  Visualizations
 } from "./components/";
 
 // Redux
@@ -388,7 +389,7 @@ class App extends Component {
     const prodProps = { currentType: "products" };
     const projProps = { currentType: "projects" };
     return (
-      <MuiThemeProvider theme={theme}>
+      <MuiThemeProvider theme={theme} style={{ overflowY: "scroll" }}>
         <AppBar
           position="static"
           className={clsx(classes.appbar, {
@@ -466,8 +467,8 @@ class App extends Component {
                   root: classes.tabRoot,
                   selected: classes.tabSelected
                 }}
-                value="network"
-                label="Supply Chain"
+                value="visualizations"
+                label="Visualizations"
               />
             </Tabs>
           ) : (
@@ -543,7 +544,7 @@ class App extends Component {
           {value === "projects" && <ItemOverview />}
           {value === "products" && <ItemOverview />}
           {value === "suppliers" && <ItemOverview />}
-          {value === "network" && <RiskGraph />}
+          {value === "visualizations" && <Visualizations />}
         </div>
         <Dialog
           onClose={() => this.setState({ clearDialogOpen: false })}
