@@ -389,7 +389,7 @@ class App extends Component {
     const prodProps = { currentType: "products" };
     const projProps = { currentType: "projects" };
     return (
-      <MuiThemeProvider theme={theme} style={{ overflowY: "scroll" }}>
+      <MuiThemeProvider theme={theme}>
         <AppBar
           position="static"
           className={clsx(classes.appbar, {

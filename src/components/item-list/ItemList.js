@@ -185,14 +185,14 @@ class ItemList extends Component {
       riskSet = this.props.suppliersRisk;
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
-      scores = this.props.scores.supplier;
+      scores = this.props.scores.supplier || {};
     } else if (type === "products") {
       items = [...this.props.products, ...this.props.productsInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
       riskSet = this.props.productsRisk;
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
-      scores = this.props.scores.product;
+      scores = this.props.scores.product || {};
     } else if (type === "projects") {
       items = [...this.props.projects, ...this.props.projectsInactive].filter(
         proj => !!proj.parent
@@ -201,7 +201,7 @@ class ItemList extends Component {
       riskSet = this.props.projectsRisk;
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
-      scores = this.props.scores.project;
+      scores = this.props.scores.project || {};
     }
     console.log("SCORES", scores);
 
@@ -306,8 +306,9 @@ class ItemList extends Component {
         riskSet.hasOwnProperty(item.ID) &&
         responses[item.ID]
       ) {
-        listItem["score.impact"] = scores[item.ID].impact;
-        listItem["score.exposure"] = scores[item.ID].exposure;
+        const itemScores = scores[item.ID] || {};
+        listItem["score.impact"] = itemScores.impact || 0;
+        listItem["score.exposure"] = itemScores.exposure || 0;
 
         // the following must be in this order
         if (hasCriticality) {
@@ -397,7 +398,9 @@ class ItemList extends Component {
             <div
               className={[classes.scoreColPart, classes.scoreBars].join(" ")}
               // style={{ width: row["score.impact"] || 0 }}
-              style={{ width: ((row["score.impact"] || 0) / maxImpact) * 40 }}
+              style={{
+                width: ((row["score.impact"] || 0) / maxImpact || 0) * 40
+              }}
             />
           </TableCell>
           <TableCell
@@ -413,7 +416,7 @@ class ItemList extends Component {
               className={[classes.scoreColPart, classes.scoreBars].join(" ")}
               // style={{ width: row["score.impact"] || 0 }}
               style={{
-                width: ((row["score.exposure"] || 0) / maxExposure) * 40
+                width: ((row["score.exposure"] || 0) / maxExposure || 0) * 40
               }}
             />
           </TableCell>

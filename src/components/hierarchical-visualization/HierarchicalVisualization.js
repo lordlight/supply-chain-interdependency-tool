@@ -320,22 +320,22 @@ class HierarchicalVisualization extends Component {
       .filter(pr =>
         HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true
       );
+    let resourceScores = this.props.scores.project || {};
     let maxExposure = Math.max(
       ...(activeProjects.map(
-        proj => this.props.scores.project[proj.ID].exposure
+        proj => (resourceScores[proj.ID] || {}).exposure
       ) || 0)
     );
     let maxImpact = Math.max(
-      ...(activeProjects.map(
-        proj => this.props.scores.project[proj.ID].impact
-      ) || 0)
+      ...(activeProjects.map(proj => (resourceScores[proj.ID] || {}).impact) ||
+        0)
     );
     const projectNodes = activeProjects.map(proj => {
-      const parentId = proj["Parent ID"];
       // const pkey = `projects|${parentId}`;
-      const impact = this.props.scores.project[proj.ID].impact;
+      const itemScores = resourceScores[proj.ID] || {};
+      const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = this.props.scores.project[proj.ID].exposure;
+      const exposure = itemScores.exposure || 0;
       // const criticality =
       //   ((props.projectsRisk[proj.ID] || {}).criticality || {})[pkey] || 0;
       const title = `<div><p>Project Name:&nbsp${
@@ -350,7 +350,7 @@ class HierarchicalVisualization extends Component {
         title,
         color: impactColor,
         group: "projects",
-        value: exposure / maxExposure,
+        value: exposure / maxExposure || 0,
         // value: impact,
         level: level
         // label: impact.toFixed(1)
@@ -361,23 +361,25 @@ class HierarchicalVisualization extends Component {
     const activeProducts = products.filter(p =>
       HIDE_UNCONNECTED_RESOURCES ? productEdgesSeen.has(p.ID) : true
     );
+    resourceScores = this.props.scores.product || {};
+
     maxExposure = Math.max(
       ...(activeProducts.map(
-        prod => this.props.scores.product[prod.ID].exposure
+        prod => (resourceScores[prod.ID] || {}).exposure
       ) || 0)
     );
     maxImpact = Math.max(
-      ...(activeProjects.map(
-        proj => this.props.scores.project[proj.ID].impact
-      ) || 0)
+      ...(activeProducts.map(prod => (resourceScores[prod.ID] || {}).impact) ||
+        0)
     );
     const productNodes = activeProducts.map(prod => {
       // const qscore = (props.productsRisk[prod.ID] || {}).score || 0;
       // const score =
       //   productSupplyLines[prod.ID].score + productAccessLines[prod.ID].score;
-      const impact = this.props.scores.product[prod.ID].impact;
+      const itemScores = resourceScores[prod.ID] || {};
+      const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = this.props.scores.product[prod.ID].exposure;
+      const exposure = itemScores.exposure || 0;
       const title = `<div><p>Product Name:&nbsp${
         prod.Name
       }</p><p>Product Impact Score:&nbsp${impact.toFixed(
@@ -389,7 +391,7 @@ class HierarchicalVisualization extends Component {
         color: impactColor,
         group: "products",
         // value: impact,
-        value: exposure / maxExposure,
+        value: exposure / maxExposure || 0,
         level: curNodeLevel
         // label: impact.toFixed(1)
       };
@@ -398,23 +400,23 @@ class HierarchicalVisualization extends Component {
     const activeSuppliers = suppliers.filter(s =>
       HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID) : true
     );
+    resourceScores = this.props.scores.supplier || {};
     maxExposure = Math.max(
-      ...(activeSuppliers.map(
-        sup => this.props.scores.supplier[sup.ID].exposure
-      ) || 0)
+      ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).exposure) ||
+        0)
     );
     maxImpact = Math.max(
-      ...(activeProjects.map(
-        proj => this.props.scores.project[proj.ID].impact
-      ) || 0)
+      ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).impact) ||
+        0)
     );
     const supplierNodes = activeSuppliers.map(sup => {
       // const impact = supplierImpactScores[sup.ID] || 0;
       // const score =
       //   supplierSupplyLines[sup.ID].score + supplierAccessLines[sup.ID].score;
-      const impact = this.props.scores.supplier[sup.ID].impact;
+      const itemScores = resourceScores[sup.ID] || {};
+      const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = this.props.scores.supplier[sup.ID].exposure;
+      const exposure = itemScores.exposure || 0;
       const title = `<div><p>Supplier Name:&nbsp${
         sup.Name
       }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
@@ -427,13 +429,15 @@ class HierarchicalVisualization extends Component {
         color: impactColor,
         group: "suppliers",
         // value: impact,
-        value: exposure / maxExposure,
+        value: exposure / maxExposure || 0,
         level: curNodeLevel
       };
     });
+    resourceScores = this.props.scores.project || {};
     const organizationNodes = organizations.map(proj => {
-      const impact = this.props.scores.project[proj.ID].impact;
-      const exposure = this.props.scores.project[proj.ID].exposure;
+      const itemScores = resourceScores[proj.ID] || {};
+      const impact = itemScores.impact || 0;
+      const exposure = itemScores.exposure || 0;
       const title = `<div><p>Organization Name:&nbsp${
         proj.Name
       }</p><p>Organization Impact Score:&nbsp;${impact.toFixed(

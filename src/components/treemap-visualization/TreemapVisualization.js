@@ -130,7 +130,7 @@ const theme = {
 
 class TreemapVisualization extends Component {
   state = {
-    resource: "product"
+    resource: "project"
   };
 
   getImpactColor = impactPct => {
@@ -152,18 +152,12 @@ class TreemapVisualization extends Component {
     } else if (this.state.resource === "supplier") {
       resources = suppliers;
     }
-    const maxImpact = Math.max(
-      ...Object.values(scores[this.state.resource]).map(
-        entry => entry.impact || 0
-      )
-    );
     const children = Object.values(resources || {}).map(pr => {
       return {
         id: pr.ID,
         name: pr.Name,
-        // impact: ((scores.product[pr.ID] || {}).impact || 0) / maxImpact,
         impact: Math.round(
-          (scores[this.state.resource][pr.ID] || {}).impact || 0
+          ((scores[this.state.resource] || {})[pr.ID] || {}).impact || 0
         )
       };
     });
@@ -188,7 +182,7 @@ class TreemapVisualization extends Component {
 
     const root = this.constructTree(this.props);
     const maxImpact = Math.max(
-      ...Object.values(this.props.scores.product).map(
+      ...Object.values(this.props.scores[this.state.resource] || {}).map(
         entry => entry.impact || 0
       )
     );
