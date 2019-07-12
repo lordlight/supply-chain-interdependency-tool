@@ -128,6 +128,12 @@ const theme = {
   fontSize: 11
 };
 
+const RESOURCE_NAMES = {
+  project: "Projects",
+  product: "Products",
+  supplier: "Suppliers"
+};
+
 class TreemapVisualization extends Component {
   state = {
     resource: "project"
@@ -158,12 +164,15 @@ class TreemapVisualization extends Component {
         name: pr.Name,
         impact: Math.round(
           ((scores[this.state.resource] || {})[pr.ID] || {}).impact || 0
+        ),
+        exposure: Math.round(
+          ((scores[this.state.resource] || {})[pr.ID] || {}).exposure || 0
         )
       };
     });
     const root = {
       id: this.state.resource,
-      name: this.state.resource,
+      name: RESOURCE_NAMES[this.state.resource],
       // impact: 0.5,
       // impact: 0,
       children
@@ -218,7 +227,7 @@ class TreemapVisualization extends Component {
           <ResponsiveTreeMap
             root={root}
             identity="id"
-            value="impact"
+            value="exposure"
             innerPadding={3}
             outerPadding={3}
             margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -237,14 +246,26 @@ class TreemapVisualization extends Component {
             animate={true}
             motionStiffness={90}
             motionDamping={11}
-            tooltip={({ id, value, color, label }) => {
+            // tooltip={({ id, value, color, label }) => {
+            //   return (
+            //     <strong>
+            //       {label || id}: {value}
+            //     </strong>
+            //   );
+            // }}
+            tooltip={d => {
               return (
-                <strong>
-                  {label || id}: {value}
-                </strong>
+                <React.Fragment>
+                  <strong>{d.data.name || d.data.id}</strong>
+                  {d.data.exposure && d.data.impact && (
+                    <React.Fragment>
+                      <div>Exposure: {d.data.exposure}</div>
+                      <div>Impact: {d.data.impact}</div>
+                    </React.Fragment>
+                  )}
+                </React.Fragment>
               );
             }}
-            the
             theme={theme}
           />
         </div>
