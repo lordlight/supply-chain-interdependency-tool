@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import { ImportDialog } from "../../components/";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import Card from "@material-ui/core/Card";
@@ -20,7 +22,11 @@ import Slider from "@material-ui/lab/Slider";
 
 import { connect } from "react-redux";
 import store from "../../redux/store";
-import { answerMulti } from "../../redux/actions";
+import {
+  answerMulti,
+  updateImportFile,
+  updateImportState
+} from "../../redux/actions";
 
 import { getNumQuestionsForResource } from "../../utils/general-utils";
 
@@ -37,7 +43,8 @@ const mapState = state => ({
   projectQuestions: state.projectQuestions,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses
+  projectResponses: state.projectResponses,
+  importState: state.importState
 });
 
 const styles = theme => ({
@@ -109,6 +116,7 @@ class QuestionStatusCard extends Component {
     super(props);
     this.state = {
       dialogOpen: false,
+      importDialogOpen: false,
       answerChance: 70,
       responseSkew: 50
     };
@@ -117,6 +125,13 @@ class QuestionStatusCard extends Component {
       this.state[`responseSkew.${qt}`] = 50;
     });
   }
+
+  componentDidUpdate = prevProps => {
+    if ((this.props.importState == null) & (prevProps.importState != null)) {
+      this.setState({ importDialogOpen: false });
+      store.dispatch(updateImportFile({ importFile: null }));
+    }
+  };
 
   randomizeAnswers = () => {
     const randomDate = () => {
@@ -224,6 +239,17 @@ class QuestionStatusCard extends Component {
     this.setState({ [`responseSkew.${qt}`]: value });
   };
 
+  handleImportDialogOpen = () => {
+    this.setState({ importDialogOpen: true });
+    store.dispatch(updateImportState({ importState: "prompting" }));
+  };
+
+  handleImportDialogClose = event => {
+    this.setState({ importDialogOpen: false });
+    store.dispatch(updateImportFile({ importFile: null }));
+    store.dispatch(updateImportState({ importState: null }));
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -315,14 +341,35 @@ class QuestionStatusCard extends Component {
           </Typography>
         </CardContent>
         <CardActions style={{ justifyContent: "flex-end" }}>
-          <IconButton
-            size="small"
-            style={{ opacity: 0.0 }}
-            onClick={() => this.setState({ dialogOpen: true })}
-          >
-            <GestureIcon />
-          </IconButton>
+          {items.length === 0 ? (
+            <Button
+              size="small"
+              color="primary"
+              style={{
+                fontSize: "15px",
+                textAlign: "left",
+                justifyContent: "left"
+              }}
+              onClick={this.handleImportDialogOpen}
+            >
+              IMPORT...
+            </Button>
+          ) : (
+            <IconButton
+              size="small"
+              style={{ opacity: 0.0 }}
+              onClick={() => this.setState({ dialogOpen: true })}
+            >
+              <GestureIcon />
+            </IconButton>
+          )}
         </CardActions>
+        <ImportDialog
+          key={type}
+          type={type}
+          open={this.state.importDialogOpen}
+          handleClose={this.handleImportDialogClose}
+        />
         <Dialog
           onClose={() => this.setState({ dialogOpen: false })}
           aria-labelledby="simulation-dialog-title"

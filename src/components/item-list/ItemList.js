@@ -23,6 +23,7 @@ import {
   getQuestionResponseTimestamp,
   getNumQuestionsForResource
 } from "../../utils/general-utils";
+import { Typography } from "@material-ui/core";
 
 function getAge(diff) {
   const formatResult = (val, unit) => {
@@ -480,12 +481,18 @@ class ItemList extends Component {
           <ItemVisualCard />
           <QuestionStatusCard />
         </div>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>{rowHeaders}</TableRow>
-          </TableHead>
-          <TableBody>{rows}</TableBody>
-        </Table>
+        {rows.length > 0 ? (
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>{rowHeaders}</TableRow>
+            </TableHead>
+            <TableBody>{rows}</TableBody>
+          </Table>
+        ) : (
+          <Typography variant="h5" style={{ textAlign: "center" }}>
+            {`Please import ${type} data.`}
+          </Typography>
+        )}
         {/* <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
