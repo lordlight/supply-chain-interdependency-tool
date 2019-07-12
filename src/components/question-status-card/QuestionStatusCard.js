@@ -14,14 +14,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Button from "@material-ui/core/Button";
+import Slider from "@material-ui/lab/Slider";
 
 import { connect } from "react-redux";
 import store from "../../redux/store";
 import { answerMulti } from "../../redux/actions";
 
 import { getNumQuestionsForResource } from "../../utils/general-utils";
-
-import { random } from "lodash";
 
 const mapState = state => ({
   currentType: state.currentType,
@@ -61,18 +60,73 @@ const styles = theme => ({
   inactive: {
     fontSize: 16,
     color: "gray"
+  },
+  slider: {
+    padding: "22px 0px"
+    // width: "90%"
+  },
+  thumb: {
+    backgroundColor: "blue"
+  },
+  thumbIcon: {
+    display: "flex",
+    justifyContent: "center"
   }
 });
 
+class PercentageSlider extends Component {
+  render() {
+    const { classes } = this.props;
+    return (
+      <Slider
+        classes={{
+          container: classes.slider,
+          thumb: classes.thumb,
+          thumbIcon: classes.thumbIcon
+        }}
+        step={0.5}
+        thumb={
+          <div>
+            <Typography style={{ paddingTop: 12 }}>
+              {this.props.value.toFixed(1)}
+            </Typography>
+          </div>
+        }
+        value={this.props.value}
+        onChange={this.props.onChange}
+      />
+    );
+  }
+}
+PercentageSlider = withStyles(styles)(PercentageSlider);
+
 class QuestionStatusCard extends Component {
   state = {
-    dialogOpen: false
+    dialogOpen: false,
+    answerChance: 70,
+    responseSkew: 50
   };
 
   randomizeAnswers = () => {
     const randomDate = () => {
       return Date.now() - Math.random() * 604800000.0 * 4;
     };
+
+    const getRandomAnswer = (answers, skew) => {
+      const answerVals = answers
+        .map((a, i) => [a.val, i])
+        .sort((a, b) => a[0] - b[0]);
+      const aidx = Math.min(
+        Math.floor(Math.pow(Math.random(), skew) * answers.length),
+        answers.length - 1
+      );
+      const answer = answerVals[aidx][1];
+      return answer;
+    };
+
+    const answerChance = this.state.answerChance / 100.0;
+    const skew =
+      1 / (Math.exp(this.state.responseSkew / 100.0) / Math.exp(0.5)) ** 4.606;
 
     const type = this.props.currentType;
     let items, questions, responses;
@@ -101,8 +155,8 @@ class QuestionStatusCard extends Component {
             const assetIds = (assetVal || "").split(";").filter(v => !!v);
             assetIds.forEach(aid => {
               const qid = `${q.ID}|${aid}`;
-              if (Math.random() < 0.7) {
-                const answer = random(q.Answers.length - 1);
+              if (Math.random() < answerChance) {
+                const answer = getRandomAnswer(q.Answers, skew);
                 responses[qid] = [answer, randomDate()];
               } else {
                 // question not answered
@@ -117,8 +171,8 @@ class QuestionStatusCard extends Component {
           const qvals = (i[qkey] || "").split(";").filter(v => !!v);
           qvals.forEach(qval => {
             const qid = `${q.ID}|${qval}`;
-            if (Math.random() < 0.7) {
-              const answer = random(q.Answers.length - 1);
+            if (Math.random() < answerChance) {
+              const answer = getRandomAnswer(q.Answers, skew);
               responses[qid] = [answer, randomDate()];
             } else {
               // question not answered
@@ -126,8 +180,8 @@ class QuestionStatusCard extends Component {
             }
           });
         } else {
-          if (Math.random() < 0.7) {
-            const answer = random(q.Answers.length - 1);
+          if (Math.random() < answerChance) {
+            const answer = getRandomAnswer(q.Answers, skew);
             responses[q.ID] = [answer, randomDate()];
           } else {
             // question not answered
@@ -147,6 +201,14 @@ class QuestionStatusCard extends Component {
 
   handleClose = () => {
     this.setState({ dialogOpen: false });
+  };
+
+  handleAnswerChance = (event, value) => {
+    this.setState({ answerChance: value });
+  };
+
+  handleResponseSkew = (event, value) => {
+    this.setState({ responseSkew: value });
   };
 
   render() {
@@ -238,11 +300,31 @@ class QuestionStatusCard extends Component {
           <DialogTitle id="simulation-dialog-title">
             Generate Random Answers
           </DialogTitle>
-          <DialogContent>
+          <DialogContent
+            style={{
+              overflowX: "hidden"
+            }}
+          >
             <DialogContentText>
               This will replace all existing answers with randomly generated
-              answers. Continue?
+              answers.
             </DialogContentText>
+          </DialogContent>
+          <DialogContent
+            style={{
+              overflowX: "hidden"
+            }}
+          >
+            <Typography>% chance question is answered</Typography>
+            <PercentageSlider
+              value={this.state.answerChance}
+              onChange={this.handleAnswerChance}
+            />
+            <Typography>response strength</Typography>
+            <PercentageSlider
+              value={this.state.responseSkew}
+              onChange={this.handleResponseSkew}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">

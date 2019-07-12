@@ -203,7 +203,6 @@ class ItemList extends Component {
       responses = this.props.projectResponses;
       scores = this.props.scores.project || {};
     }
-    console.log("SCORES", scores);
 
     const hasCriticality = questions.some(
       q => q["Type of question"] === "Criticality"
@@ -366,7 +365,6 @@ class ItemList extends Component {
     const maxExposure = Math.max(
       ...list.map(row => row["score.exposure"] || 0)
     );
-    console.log({ maxImpact, maxExposure });
     const rows = list.map((row, i) => {
       const scoreValues = [
         hasCriticality &&
