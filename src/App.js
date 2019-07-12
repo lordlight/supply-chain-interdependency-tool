@@ -476,6 +476,7 @@ class App extends Component {
               <IconButton
                 color="inherit"
                 onClick={e => this.handleQuestionPageBack(e)}
+                style={{ visibility: "hidden" }}
               >
                 <ChevronLeft />
               </IconButton>

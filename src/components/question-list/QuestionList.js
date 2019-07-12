@@ -19,6 +19,11 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 import { getQuestionResponse } from "../../utils/general-utils";
 
@@ -96,13 +101,47 @@ const mapState = state => ({
 });
 
 class QuestionList extends Component {
+  state = {
+    confirmDialogOpen: false
+  };
+
   updateResponse = (qId, ansInd) => {
     store.dispatch(answerTemp({ qId: qId, ansInd: ansInd }));
   };
 
-  handleCancel = () => {
+  handleCancel = isDirty => {
+    if (isDirty) {
+      this.setState({ confirmDialogOpen: true });
+    } else {
+      this.handleLeave();
+    }
+  };
+
+  handleLeave = () => {
     store.dispatch(updateTempResponses({ tempResponses: {} }));
     store.dispatch(updateCurrentItem({ currentItem: null }));
+  };
+
+  isDirty = () => {
+    let responses = null;
+    if (this.props.currentType === "suppliers") {
+      responses = this.props.supplierResponses;
+    } else if (this.props.currentType === "products") {
+      responses = this.props.productResponses;
+    } else if (this.props.currentType === "projects") {
+      responses = this.props.projectResponses;
+    }
+    responses = responses[this.props.currentItem.ID] || {};
+    let dirty = false;
+    Object.entries(this.props.tempResponses).forEach(resp => {
+      let key = resp[0],
+        val = resp[1];
+      const oldVal = getQuestionResponse(responses[key]);
+      if (val !== oldVal) {
+        dirty = true;
+      }
+    });
+    return dirty;
   };
 
   handleSave = () => {
@@ -141,7 +180,7 @@ class QuestionList extends Component {
       })
     );
 
-    this.handleCancel();
+    this.handleLeave();
   };
 
   componentDidMount = () => {
@@ -331,6 +370,8 @@ class QuestionList extends Component {
       });
     criticalityRows = [].concat(...criticalityRows);
 
+    const isDirty = this.isDirty();
+
     return (
       <React.Fragment>
         {type === "suppliers" && (
@@ -385,7 +426,7 @@ class QuestionList extends Component {
           <div className={classes.footer}>
             <div className={classes.buttonContainer}>
               <Button
-                onClick={this.handleCancel}
+                onClick={() => this.handleCancel(isDirty)}
                 variant="contained"
                 className={classes.tertiaryButton}
               >
@@ -396,6 +437,7 @@ class QuestionList extends Component {
                 variant="contained"
                 color="primary"
                 className={classes.button}
+                disabled={!isDirty}
               >
                 SAVE
               </Button>
@@ -413,6 +455,37 @@ class QuestionList extends Component {
                     message={<span id="message-id">Current Risk: {riskVal}</span>}
                 />*/}
         </div>
+        <Dialog
+          onClose={() => this.setState({ confirmDialogOpen: false })}
+          aria-labelledby="confirm-dialog-title"
+          open={this.state.confirmDialogOpen}
+        >
+          <DialogTitle id="confirm-dialog-title">
+            You Have Updates Pending
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Warning: any updates that are pending will be discarded. Continue?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => this.setState({ confirmDialogOpen: false })}
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                this.handleLeave();
+                this.setState({ confirmDialogOpen: false });
+              }}
+              color="primary"
+            >
+              Continue
+            </Button>
+          </DialogActions>
+        </Dialog>
       </React.Fragment>
     );
   }
