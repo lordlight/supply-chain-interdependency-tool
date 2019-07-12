@@ -14,6 +14,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+
 import Slider from "@material-ui/lab/Slider";
 
 import { connect } from "react-redux";
@@ -100,12 +102,21 @@ class PercentageSlider extends Component {
 }
 PercentageSlider = withStyles(styles)(PercentageSlider);
 
+const QUESTION_TYPES = ["Access", "Criticality", "Dependency", "Assurance"];
+
 class QuestionStatusCard extends Component {
-  state = {
-    dialogOpen: false,
-    answerChance: 70,
-    responseSkew: 50
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      dialogOpen: false,
+      answerChance: 70,
+      responseSkew: 50
+    };
+    QUESTION_TYPES.forEach(qt => {
+      this.state[`answerChance.${qt}`] = 70;
+      this.state[`responseSkew.${qt}`] = 50;
+    });
+  }
 
   randomizeAnswers = () => {
     const randomDate = () => {
@@ -123,10 +134,6 @@ class QuestionStatusCard extends Component {
       const answer = answerVals[aidx][1];
       return answer;
     };
-
-    const answerChance = this.state.answerChance / 100.0;
-    const skew =
-      1 / (Math.exp(this.state.responseSkew / 100.0) / Math.exp(0.5)) ** 4.606;
 
     const type = this.props.currentType;
     let items, questions, responses;
@@ -149,6 +156,12 @@ class QuestionStatusCard extends Component {
       questions.forEach(q => {
         const qtype = q["Type of question"];
         const qkey = q.Relation;
+        const answerChance = this.state[`answerChance.${qtype}`] / 100.0;
+        const skew =
+          1 /
+          (Math.exp(this.state[`responseSkew.${qtype}`] / 100.0) /
+            Math.exp(0.5)) **
+            4.606;
         if (qtype === "Access") {
           const assetVal = q["Asset ID"];
           if (assetVal) {
@@ -203,12 +216,12 @@ class QuestionStatusCard extends Component {
     this.setState({ dialogOpen: false });
   };
 
-  handleAnswerChance = (event, value) => {
-    this.setState({ answerChance: value });
+  handleAnswerChance = qt => (event, value) => {
+    this.setState({ [`answerChance.${qt}`]: value });
   };
 
-  handleResponseSkew = (event, value) => {
-    this.setState({ responseSkew: value });
+  handleResponseSkew = qt => (event, value) => {
+    this.setState({ [`responseSkew.${qt}`]: value });
   };
 
   render() {
@@ -233,6 +246,24 @@ class QuestionStatusCard extends Component {
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
     }
+
+    const hasAccess = questions.some(q => q["Type of question"] === "Access");
+    const hasCriticality = questions.some(
+      q => q["Type of question"] === "Criticality"
+    );
+    const hasDependency = questions.some(
+      q => q["Type of question"] === "Dependency"
+    );
+    const hasAssurance = questions.some(
+      q => q["Type of question"] === "Assurance"
+    );
+
+    const usedQuestionTypes = [
+      hasAccess && "Access",
+      hasCriticality && "Criticality",
+      hasDependency && "Dependency",
+      hasAssurance && "Assurance"
+    ].filter(Boolean);
 
     let numCompleted = 0,
       numPartial = 0,
@@ -310,22 +341,30 @@ class QuestionStatusCard extends Component {
               answers.
             </DialogContentText>
           </DialogContent>
-          <DialogContent
-            style={{
-              overflowX: "hidden"
-            }}
-          >
-            <Typography>% chance question is answered</Typography>
-            <PercentageSlider
-              value={this.state.answerChance}
-              onChange={this.handleAnswerChance}
-            />
-            <Typography>response strength</Typography>
-            <PercentageSlider
-              value={this.state.responseSkew}
-              onChange={this.handleResponseSkew}
-            />
-          </DialogContent>
+
+          {usedQuestionTypes.map(qt => (
+            <React.Fragment key={qt}>
+              <DialogContent
+                style={{
+                  overflowX: "hidden"
+                }}
+              >
+                <Typography variant="overline">{`${qt} Questions`}</Typography>
+                <Typography>% chance question is answered</Typography>
+                <PercentageSlider
+                  value={this.state[`answerChance.${qt}`]}
+                  onChange={this.handleAnswerChance(qt)}
+                />
+                <Typography>response strength</Typography>
+                <PercentageSlider
+                  value={this.state[`responseSkew.${qt}`]}
+                  onChange={this.handleResponseSkew(qt)}
+                />
+              </DialogContent>
+              <Divider />
+            </React.Fragment>
+          ))}
+
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
               Cancel
