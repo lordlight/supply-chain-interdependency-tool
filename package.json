@@ -38,9 +38,9 @@
     "dev": "yarn react-scripts start",
     "build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; cp -a ./assets/. ./build/assets/; npm --prefix ./build install ./build",
     "start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.'",
-    "pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite",
-    "pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
+    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.' --icon=assets/icons/mac/cscrm.icns",
+    "pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
+    "pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite --icon=assets/icons/png/1024x1024.png"
   },
   "eslintConfig": {
     "extends": "react-app"
