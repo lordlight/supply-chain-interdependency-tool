@@ -165,8 +165,8 @@ class TreemapVisualization extends Component {
         impact: Math.round(
           ((scores[this.state.resource] || {})[pr.ID] || {}).impact || 0
         ),
-        exposure: Math.round(
-          ((scores[this.state.resource] || {})[pr.ID] || {}).exposure || 0
+        interdependence: Math.round(
+          ((scores[this.state.resource] || {})[pr.ID] || {}).interdependence || 0
         )
       };
     });
@@ -227,7 +227,7 @@ class TreemapVisualization extends Component {
           <ResponsiveTreeMap
             root={root}
             identity="id"
-            value="exposure"
+            value="interdependence"
             innerPadding={3}
             outerPadding={3}
             margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -257,9 +257,9 @@ class TreemapVisualization extends Component {
               return (
                 <React.Fragment>
                   <strong>{d.data.name || d.data.id}</strong>
-                  {d.data.exposure && d.data.impact && (
+                  {d.data.interdependence && d.data.impact && (
                     <React.Fragment>
-                      <div>Exposure: {d.data.exposure}</div>
+                      <div>Interdependence: {d.data.interdependence}</div>
                       <div>Impact: {d.data.impact}</div>
                     </React.Fragment>
                   )}

@@ -212,7 +212,7 @@ export function computeImpacts(
         assuranceDependency: [],
         supplyLines: [],
         impact: 0,
-        exposure: 0
+        interdependence: 0
       })
   );
   products.forEach(
@@ -222,7 +222,7 @@ export function computeImpacts(
         access: [],
         supplyLines: [],
         impact: 0,
-        exposure: 0
+        interdependence: 0
       })
   );
   suppliers.forEach(
@@ -232,7 +232,7 @@ export function computeImpacts(
         access: [],
         supplyLines: [],
         impact: 0,
-        exposure: 0
+        interdependence: 0
       })
   );
   const productSupplierAccessScores = {};
@@ -329,7 +329,7 @@ export function computeImpacts(
   Object.values(scores).forEach(resourceInfo =>
     Object.values(resourceInfo).forEach(info => {
       info.impact = Math.max(...info.supplyLines.map(sl => sl.score), 0);
-      info.exposure = info.supplyLines
+      info.interdependence = info.supplyLines
         .map(sl => sl.score)
         .reduce((acc, val) => acc + val, 0);
     })

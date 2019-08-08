@@ -230,10 +230,10 @@ class ItemList extends Component {
         sortType: "score.impact"
       },
       {
-        label: "Exposure",
-        tooltip: "Sort by exposure",
+        label: "Interdependence",
+        tooltip: "Sort by interdependence",
         cssClass: classes.metricCol,
-        sortType: "score.exposure"
+        sortType: "score.interdependence"
       },
       hasCriticality && {
         label: "Criticality",
@@ -308,7 +308,7 @@ class ItemList extends Component {
       ) {
         const itemScores = scores[item.ID] || {};
         listItem["score.impact"] = itemScores.impact || 0;
-        listItem["score.exposure"] = itemScores.exposure || 0;
+        listItem["score.interdependence"] = itemScores.interdependence || 0;
 
         // the following must be in this order
         if (hasCriticality) {
@@ -363,8 +363,8 @@ class ItemList extends Component {
     });
 
     const maxImpact = Math.max(...list.map(row => row["score.impact"] || 0));
-    const maxExposure = Math.max(
-      ...list.map(row => row["score.exposure"] || 0)
+    const maxInterdependence = Math.max(
+      ...list.map(row => row["score.interdependence"] || 0)
     );
     const rows = list.map((row, i) => {
       const scoreValues = [
@@ -407,15 +407,15 @@ class ItemList extends Component {
             style={{ whiteSpace: "nowrap", borderRight: "2px solid #dcdcdc" }}
           >
             <div className={classes.scoreColPart}>
-              {row["score.exposure"] != null
-                ? row["score.exposure"].toFixed(1)
+              {row["score.interdependence"] != null
+                ? row["score.interdependence"].toFixed(1)
                 : "---"}
             </div>
             <div
               className={[classes.scoreColPart, classes.scoreBars].join(" ")}
               // style={{ width: row["score.impact"] || 0 }}
               style={{
-                width: ((row["score.exposure"] || 0) / maxExposure || 0) * 40
+                width: ((row["score.interdependence"] || 0) / maxInterdependence || 0) * 40
               }}
             />
           </TableCell>

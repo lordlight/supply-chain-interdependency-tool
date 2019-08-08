@@ -321,9 +321,9 @@ class HierarchicalVisualization extends Component {
         HIDE_UNCONNECTED_RESOURCES ? projectEdgesSeen.has(pr.ID) : true
       );
     let resourceScores = this.props.scores.project || {};
-    let maxExposure = Math.max(
+    let maxInterdependence = Math.max(
       ...(activeProjects.map(
-        proj => (resourceScores[proj.ID] || {}).exposure
+        proj => (resourceScores[proj.ID] || {}).interdependence
       ) || 0)
     );
     let maxImpact = Math.max(
@@ -335,14 +335,14 @@ class HierarchicalVisualization extends Component {
       const itemScores = resourceScores[proj.ID] || {};
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = itemScores.exposure || 0;
+      const interdependence = itemScores.interdependence || 0;
       // const criticality =
       //   ((props.projectsRisk[proj.ID] || {}).criticality || {})[pkey] || 0;
       const title = `<div><p>Project Name:&nbsp${
         proj.Name
       }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
         1
-      )}</p><p>Project Exposure Score:&nbsp;${exposure.toFixed(1)}</p></div>`;
+      )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(1)}</p></div>`;
       const level = Math.max((proj.Level || "").split(".").length - 1, 1);
       curNodeLevel = Math.max(curNodeLevel, level);
       return {
@@ -350,7 +350,7 @@ class HierarchicalVisualization extends Component {
         title,
         color: impactColor,
         group: "projects",
-        value: exposure / maxExposure || 0,
+        value: interdependence / maxInterdependence || 0,
         // value: impact,
         level: level
         // label: impact.toFixed(1)
@@ -363,9 +363,9 @@ class HierarchicalVisualization extends Component {
     );
     resourceScores = this.props.scores.product || {};
 
-    maxExposure = Math.max(
+    maxInterdependence = Math.max(
       ...(activeProducts.map(
-        prod => (resourceScores[prod.ID] || {}).exposure
+        prod => (resourceScores[prod.ID] || {}).interdependence
       ) || 0)
     );
     maxImpact = Math.max(
@@ -379,19 +379,19 @@ class HierarchicalVisualization extends Component {
       const itemScores = resourceScores[prod.ID] || {};
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = itemScores.exposure || 0;
+      const interdependence = itemScores.interdependence || 0;
       const title = `<div><p>Product Name:&nbsp${
         prod.Name
       }</p><p>Product Impact Score:&nbsp${impact.toFixed(
         1
-      )}</p><p>Product Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
+      )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(1)}</p></div>`;
       return {
         id: "PR_" + prod.ID,
         title,
         color: impactColor,
         group: "products",
         // value: impact,
-        value: exposure / maxExposure || 0,
+        value: interdependence / maxInterdependence || 0,
         level: curNodeLevel
         // label: impact.toFixed(1)
       };
@@ -401,8 +401,8 @@ class HierarchicalVisualization extends Component {
       HIDE_UNCONNECTED_RESOURCES ? supplierEdgesSeen.has(s.ID) : true
     );
     resourceScores = this.props.scores.supplier || {};
-    maxExposure = Math.max(
-      ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).exposure) ||
+    maxInterdependence = Math.max(
+      ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).interdependence) ||
         0)
     );
     maxImpact = Math.max(
@@ -416,12 +416,12 @@ class HierarchicalVisualization extends Component {
       const itemScores = resourceScores[sup.ID] || {};
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / maxImpact);
-      const exposure = itemScores.exposure || 0;
+      const interdependence = itemScores.interdependence || 0;
       const title = `<div><p>Supplier Name:&nbsp${
         sup.Name
       }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
         1
-      )}</p><p>Supplier Exposure Score:&nbsp${exposure.toFixed(1)}</p></div>`;
+      )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(1)}</p></div>`;
       return {
         id: "S_" + sup.ID,
         // label: impact.toFixed(1),
@@ -429,7 +429,7 @@ class HierarchicalVisualization extends Component {
         color: impactColor,
         group: "suppliers",
         // value: impact,
-        value: exposure / maxExposure || 0,
+        value: interdependence / maxInterdependence || 0,
         level: curNodeLevel
       };
     });
@@ -437,12 +437,12 @@ class HierarchicalVisualization extends Component {
     const organizationNodes = organizations.map(proj => {
       const itemScores = resourceScores[proj.ID] || {};
       const impact = itemScores.impact || 0;
-      const exposure = itemScores.exposure || 0;
+      const interdependence = itemScores.interdependence || 0;
       const title = `<div><p>Organization Name:&nbsp${
         proj.Name
       }</p><p>Organization Impact Score:&nbsp;${impact.toFixed(
         1
-      )}</p><p>Organization Exposure Score:&nbsp;${exposure.toFixed(
+      )}</p><p>Organization Interdependence Score:&nbsp;${interdependence.toFixed(
         1
       )}</p></div>`;
       return {
@@ -675,8 +675,8 @@ class HierarchicalVisualization extends Component {
             <ToggleButton value="impact">
               <Typography>Impact</Typography>
             </ToggleButton>
-            <ToggleButton value="exposure">
-              <Typography>Exposure</Typography>
+            <ToggleButton value="interdependence">
+              <Typography>Interdependence</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
         </div> */}
