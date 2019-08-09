@@ -208,9 +208,6 @@ class ItemList extends Component {
     const hasCriticality = questions.some(
       q => q["Type of question"] === "Criticality"
     );
-    const hasAssurance = questions.some(
-      q => q["Type of question"] === "Assurance"
-    );
     const hasAccess = questions.some(q => q["Type of question"] === "Access");
     const hasDependency = questions.some(
       q => q["Type of question"] === "Dependency"
@@ -235,18 +232,19 @@ class ItemList extends Component {
         cssClass: classes.metricCol,
         sortType: "score.interdependence"
       },
+      {
+        label: "Assurance",
+        tooltip: "Sort by assurance",
+        cssClass: classes.metricCol,
+        sortType: "score.assurance"
+      },
       hasCriticality && {
         label: "Criticality",
         tooltip: "Sort by criticality",
         cssClass: classes.scoreCol,
         sortType: "score.criticality.max"
       },
-      hasAssurance && {
-        label: "Assurance",
-        tooltip: "Sort by assurance",
-        cssClass: classes.scoreCol,
-        sortType: "score.assurance"
-      },
+
       hasAccess && {
         label: "Access",
         tooltip: "Sort by access",
@@ -309,15 +307,13 @@ class ItemList extends Component {
         const itemScores = scores[item.ID] || {};
         listItem["score.impact"] = itemScores.impact || 0;
         listItem["score.interdependence"] = itemScores.interdependence || 0;
+        listItem["score.assurance"] = itemScores.assurance || 0;
 
         // the following must be in this order
         if (hasCriticality) {
           listItem["score.criticality.max"] = Math.max(
             ...Object.values(riskSet[item.ID].Criticality)
           );
-        }
-        if (hasAssurance) {
-          listItem["score.assurance"] = riskSet[item.ID].Assurance;
         }
         if (hasAccess) {
           listItem["score.access.max"] = Math.max(
@@ -366,15 +362,14 @@ class ItemList extends Component {
     const maxInterdependence = Math.max(
       ...list.map(row => row["score.interdependence"] || 0)
     );
+    const maxAssurance = Math.max(
+      ...list.map(row => row["score.assurance"] || 0)
+    );
     const rows = list.map((row, i) => {
       const scoreValues = [
         hasCriticality &&
           (row["score.criticality.max"] != null
             ? row["score.criticality.max"].toFixed(1)
-            : "N/A"),
-        hasAssurance &&
-          (row["score.assurance"] != null
-            ? row["score.assurance"].toFixed(1)
             : "N/A"),
         hasAccess &&
           (row["score.access.max"] != null
@@ -396,16 +391,13 @@ class ItemList extends Component {
             </div>
             <div
               className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-              // style={{ width: row["score.impact"] || 0 }}
               style={{
                 width: ((row["score.impact"] || 0) / maxImpact || 0) * 40
               }}
             />
           </TableCell>
-          <TableCell
-            className={classes.lastOfCell}
-            style={{ whiteSpace: "nowrap", borderRight: "2px solid #dcdcdc" }}
-          >
+
+          <TableCell className={classes.cell} style={{ whiteSpace: "nowrap" }}>
             <div className={classes.scoreColPart}>
               {row["score.interdependence"] != null
                 ? row["score.interdependence"].toFixed(1)
@@ -413,9 +405,27 @@ class ItemList extends Component {
             </div>
             <div
               className={[classes.scoreColPart, classes.scoreBars].join(" ")}
-              // style={{ width: row["score.impact"] || 0 }}
               style={{
-                width: ((row["score.interdependence"] || 0) / maxInterdependence || 0) * 40
+                width:
+                  ((row["score.interdependence"] || 0) / maxInterdependence ||
+                    0) * 40
+              }}
+            />
+          </TableCell>
+
+          <TableCell
+            className={classes.lastOfCell}
+            style={{ whiteSpace: "nowrap", borderRight: "2px solid #dcdcdc" }}
+          >
+            <div className={classes.scoreColPart}>
+              {row["score.assurance"] != null
+                ? row["score.assurance"].toFixed(1)
+                : "---"}
+            </div>
+            <div
+              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              style={{
+                width: ((row["score.assurance"] || 0) / maxAssurance || 0) * 40
               }}
             />
           </TableCell>
