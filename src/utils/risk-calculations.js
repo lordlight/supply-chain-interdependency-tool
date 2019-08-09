@@ -11,6 +11,19 @@ const NORMALIZED_VALUES = {
   assets_criticality: 10
 };
 
+// weighting for final scoring
+const DEPENDENCY_WEIGHT = 1.0;
+const ASSET_WEIGHTS = {
+  PA: 1.0,
+  SDA: 1.0,
+  ICTA: 1.0
+};
+// const ASSET_WEIGHTS = {
+//   PA: 1 / 3,
+//   SDA: 1 / 3,
+//   ICTA: 1 / 3
+// };
+
 export function calculateItemRisk(
   resourceType,
   responses,
@@ -196,7 +209,7 @@ export function computeImpacts(
   products.forEach(p => (productsMap[p.ID] = p));
   suppliers.forEach(s => (suppliersMap[s.ID] = s));
 
-  let assuranceDependencyScoreEntries = [];
+  let dependencyScoreEntries = [];
   let accessScoreEntries = [];
   const scores = {
     project: {},
@@ -209,7 +222,7 @@ export function computeImpacts(
   projects.forEach(
     p =>
       (scores.project[p.ID] = {
-        assuranceDependency: [],
+        dependency: [],
         supplyLines: [],
         impact: 0,
         interdependence: 0
@@ -218,7 +231,7 @@ export function computeImpacts(
   products.forEach(
     p =>
       (scores.product[p.ID] = {
-        assuranceDependency: [],
+        dependency: [],
         access: [],
         supplyLines: [],
         impact: 0,
@@ -228,11 +241,12 @@ export function computeImpacts(
   suppliers.forEach(
     s =>
       (scores.supplier[s.ID] = {
-        assuranceDependency: [],
+        dependency: [],
         access: [],
         supplyLines: [],
         impact: 0,
-        interdependence: 0
+        interdependence: 0,
+        assurance: (supplierRisks[s.ID] || {}).Assurance || 0
       })
   );
   const productSupplierAccessScores = {};
@@ -248,21 +262,22 @@ export function computeImpacts(
       const [skey, dpscore] = dpentry;
       const supplierId = skey.split("|")[1];
       const supplier = supplierRisks[supplierId] || {};
-      const assurance = supplier.Assurance || 0;
+      // const assurance = supplier.Assurance || 0;
       Object.entries(scores.Criticality || {}).forEach(crentry => {
         const [pkey, crscore] = crentry;
         const projectId = pkey.split("|")[1];
         const project = projectRisks[projectId] || {};
         const prcrit =
           (Object.entries(project.Criticality || {})[0] || [])[1] || 0;
-        const adscore = (assurance * dpscore * crscore * prcrit) / 1000.0;
+        // const adscore = (assurance * dpscore * crscore * prcrit) / 1000.0;
+        const dscore = (dpscore * crscore * prcrit) / 10.0;
         const adscoreEntry = {
           projectId,
           productId,
           supplierId,
-          score: adscore
+          dependencyScore: dscore
         };
-        assuranceDependencyScoreEntries.push(adscoreEntry);
+        dependencyScoreEntries.push(adscoreEntry);
       });
       Object.entries(assetRisks).forEach(entry => {
         const [assetId, assetScores] = entry;
@@ -293,10 +308,10 @@ export function computeImpacts(
       });
     });
   });
-  assuranceDependencyScoreEntries.forEach(entry => {
-    scores.project[entry.projectId].assuranceDependency.push(entry);
-    scores.product[entry.productId].assuranceDependency.push(entry);
-    scores.supplier[entry.supplierId].assuranceDependency.push(entry);
+  dependencyScoreEntries.forEach(entry => {
+    scores.project[entry.projectId].dependency.push(entry);
+    scores.product[entry.productId].dependency.push(entry);
+    scores.supplier[entry.supplierId].dependency.push(entry);
   });
 
   accessScoreEntries.forEach(entry => {
@@ -308,11 +323,15 @@ export function computeImpacts(
   });
 
   // can compute supply line scores now
-  const supplyLineScores = assuranceDependencyScoreEntries.map(entry => {
+  const supplyLineScores = dependencyScoreEntries.map(entry => {
     const accessKey = `${entry.productId}|${entry.supplierId}`;
     const accessScores = productSupplierAccessScores[accessKey];
     const score =
-      entry.score + accessScores.reduce((acc, val) => acc + val.score, 0);
+      entry.dependencyScore * DEPENDENCY_WEIGHT +
+      accessScores.reduce(
+        (acc, val) => acc + val.score * (ASSET_WEIGHTS[val.assetId] || 0),
+        0
+      );
     return { ...entry, score };
   });
 
@@ -332,6 +351,19 @@ export function computeImpacts(
       info.interdependence = info.supplyLines
         .map(sl => sl.score)
         .reduce((acc, val) => acc + val, 0);
+      if (info.assurance === undefined) {
+        const uniqueSuppliers = info.supplyLines.reduce(
+          (acc, sl) => acc.add(sl.supplierId),
+          new Set()
+        );
+        const assurances = Array.from(uniqueSuppliers).map(
+          sid => (supplierRisks[sid] || {}).Assurance || 0
+        );
+        info.assurance =
+          assurances.length > 0
+            ? assurances.reduce((acc, val) => acc + val, 0) / assurances.length
+            : 0;
+      }
     })
   );
 
