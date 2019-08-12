@@ -19,6 +19,7 @@
     "d3": "^5.9.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-is-dev": "^1.0.1",
+    "electron-store": "^4.0.0",
     "json2csv": "^4.5.1",
     "react": "^16.8.5",
     "react-chartjs-2": "^2.7.6",

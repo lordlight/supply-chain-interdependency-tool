@@ -3,14 +3,19 @@ import Typography from "@material-ui/core/Typography";
 import Graph from "react-graph-vis";
 import { ForceGraph2D } from "react-force-graph";
 
-// import store from '../../redux/store';
+import store from "../../redux/store";
+import { updatePreferences } from "../../redux/actions";
 import { connect } from "react-redux";
 
 import { getCellMultiples } from "../../utils/general-utils";
 
+const electron = window.electron;
+const ipcRenderer = electron.ipcRenderer;
+
 const HIDE_UNCONNECTED_RESOURCES = false;
 
 const IMPACT_COLORS = [
+  // "rgba(255, 0, 255, 0.5)",
   "#FF00FF",
   "#FC03FC",
   "#FA05FA",
@@ -123,10 +128,15 @@ const mapState = state => ({
   projectsRisk: state.projectsRisk,
   scores: state.scores,
   productQuestions: state.productQuestions,
-  supplierQuestions: state.supplierQuestions
+  supplierQuestions: state.supplierQuestions,
+  preferences: state.preferences
 });
 
 class HierarchicalVisualization extends Component {
+  state = {
+    visible: false
+  };
+
   graph = {
     nodes: [],
     edges: []
@@ -150,6 +160,7 @@ class HierarchicalVisualization extends Component {
 
   componentDidMount() {
     console.log("did mount");
+    window.addEventListener("beforeunload", this.syncProperties);
     // this.drawChart();
     // const dimensions = this.treeContainer.getBoundingClientRect();
     // window.addEventListener("resize", this.resize);
@@ -164,10 +175,25 @@ class HierarchicalVisualization extends Component {
     //   });
   }
 
+  syncProperties = () => {
+    const scale = this.network.getScale();
+    const vp = this.network.getViewPosition();
+    const nodePositions = this.network.getPositions();
+    const preferences = {
+      "viz.hierarchical.scale": scale,
+      "viz.hierarchical.position": vp,
+      "viz.hierarchical.nodes": nodePositions
+    };
+    store.dispatch(updatePreferences(preferences));
+    ipcRenderer.send("update-preferences", preferences);
+  };
+
   componentWillUnmount() {
     console.log("will unmount");
     window.removeEventListener("resize", this.resize);
     clearTimeout(this.resizeTimeout);
+    this.syncProperties();
+    window.removeEventListener("beforeunload", this.syncProperties);
   }
 
   // shouldComponentUpdate = (nextProps, nextState) => {
@@ -213,18 +239,22 @@ class HierarchicalVisualization extends Component {
       return impactColor;
     };
 
-    const { products, suppliers, projects } = props;
+    const { products, suppliers, projects, preferences } = props;
+
+    const nodePositions = preferences["viz.hierarchical.nodes"] || {};
+    console.log("NODE POS", nodePositions);
 
     // const supplyLineImpactScores = [];
     // this is for shadow projects...
     // const accessImpactScores = [];
 
     const organizations = props.projects.filter(p => !p.parent);
+    const myOrganization = organizations[0] || {};
     const assets = props.assets.map(p => {
       return {
         ...p,
-        parent: organizations[0],
-        "Parent ID": (organizations[0] || {}).ID
+        parent: myOrganization,
+        "Parent ID": myOrganization.ID
       };
     });
     // const projects = [...shadowProjects, ...props.projects];
@@ -241,27 +271,80 @@ class HierarchicalVisualization extends Component {
     const projectEdgesSeen = new Set();
     // const supplierImpactScores = {};
 
+    const maxProjectImpact = Math.max(
+      ...projects
+        .filter(proj => !!proj.parent)
+        .map(proj => {
+          const itemScores = (this.props.scores.project || {})[proj.ID] || {};
+          return itemScores.impact || 0;
+        })
+    );
+    const maxProjectInterdependence = Math.max(
+      ...projects
+        .filter(proj => !!proj.parent)
+        .map(proj => {
+          const itemScores = (this.props.scores.project || {})[proj.ID] || {};
+          return itemScores.interdependence || 0;
+        })
+    );
+
     // only one possible parent
-    const projectToProjectEdges = projects.map(proj => {
-      const parentId = proj["Parent ID"];
-      projectEdgesSeen.add(proj.ID);
-      projectEdgesSeen.add(parentId);
-      const key = `project|${parentId}`;
-      const criticality =
-        ((props.projectsRisk[proj.ID] || {}).Criticality || {})[key] || 0;
-      const title = `<div><p>Project Name:&nbsp${
-        proj.Name
-      }</p><p>Project Criticality:&nbsp;${criticality.toFixed(1)}</p></div>`;
-      // const title = `<div><p>Project Name:&nbsp${proj.Name}</div>`;
-      return {
-        from: "P_" + parentId,
-        to: "P_" + proj.ID,
-        title
-        // value: criticality * 5.0
-        // value: criticality
-        // chosen: { edge: values => (values.color = "#7f0000") }
-      };
-    });
+    const projectToProjectEdges = projects
+      .filter(proj => !!proj.parent)
+      .map(proj => {
+        const parentId = proj["Parent ID"];
+        projectEdgesSeen.add(proj.ID);
+        projectEdgesSeen.add(parentId);
+        const itemScores = (this.props.scores.project || {})[proj.ID] || {};
+        const interdependence = itemScores.interdependence || 0;
+        const impact = itemScores.impact || 0;
+        const impactColor = getImpactColor(impact / maxProjectImpact);
+        // const value = impact / orgImpact;
+        const value = interdependence / maxProjectInterdependence;
+        const key = `project|${parentId}`;
+        // const criticality =
+        //   ((props.projectsRisk[proj.ID] || {}).Criticality || {})[key] || 0;
+        const title = `<div><p>Project Name:&nbsp${
+          proj.Name
+        }</p><p>Impact Score:&nbsp;${impact.toFixed(
+          1
+        )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
+          1
+        )}</p></div>`;
+        // const title = `<div><p>Project Name:&nbsp${proj.Name}</div>`;
+        return {
+          from: "P_" + parentId,
+          to: "P_" + proj.ID,
+          title,
+          value,
+          color: {
+            color: impactColor
+          }
+        };
+      });
+
+    const projectToProductEdgeScores = products
+      .map(prod => {
+        const projectIds = getCellMultiples(prod["Project ID"] || "");
+        return projectIds.map(prid => {
+          const supplyLines =
+            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+          const slmatches = supplyLines.filter(sl => sl.projectId === prid);
+          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const interdependence = slmatches.reduce(
+            (acc, m) => acc + m.score,
+            0
+          );
+          return { maxImpact, interdependence };
+        });
+      })
+      .flat();
+    const maxProjectToProductImpact = Math.max(
+      ...projectToProductEdgeScores.map(scores => scores.maxImpact)
+    );
+    const maxProjectToProductInterdependence = Math.max(
+      ...projectToProductEdgeScores.map(scores => scores.interdependence)
+    );
 
     const projectToProductEdges = products
       .map(prod => {
@@ -276,6 +359,22 @@ class HierarchicalVisualization extends Component {
           }
           productEdgesSeen.add(prod.ID);
           projectEdgesSeen.add(prid);
+
+          const supplyLines =
+            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+          const slmatches = supplyLines.filter(sl => sl.projectId === prid);
+          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const interdependence = slmatches.reduce(
+            (acc, m) => acc + m.score,
+            0
+          );
+          // const value = maxImpact / orgImpact;
+          const value = interdependence / maxProjectToProductInterdependence;
+          const impactColor = getImpactColor(
+            maxImpact / maxProjectToProductImpact
+          );
+
+          // const value = slmatch.score / orgImpact;
           // const risk = productCriticality * productScore;
           // const title = `<div><p>Product Name:&nbsp${
           //   prod.Name
@@ -286,30 +385,73 @@ class HierarchicalVisualization extends Component {
             prod.Name
           }</p><p>Project Name:&nbsp;${
             (projectsMap[prid] || {}).Name
-          }</p></div>`;
+          }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
+            1
+          )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
+            1
+          )}</p></div>`;
           return {
             from: "P_" + prid,
             to: "PR_" + prod.ID,
-            title
-            // value: risk / 2.0
+            title,
+            value,
+            color: {
+              color: impactColor
+            }
           };
         });
         return productEdges.filter(Boolean);
       })
       .flat();
 
+    const productToSupplierEdgeScores = products.map(prod => {
+      const supId = prod["Supplier ID"];
+      const supplyLines =
+        (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+      const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
+      const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+      const interdependence = slmatches.reduce((acc, m) => acc + m.score, 0);
+      return { maxImpact, interdependence };
+    });
+    const maxProductToSupplierImpact = Math.max(
+      ...productToSupplierEdgeScores.map(scores => scores.maxImpact)
+    );
+    const maxProductToSupplierInterdependence = Math.max(
+      ...productToSupplierEdgeScores.map(scores => scores.interdependence)
+    );
+
     const productToSupplierEdges = products.map(prod => {
       productEdgesSeen.add(prod.ID);
-      supplierEdgesSeen.add(prod["Supplier ID"]);
       const supId = prod["Supplier ID"];
+      supplierEdgesSeen.add(supId);
 
+      const supplyLines =
+        (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+      const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
+      const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+      const interdependence = slmatches.reduce((acc, m) => acc + m.score, 0);
+      // const value = maxImpact / orgImpact;
+      const value = interdependence / maxProductToSupplierInterdependence;
+      const impactColor = getImpactColor(
+        maxImpact / maxProductToSupplierImpact
+      );
       const title = `<div><p>Supplier Name:&nbsp;${
         (suppliersMap[supId] || {}).Name
-      }</p><p>Product Name:&nbsp;${prod.Name}</p></div>`;
+      }</p><p>Product Name:&nbsp;${
+        prod.Name
+      }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
+        1
+      )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
+        1
+      )}</p></div>`;
       return {
         from: "PR_" + prod.ID,
         to: "S_" + supId,
-        title
+        title,
+        value,
+        color: {
+          color: impactColor
+        }
         // value: totalImpactScore
         // chosen: { edge: values => (values.color = "#7f0000") }
       };
@@ -342,18 +484,28 @@ class HierarchicalVisualization extends Component {
         proj.Name
       }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
         1
-      )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(1)}</p></div>`;
+      )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(
+        1
+      )}</p></div>`;
       const level = Math.max((proj.Level || "").split(".").length - 1, 1);
       curNodeLevel = Math.max(curNodeLevel, level);
+      const nodeId = "P_" + proj.ID;
       return {
-        id: "P_" + proj.ID,
+        id: nodeId,
+        label: proj.Name,
         title,
         color: impactColor,
         group: "projects",
         value: interdependence / maxInterdependence || 0,
         // value: impact,
-        level: level
-        // label: impact.toFixed(1)
+        level: level,
+        widthConstraint: {
+          maximum: 160
+        },
+        font: {
+          size: 32
+        },
+        ...nodePositions[nodeId]
       };
     });
 
@@ -384,16 +536,26 @@ class HierarchicalVisualization extends Component {
         prod.Name
       }</p><p>Product Impact Score:&nbsp${impact.toFixed(
         1
-      )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(1)}</p></div>`;
+      )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(
+        1
+      )}</p></div>`;
+      const nodeId = "PR_" + prod.ID;
       return {
-        id: "PR_" + prod.ID,
+        id: nodeId,
+        label: prod.Name,
         title,
         color: impactColor,
         group: "products",
         // value: impact,
         value: interdependence / maxInterdependence || 0,
-        level: curNodeLevel
-        // label: impact.toFixed(1)
+        level: curNodeLevel,
+        widthConstraint: {
+          maximum: 160
+        },
+        font: {
+          size: 32
+        },
+        ...nodePositions[nodeId]
       };
     });
     curNodeLevel++;
@@ -402,8 +564,9 @@ class HierarchicalVisualization extends Component {
     );
     resourceScores = this.props.scores.supplier || {};
     maxInterdependence = Math.max(
-      ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).interdependence) ||
-        0)
+      ...(activeSuppliers.map(
+        sup => (resourceScores[sup.ID] || {}).interdependence
+      ) || 0)
     );
     maxImpact = Math.max(
       ...(activeSuppliers.map(sup => (resourceScores[sup.ID] || {}).impact) ||
@@ -421,16 +584,26 @@ class HierarchicalVisualization extends Component {
         sup.Name
       }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
         1
-      )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(1)}</p></div>`;
+      )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(
+        1
+      )}</p></div>`;
+      const nodeId = "S_" + sup.ID;
       return {
-        id: "S_" + sup.ID,
-        // label: impact.toFixed(1),
+        id: nodeId,
+        label: sup.Name,
         title,
         color: impactColor,
         group: "suppliers",
         // value: impact,
         value: interdependence / maxInterdependence || 0,
-        level: curNodeLevel
+        level: curNodeLevel,
+        widthConstraint: {
+          maximum: 160
+        },
+        font: {
+          size: 32
+        },
+        ...nodePositions[nodeId]
       };
     });
     resourceScores = this.props.scores.project || {};
@@ -445,14 +618,21 @@ class HierarchicalVisualization extends Component {
       )}</p><p>Organization Interdependence Score:&nbsp;${interdependence.toFixed(
         1
       )}</p></div>`;
+      const nodeId = "P_" + proj.ID;
       return {
         group: "organizations",
-        id: "P_" + proj.ID,
+        id: nodeId,
+        label: proj.Name,
         title,
         // label: impact.toFixed(1),
         // value: impact,
-        value: 1,
-        level: 0
+        value: 2,
+        level: 0,
+        font: {
+          size: 48
+        },
+        // color: getImpactColor(1),
+        ...nodePositions[nodeId]
       };
     });
     const nodes = [
@@ -594,7 +774,7 @@ class HierarchicalVisualization extends Component {
         nodeDistance: 200
       },
       hierarchicalRepulsion: {
-        nodeDistance: 200
+        nodeDistance: 240
       }
     },
     interaction: {
@@ -605,10 +785,10 @@ class HierarchicalVisualization extends Component {
     //     enabled: true
     // },
     groups: {
-      organizations: { shape: "dot", color: "gray" },
+      organizations: { shape: "hexagon", color: "gray" },
       projects: { shape: "dot" },
-      products: { shape: "dot" },
-      suppliers: { shape: "dot" }
+      products: { shape: "square" },
+      suppliers: { shape: "triangle" }
     },
     nodes: {
       scaling: {
@@ -616,7 +796,7 @@ class HierarchicalVisualization extends Component {
           enabled: true
         },
         min: 5,
-        max: 60
+        max: 120
       }
     },
     layout: {
@@ -647,6 +827,68 @@ class HierarchicalVisualization extends Component {
     }
   };
 
+  firstDraw = true;
+
+  events = {
+    // zoom: event => {
+    //   const vp = this.network.getViewPosition();
+    //   // console.log("ZOOOM", event, vp);
+    //   store.dispatch(
+    //     updatePreferences({
+    //       "viz.hierarchical.scale": event.scale,
+    //       "viz.hierarchical.position": vp
+    //     })
+    //   );
+    //   ipcRenderer.send("update-preferences", {
+    //     "viz.hierarchical.scale": event.scale,
+    //     "viz.hierarchical.position": vp
+    //   });
+    // },
+    dragEnd: event => {
+      // console.log("DRAGEEVENTETS", event);
+      // console.log("NODE INFO", this.network.getPositions());
+      // this.network.storePositions();
+      // const vp = this.network.getViewPosition();
+      // console.log("DRAG", event, vp);
+      // store.dispatch(
+      //   updatePreferences({
+      //     "viz.hierarchical.position": vp
+      //   })
+      // );
+      // ipcRenderer.send("update-preferences", {
+      //   "viz.hierarchical.position": vp
+      // });
+    },
+    stabilized: () => {
+      if (this.firstDraw) {
+        const scale = this.props.preferences["viz.hierarchical.scale"];
+        const position = this.props.preferences["viz.hierarchical.position"];
+        const moveToOptions = {
+          ...(scale && { scale }),
+          ...(position && { position })
+        };
+        this.network.moveTo(moveToOptions);
+        this.network.stopSimulation();
+        this.network.setOptions({
+          layout: { hierarchical: { enabled: false } }
+        });
+        this.firstDraw = false;
+        setTimeout(() => this.setState({ visible: true }), 0);
+      }
+    },
+    // stabilized: () => {
+    //   this.network.stopSimulation();
+    //   this.network.setOptions({
+    //     layout: { hierarchical: { enabled: false } }
+    //   });
+    // },
+    startStabilizing: () => {
+      if (!this.firstDraw) {
+        this.network.stopSimulation();
+      }
+    }
+  };
+
   handleMetric = (event, newMetric) => {
     if (newMetric != null) {
       this.setState({ metric: newMetric });
@@ -657,14 +899,47 @@ class HierarchicalVisualization extends Component {
     this.setState({ visualization: viz });
   };
 
+  // componentDidMount = () => {
+  //   const scale = this.props.preferences["viz.hierarchical.scale"];
+  //   const position = this.props.preferences["viz.hierarchical.position"];
+  //   const moveToOptions = {
+  //     ...(scale && { scale }),
+  //     ...(position && { position })
+  //   };
+  //   console.log("NETWORK 1", this.network);
+  //   setTimeout(() => {
+  //     this.network.moveTo(moveToOptions);
+  //     console.log("NETWORK 2", this.network);
+  //   }, 1000);
+  //   console.log("MTO", moveToOptions);
+  // };
+
   render() {
     const { classes } = this.props;
 
+    // console.log("PATH>>>>", storage.getDefaultDataPath());
+
+    // const scale = this.props.preferences["viz.hierarchical.scale"];
+    // const position = this.props.preferences["viz.hierarchical.position"];
+    // const moveToOptions = {
+    //   ...(scale && { scale }),
+    //   ...(position && { position })
+    // };
+    // console.log("MTO", moveToOptions);
+    // setTimeout(() => {
+    //   this.network.moveTo(moveToOptions);
+    // }, 1000);
+
     return (
       <div
-        id="risk-graph"
-        style={{ width: "100%", height: "100%", position: "fixed" }}
-        ref={tc => (this.treeContainer = tc)}
+        // id="risk-graph"
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "fixed",
+          visibility: this.state.visible ? "visible" : "hidden"
+        }}
+        // ref={tc => (this.treeContainer = tc)}
       >
         {/* <div style={{ display: "inline-flex" }}>
           <ToggleButtonGroup
@@ -704,7 +979,11 @@ class HierarchicalVisualization extends Component {
         <Graph
           graph={this.graph}
           options={this.options}
-          getNetwork={network => (this.network = network)}
+          events={this.events}
+          getNetwork={network => {
+            // network.moveTo(moveToOptions);
+            this.network = network;
+          }}
         />
         {/* // <ReactEcharts option={this.option} /> */}
       </div>

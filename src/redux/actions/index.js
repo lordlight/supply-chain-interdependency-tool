@@ -5,6 +5,8 @@ export const ADD_PROJECTS = "ADD_PROJECTS";
 export const ANSWER_TEMP = "ANSWER_TEMP";
 export const ANSWER_MULTI = "ANSWER_MULTI";
 export const INIT_SESSION = "INIT_SESSION";
+export const INIT_PREFERENCES = "INIT_PREFERENCES";
+export const UPDATE_PREFERENCES = "UPDATE_PREFERENCES";
 export const UPDATE_CURRENT_TYPE = "UPDATE_CURRENT_TYPE";
 export const UPDATE_CURRENT_ITEM = "UPDATE_CURRENT_ITEM";
 export const UPDATE_IMPORT_FILE = "UPDATE_IMPORT_FILE";
@@ -38,6 +40,14 @@ export function answerTemp(payload) {
 
 export function initSession(payload) {
   return { type: INIT_SESSION, payload };
+}
+
+export function initPreferences(payload) {
+  return { type: INIT_PREFERENCES, payload };
+}
+
+export function updatePreferences(payload) {
+  return { type: UPDATE_PREFERENCES, payload };
 }
 
 export function updateCurrentType(payload) {

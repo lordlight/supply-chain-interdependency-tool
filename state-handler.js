@@ -3,6 +3,9 @@ const process = require("process");
 const { app, ipcMain, dialog } = require("electron");
 const fs = require("fs-extra");
 
+const Store = require("electron-store");
+const store = new Store({ accessPropertiesByDotNotation: false });
+
 const csvParser = require("csv-parser");
 const csvSync = require("csv-parse/lib/sync");
 const { parse } = require("json2csv");
@@ -295,7 +298,14 @@ updateSessionData = (data, type, keepInactive = false) => {
 // Functions and event handlers for communicating with data.
 ipcMain.on("renderer-loaded", event => {
   event.sender.send("init-state", sessionData);
+  const preferences = store.store;
+  event.sender.send("init-preferences", preferences);
   //event.sender.send('app-loc', app.getPath('appData'));
+});
+
+ipcMain.on("update-preferences", (event, payload) => {
+  console.log("UPDATE PREFERENCES", payload);
+  store.set(payload);
 });
 
 ipcMain.on("open-import", event => {
@@ -373,5 +383,6 @@ ipcMain.on("clear-all-data", (event, req) => {
     ...sessionData,
     ...MUTABLE_DATA
   };
+  store.clear();
   event.sender.send("clear-all-data-response", { status: 0 });
 });

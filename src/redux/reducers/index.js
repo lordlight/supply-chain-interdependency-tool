@@ -5,6 +5,8 @@ import {
   ANSWER_MULTI,
   ANSWER_TEMP,
   INIT_SESSION,
+  INIT_PREFERENCES,
+  UPDATE_PREFERENCES,
   UPDATE_CURRENT_TYPE,
   UPDATE_CURRENT_ITEM,
   UPDATE_IMPORT_FILE,
@@ -66,7 +68,8 @@ const initialState = {
   supplierResponses: {},
   productResponses: {},
   projectResponses: {},
-  tempResponses: {}
+  tempResponses: {},
+  preferences: {}
 };
 
 const _ensureResponses = (resources, responses) => {
@@ -245,6 +248,19 @@ function rootReducer(state = initialState, action) {
       projectResponses: (state.projectResponses =
         action.payload.projectResponses)
     });
+  } else if (action.type === INIT_PREFERENCES) {
+    return {
+      ...state,
+      preferences: action.payload
+    };
+  } else if (action.type === UPDATE_PREFERENCES) {
+    return {
+      ...state,
+      preferences: {
+        ...state.preferences,
+        ...action.payload
+      }
+    };
   } else if (action.type === UPDATE_CURRENT_ITEM) {
     return Object.assign({}, state, {
       currentItem: (state.currentItem = action.payload.currentItem)

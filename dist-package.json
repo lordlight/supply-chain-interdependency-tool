@@ -10,7 +10,8 @@
     "json2csv": "^4.5.1",
     "strip-bom": "^3.0.0",
     "strip-bom-stream": "^3.0.0",
-    "fs-extra": "4.0.3"
+    "fs-extra": "4.0.3",
+    "electron-store": "^4.0.0"
   },
   "scripts": {
     "start": "electron ."
