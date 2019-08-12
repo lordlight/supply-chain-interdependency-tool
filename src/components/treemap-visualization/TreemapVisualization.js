@@ -5,6 +5,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 
+import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
+
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
@@ -146,7 +148,7 @@ class TreemapVisualization extends Component {
             // colors={{ datum: IMPACT_COLORS }}
             colors={d =>
               d.impact != null
-                ? this.getImpactColor(Math.min(d.impact / maxImpact, 1))
+                ? this.getImpactColor(Math.min(d.impact / MAX_IMPACT_SCORE, 1))
                 : "white"
             }
             borderColor={{ from: "color", modifiers: [["darker", 0.3]] }}
