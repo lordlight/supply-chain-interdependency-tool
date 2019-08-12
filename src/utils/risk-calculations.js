@@ -24,6 +24,11 @@ const ASSET_WEIGHTS = {
 //   ICTA: 1 / 3
 // };
 
+export const MAX_IMPACT_SCORE =
+  (DEPENDENCY_WEIGHT +
+    Object.values(ASSET_WEIGHTS).reduce((acc, w) => acc + w, 0)) *
+  100.0;
+
 export function calculateItemRisk(
   resourceType,
   responses,

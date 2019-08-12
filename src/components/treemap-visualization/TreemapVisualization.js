@@ -8,108 +8,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 // import store from '../../redux/store';
 import { connect } from "react-redux";
 
-const IMPACT_COLORS = [
-  "#FF00FF",
-  "#FC03FC",
-  "#FA05FA",
-  "#F708F7",
-  "#F50AF5",
-  "#F20DF2",
-  "#F00FF0",
-  "#ED12ED",
-  "#EA15EA",
-  "#E817E8",
-  "#E51AE5",
-  "#E31CE3",
-  "#E01FE0",
-  "#DE21DE",
-  "#DB24DB",
-  "#D827D8",
-  "#D629D6",
-  "#D32CD3",
-  "#D12ED1",
-  "#CE31CE",
-  "#CB34CB",
-  "#C936C9",
-  "#C639C6",
-  "#C43BC4",
-  "#C13EC1",
-  "#BF40BF",
-  "#BC43BC",
-  "#B946B9",
-  "#B748B7",
-  "#B44BB4",
-  "#B24DB2",
-  "#AF50AF",
-  "#AD52AD",
-  "#AA55AA",
-  "#A758A7",
-  "#A55AA5",
-  "#A25DA2",
-  "#A05FA0",
-  "#9D629D",
-  "#9B649B",
-  "#986798",
-  "#956A95",
-  "#936C93",
-  "#906F90",
-  "#8E718E",
-  "#8B748B",
-  "#897689",
-  "#867986",
-  "#837C83",
-  "#817E81",
-  "#7E817E",
-  "#7C837C",
-  "#798679",
-  "#768976",
-  "#748B74",
-  "#718E71",
-  "#6F906F",
-  "#6C936C",
-  "#6A956A",
-  "#679867",
-  "#649B64",
-  "#629D62",
-  "#5FA05F",
-  "#5DA25D",
-  "#5AA55A",
-  "#58A758",
-  "#55AA55",
-  "#52AD52",
-  "#50AF50",
-  "#4DB24D",
-  "#4BB44B",
-  "#48B748",
-  "#46B946",
-  "#43BC43",
-  "#40BF40",
-  "#3EC13E",
-  "#3BC43B",
-  "#39C639",
-  "#36C936",
-  "#34CB34",
-  "#31CE31",
-  "#2ED12E",
-  "#2CD32C",
-  "#29D629",
-  "#27D827",
-  "#24DB24",
-  "#21DE21",
-  "#1FE01F",
-  "#1CE31C",
-  "#1AE51A",
-  "#17E817",
-  "#15EA15",
-  "#12ED12",
-  "#0FF00F",
-  "#0DF20D",
-  "#0AF50A",
-  "#08F708",
-  "#05FA05",
-  "#03FC03",
-  "#00FF00"
-];
+const Rainbow = require("rainbowvis.js");
 
 const mapState = state => ({
   suppliers: state.suppliers,
@@ -139,12 +38,21 @@ class TreemapVisualization extends Component {
     resource: "project"
   };
 
+  constructor(props) {
+    super(props);
+    this.rainbow = new Rainbow();
+    this.rainbow.setSpectrum("red", "yellow", "green");
+    this.impact_colors = [...Array(101).keys()].map(
+      i => `#${this.rainbow.colorAt(i)}`
+    );
+  }
+
   getImpactColor = impactPct => {
     const colorIdx = Math.min(
-      Math.floor((1 - impactPct) * IMPACT_COLORS.length),
-      IMPACT_COLORS.length - 1
+      Math.floor((1 - impactPct) * this.impact_colors.length),
+      this.impact_colors.length - 1
     );
-    const impactColor = IMPACT_COLORS[colorIdx];
+    const impactColor = this.impact_colors[colorIdx];
     return impactColor;
   };
 
@@ -166,7 +74,8 @@ class TreemapVisualization extends Component {
           ((scores[this.state.resource] || {})[pr.ID] || {}).impact || 0
         ),
         interdependence: Math.round(
-          ((scores[this.state.resource] || {})[pr.ID] || {}).interdependence || 0
+          ((scores[this.state.resource] || {})[pr.ID] || {}).interdependence ||
+            0
         )
       };
     });

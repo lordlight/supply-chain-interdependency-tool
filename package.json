@@ -21,6 +21,7 @@
     "electron-is-dev": "^1.0.1",
     "electron-store": "^4.0.0",
     "json2csv": "^4.5.1",
+    "rainbowvis.js": "^1.0.1",
     "react": "^16.8.5",
     "react-chartjs-2": "^2.7.6",
     "react-dev-utils": "^8.0.0",
