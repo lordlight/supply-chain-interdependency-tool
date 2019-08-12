@@ -79,10 +79,14 @@ const styles = theme => ({
     // marginBottom: 96
   },
   cell: {
-    borderRight: "2px solid #f8f8f8"
+    borderRight: "2px solid #f8f8f8",
+    paddingLeft: 12,
+    paddingRight: 12
   },
   lastOfCell: {
-    borderRight: "2px solid #dcdcdc"
+    borderRight: "2px solid #dcdcdc",
+    paddingLeft: 12,
+    paddingRight: 12
   },
   cellInactive: {
     color: "gray"
@@ -111,7 +115,8 @@ const styles = theme => ({
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
-    paddingRight: 12
+    paddingRight: 12,
+    minWidth: 89
   },
   questionCol: {
     textTransform: "capitalize",
@@ -127,10 +132,14 @@ const styles = theme => ({
   },
   scoreColPart: {
     display: "inline-block",
+    textAlign: "right",
+    paddingRight: 6,
+    minWidth: 40,
     width: "50%"
   },
   scoreBars: {
     height: 15,
+    display: "inline-block",
     backgroundColor: "#7f7f7f",
     verticalAlign: "middle"
   }
@@ -390,7 +399,7 @@ class ItemList extends Component {
                 : "---"}
             </div>
             <div
-              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              className={classes.scoreBars}
               style={{
                 width: ((row["score.impact"] || 0) / maxImpact || 0) * 40
               }}
@@ -404,7 +413,7 @@ class ItemList extends Component {
                 : "---"}
             </div>
             <div
-              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              className={classes.scoreBars}
               style={{
                 width:
                   ((row["score.interdependence"] || 0) / maxInterdependence ||
@@ -415,7 +424,10 @@ class ItemList extends Component {
 
           <TableCell
             className={classes.lastOfCell}
-            style={{ whiteSpace: "nowrap", borderRight: "2px solid #dcdcdc" }}
+            style={{
+              whiteSpace: "nowrap",
+              borderRight: "2px solid #dcdcdc"
+            }}
           >
             <div className={classes.scoreColPart}>
               {row["score.assurance"] != null
@@ -423,7 +435,7 @@ class ItemList extends Component {
                 : "---"}
             </div>
             <div
-              className={[classes.scoreColPart, classes.scoreBars].join(" ")}
+              className={classes.scoreBars}
               style={{
                 width: ((row["score.assurance"] || 0) / maxAssurance || 0) * 40
               }}
