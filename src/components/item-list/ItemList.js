@@ -115,8 +115,8 @@ const styles = theme => ({
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
-    paddingRight: 12,
-    minWidth: 89
+    paddingRight: 12
+    // minWidth: 89
   },
   questionCol: {
     textTransform: "capitalize",
@@ -134,8 +134,8 @@ const styles = theme => ({
     display: "inline-block",
     textAlign: "right",
     paddingRight: 6,
-    minWidth: 40,
-    width: "50%"
+    minWidth: 54
+    // width: "50%"
   },
   scoreBars: {
     height: 15,
