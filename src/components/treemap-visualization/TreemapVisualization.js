@@ -43,7 +43,7 @@ class TreemapVisualization extends Component {
   constructor(props) {
     super(props);
     this.rainbow = new Rainbow();
-    this.rainbow.setSpectrum("red", "yellow", "green");
+    this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
     this.impact_colors = [...Array(101).keys()].map(
       i => `#${this.rainbow.colorAt(i)}`
     );
