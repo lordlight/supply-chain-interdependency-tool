@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOMServer from "react-dom/server";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -41,49 +42,20 @@ const styles = theme => ({
     justifyContent: "space-between",
     width: 80
   },
-  content: {
-    position: "relative"
+  scoreBarsContainer: {
+    height: 15,
+    width: 40,
+    display: "inline-block",
+    verticalAlign: "middle",
+    borderStyle: "solid",
+    borderColor: "#7f7f7f",
+    borderWidth: 1
   },
-  desc: {
-    fontSize: "15px",
-    height: "48px",
-    overflow: "hidden",
-    lineHeight: "1",
-    textOverflow: "ellipsis"
-  },
-  media: {
-    height: 194,
-    width: 344
-  },
-  paper: {
-    position: "absolute",
-    width: theme.spacing.unit * 50,
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing.unit * 4,
-    outline: "none"
-  },
-  img: {
-    position: "absolute",
-    top: theme.spacing.unit * 2,
-    right: theme.spacing.unit * 2,
-    maxWidth: 80,
-    maxHeight: 80,
-    width: "auto",
-    height: "auto"
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: "regular",
-    textTransform: "uppercase"
-  },
-  heading: {
-    fontSize: 25,
-    paddingBottom: 24,
-    textTransform: "capitalize"
-  },
-  item: {
-    color: "rgba(0, 0, 0, 0.6)"
+  scoreBars: {
+    height: 15,
+    // display: "inline-block",
+    backgroundColor: "#7f7f7f",
+    verticalAlign: "middle"
   }
 });
 
@@ -146,6 +118,106 @@ class HierarchicalVisualization extends Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     this.constructGraph(this.props);
+  };
+
+  getNodePopupContents = (
+    type,
+    name,
+    impact,
+    interdependence,
+    maxInterdependence,
+    assurance
+  ) => {
+    const { classes } = this.props;
+
+    return ReactDOMServer.renderToString(
+      <div>
+        <Typography
+          variant="h6"
+          style={{
+            borderBottomStyle: "solid",
+            borderBottomColor: "gray",
+            borderBottomWidth: 1
+          }}
+        >
+          {type}
+        </Typography>
+        <Typography style={{ fontWeight: "bold" }}>{name}</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Typography style={{ marginRight: 6 }}>Impact</Typography>
+          <div style={{ display: "flex" }}>
+            <Typography style={{ marginRight: 6 }}>
+              {/* {impact.toFixed(1)} */}
+              {Math.round(impact)}
+            </Typography>
+            <div className={classes.scoreBarsContainer}>
+              <div
+                className={classes.scoreBars}
+                style={{
+                  width: ((impact || 0) / MAX_IMPACT_SCORE || 0) * 40
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Typography style={{ marginRight: 6 }}>Interdependence</Typography>
+          <div style={{ display: "flex" }}>
+            <Typography style={{ marginRight: 6 }}>
+              {/* {interdependence.toFixed(1)} */}
+              {Math.round(interdependence)}
+            </Typography>
+            <div className={classes.scoreBarsContainer}>
+              <div
+                className={classes.scoreBars}
+                style={{
+                  width: ((interdependence || 0) / maxInterdependence || 0) * 40
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Typography style={{ marginRight: 6 }}>Assurance</Typography>
+          <div style={{ display: "flex" }}>
+            <Typography style={{ marginRight: 6 }}>
+              {/* {assurance.toFixed(1)} */}
+              {Math.round(assurance)}
+            </Typography>
+            <div className={classes.scoreBarsContainer}>
+              <div
+                className={classes.scoreBars}
+                style={{
+                  width: ((assurance || 0) / 100 || 0) * 40
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        {/* <Typography
+          variant="caption"
+          style={{ fontStyle: "italic" }}
+        >{`double-click to see ${type} metrics`}</Typography> */}
+      </div>
+    );
   };
 
   constructGraph = props => {
@@ -347,18 +419,33 @@ class HierarchicalVisualization extends Component {
         proj => (resourceScores[proj.ID] || {}).interdependence
       ) || 0)
     );
+    let maxAssurance = Math.max(
+      ...(activeProjects.map(
+        proj => (resourceScores[proj.ID] || {}).assurance
+      ) || 0)
+    );
     const projectNodes = activeProjects.map(proj => {
       const itemScores = resourceScores[proj.ID] || {};
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
-      const title = `<div><p>Project Name:&nbsp${
-        proj.Name
-      }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
-        1
-      )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(
-        1
-      )}</p></div>`;
+      const assurance = itemScores.assurance || 0;
+      const title = this.getNodePopupContents(
+        "Project",
+        proj.Name,
+        impact,
+        interdependence,
+        maxInterdependence,
+        assurance,
+        maxAssurance
+      );
+      // const title = `<div><p>Project Name:&nbsp${
+      //   proj.Name
+      // }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
+      //   1
+      // )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(
+      //   1
+      // )}</p></div>`;
       const level = Math.max((proj.Level || "").split(".").length - 1, 1);
       curNodeLevel = Math.max(curNodeLevel, level);
       const nodeId = "P_" + proj.ID;
@@ -391,18 +478,33 @@ class HierarchicalVisualization extends Component {
         prod => (resourceScores[prod.ID] || {}).interdependence
       ) || 0)
     );
+    maxAssurance = Math.max(
+      ...(activeProducts.map(
+        prod => (resourceScores[prod.ID] || {}).assurance
+      ) || 0)
+    );
     const productNodes = activeProducts.map(prod => {
       const itemScores = resourceScores[prod.ID] || {};
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
-      const title = `<div><p>Product Name:&nbsp${
-        prod.Name
-      }</p><p>Product Impact Score:&nbsp${impact.toFixed(
-        1
-      )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(
-        1
-      )}</p></div>`;
+      const assurance = itemScores.assurance || 0;
+      const title = this.getNodePopupContents(
+        "Product",
+        prod.Name,
+        impact,
+        interdependence,
+        maxInterdependence,
+        assurance,
+        maxAssurance
+      );
+      // const title = `<div><p>Product Name:&nbsp${
+      //   prod.Name
+      // }</p><p>Product Impact Score:&nbsp${impact.toFixed(
+      //   1
+      // )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(
+      //   1
+      // )}</p></div>`;
       const nodeId = "PR_" + prod.ID;
       return {
         id: nodeId,
@@ -436,13 +538,22 @@ class HierarchicalVisualization extends Component {
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
-      const title = `<div><p>Supplier Name:&nbsp${
-        sup.Name
-      }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
-        1
-      )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(
-        1
-      )}</p></div>`;
+      const assurance = itemScores.assurance || 0;
+      const title = this.getNodePopupContents(
+        "Supplier",
+        sup.Name,
+        impact,
+        interdependence,
+        maxInterdependence,
+        assurance
+      );
+      // const title = `<div><p>Supplier Name:&nbsp${
+      //   sup.Name
+      // }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
+      //   1
+      // )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(
+      //   1
+      // )}</p></div>`;
       const nodeId = "S_" + sup.ID;
       return {
         id: nodeId,
@@ -467,11 +578,27 @@ class HierarchicalVisualization extends Component {
       const impact = itemScores.impact || 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
-      const title = `<div><p style="font-weight:bold;">Organization</p><p>${
-        proj.Name
-      }</p><p>Impact:&nbsp;${impact.toFixed(
-        1
-      )}</p><p>Interdependence:&nbsp;${interdependence.toFixed(1)}</p></div>`;
+      const assurance = itemScores.assurance || 0;
+
+      // const title = `<div><p style="font-weight:bold;">Organization</p><p>${
+      //   proj.Name
+      // }</p><p>Impact:&nbsp;${impact.toFixed(
+      //   1
+      // )}</p><p>Interdependence:&nbsp;${interdependence.toFixed(1)}</p></div>`;
+      // const title = ReactDOMServer.renderToString(
+      //   <div>
+      //     <p style={{ fontWeight: "bold" }}>Organization</p>
+      //   </div>
+      // );
+      const title = this.getNodePopupContents(
+        "Organization",
+        proj.Name,
+        impact,
+        interdependence,
+        interdependence,
+        assurance,
+        assurance
+      );
       const nodeId = "P_" + proj.ID;
       return {
         group: "organizations",
@@ -628,15 +755,26 @@ class HierarchicalVisualization extends Component {
             justifyContent: "space-between"
           }}
         > */}
-        <div style={{ position: "absolute", zIndex: 100 }}>
-          <Typography variant="h6">Legend</Typography>
+        <div
+          style={{
+            position: "absolute",
+            borderStyle: "solid",
+            borderColor: "lightgray",
+            borderWidth: 2,
+            padding: 6,
+            top: 12
+            // bottom: 6
+            // zIndex: 100
+          }}
+        >
+          {/* <Typography variant="h6">Legend</Typography> */}
           <div
             style={{
               display: "flex",
-              borderStyle: "solid",
-              borderColor: "lightgray",
-              borderWidth: 2,
-              padding: 6,
+              // borderStyle: "solid",
+              // borderColor: "lightgray",
+              // borderWidth: 2,
+              // padding: 6,
               backgroundColor: "#f8f8f8",
               alignItems: "center"
             }}
@@ -706,7 +844,7 @@ class HierarchicalVisualization extends Component {
             <div style={{ marginLeft: 24 }}>
               <Typography>Impact</Typography>
               <div style={{ display: "flex" }}>
-                {this.impact_colors.map(c => (
+                {[...this.impact_colors].reverse().map(c => (
                   <div
                     key={c}
                     style={{ width: 2, height: 9, backgroundColor: c }}
@@ -720,8 +858,8 @@ class HierarchicalVisualization extends Component {
                   width: this.impact_colors.length * 2
                 }}
               >
-                <Typography variant="caption">high</Typography>
                 <Typography variant="caption">low</Typography>
+                <Typography variant="caption">high</Typography>
               </div>
             </div>
           </div>
@@ -737,7 +875,10 @@ class HierarchicalVisualization extends Component {
         </div>
         {/* </div> */}
         <div
-          style={{ height: "100%" }}
+          style={{
+            height: "100%"
+            // height: "calc(100% - 84px)"
+          }}
           // style={{
           //   flex: "1 1 100%",
           //   display: "flex",
