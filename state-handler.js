@@ -304,7 +304,7 @@ ipcMain.on("renderer-loaded", event => {
 });
 
 ipcMain.on("update-preferences", (event, payload) => {
-  console.log("UPDATE PREFERENCES", payload);
+  // console.log("UPDATE PREFERENCES", payload);
   store.set(payload);
 });
 

@@ -297,7 +297,7 @@ export function computeImpacts(
             normalizeFactor *= 100;
           }
         });
-        Object.entries(supplier.Access).forEach(acentry => {
+        Object.entries(supplier.Access || {}).forEach(acentry => {
           const [akey, acscore] = acentry;
           const curAssetId = akey.split("|")[1];
           if (curAssetId === assetId) {
@@ -314,23 +314,24 @@ export function computeImpacts(
     });
   });
   dependencyScoreEntries.forEach(entry => {
-    scores.project[entry.projectId].dependency.push(entry);
+    ((scores.project[entry.projectId] || {}).dependency || []).push(entry);
     scores.product[entry.productId].dependency.push(entry);
-    scores.supplier[entry.supplierId].dependency.push(entry);
+    ((scores.supplier[entry.supplierId] || {}).dependency || []).push(entry);
   });
 
   accessScoreEntries.forEach(entry => {
     scores.product[entry.productId].access.push(entry);
-    scores.supplier[entry.supplierId].access.push(entry);
-    productSupplierAccessScores[`${entry.productId}|${entry.supplierId}`].push(
-      entry
-    );
+    ((scores.supplier[entry.supplierId] || {}).access || []).push(entry);
+    (
+      productSupplierAccessScores[`${entry.productId}|${entry.supplierId}`] ||
+      []
+    ).push(entry);
   });
 
   // can compute supply line scores now
   const supplyLineScores = dependencyScoreEntries.map(entry => {
     const accessKey = `${entry.productId}|${entry.supplierId}`;
-    const accessScores = productSupplierAccessScores[accessKey];
+    const accessScores = productSupplierAccessScores[accessKey] || [];
     const score =
       entry.dependencyScore * DEPENDENCY_WEIGHT +
       accessScores.reduce(
@@ -341,9 +342,9 @@ export function computeImpacts(
   });
 
   supplyLineScores.forEach(entry => {
-    scores.project[entry.projectId].supplyLines.push(entry);
+    ((scores.project[entry.projectId] || {}).supplyLines || []).push(entry);
     scores.product[entry.productId].supplyLines.push(entry);
-    scores.supplier[entry.supplierId].supplyLines.push(entry);
+    ((scores.supplier[entry.supplierId] || {}).supplyLines || []).push(entry);
   });
 
   // find top-level org "project"

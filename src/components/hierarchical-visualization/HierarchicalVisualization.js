@@ -362,51 +362,70 @@ class HierarchicalVisualization extends Component {
       })
       .flat();
 
-    const productToSupplierEdgeScores = products.map(prod => {
-      const supId = prod["Supplier ID"];
-      const supplyLines =
-        (this.props.scores.product[prod.ID] || {}).supplyLines || [];
-      const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-      const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
-      const interdependence = slmatches.reduce((acc, m) => acc + m.score, 0);
-      return { maxImpact, interdependence };
-    });
+    const productToSupplierEdgeScores = products
+      .map(prod => {
+        // const supId = prod["Supplier ID"];
+        const supplierIds = getCellMultiples(prod["Supplier ID"] || "");
+        const supplierEdges = supplierIds.map(supId => {
+          const supplyLines =
+            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+          const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
+          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const interdependence = slmatches.reduce(
+            (acc, m) => acc + m.score,
+            0
+          );
+          return { maxImpact, interdependence };
+        });
+        return supplierEdges.filter(Boolean);
+      })
+      .flat();
 
     const maxProductToSupplierInterdependence = Math.max(
       ...productToSupplierEdgeScores.map(scores => scores.interdependence)
     );
 
-    const productToSupplierEdges = products.map(prod => {
-      productEdgesSeen.add(prod.ID);
-      const supId = prod["Supplier ID"];
-      supplierEdgesSeen.add(supId);
+    const productToSupplierEdges = products
+      .map(prod => {
+        // const supId = prod["Supplier ID"];
 
-      const supplyLines =
-        (this.props.scores.product[prod.ID] || {}).supplyLines || [];
-      const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-      const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
-      const interdependence = slmatches.reduce((acc, m) => acc + m.score, 0);
-      const value = interdependence / maxProductToSupplierInterdependence;
-      const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
-      const title = `<div><p>Supplier Name:&nbsp;${
-        (suppliersMap[supId] || {}).Name
-      }</p><p>Product Name:&nbsp;${
-        prod.Name
-      }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
-        1
-      )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
-        1
-      )}</p></div>`;
-      return {
-        from: "PR_" + prod.ID,
-        to: "S_" + supId,
-        title,
-        value,
-        color: {
-          color: impactColor
-        }
-      };
-    });
+        const supplierIds = getCellMultiples(prod["Supplier ID"] || "");
+        const supplierEdges = supplierIds.map(supId => {
+          productEdgesSeen.add(prod.ID);
+          supplierEdgesSeen.add(supId);
+          const supplyLines =
+            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+          const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
+          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const interdependence = slmatches.reduce(
+            (acc, m) => acc + m.score,
+            0
+          );
+          const value = interdependence / maxProductToSupplierInterdependence;
+          const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
+          const title = `<div><p>Supplier Name:&nbsp;${
+            (suppliersMap[supId] || {}).Name
+          }</p><p>Product Name:&nbsp;${
+            prod.Name
+          }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
+            1
+          )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
+            1
+          )}</p></div>`;
+          return {
+            from: "PR_" + prod.ID,
+            to: "S_" + supId,
+            title,
+            value,
+            color: {
+              color: impactColor
+            }
+          };
+        });
+        return supplierEdges;
+      })
+      .flat();
+
     let curNodeLevel = 1;
     const activeProjects = projects
       .filter(pr => !!pr.parent)
