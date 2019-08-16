@@ -220,6 +220,87 @@ class HierarchicalVisualization extends Component {
     );
   };
 
+  getEdgePopupContents = (
+    resource1Type,
+    resource1Name,
+    resource2Type,
+    resource2Name,
+    impact,
+    interdependence,
+    maxInterdependence
+  ) => {
+    const { classes } = this.props;
+
+    return ReactDOMServer.renderToString(
+      <div>
+        <Typography
+          variant="h6"
+          style={{
+            borderBottomStyle: "solid",
+            borderBottomColor: "gray",
+            borderBottomWidth: 1
+          }}
+        >
+          Supply Line
+        </Typography>
+        <Typography style={{ fontWeight: "bold" }}>
+          {resource1Type}:&nbsp;{resource1Name}
+        </Typography>
+        {resource2Type && resource2Name && (
+          <Typography style={{ fontWeight: "bold" }}>
+            {resource2Type}:&nbsp;{resource2Name}
+          </Typography>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Typography style={{ marginRight: 6 }}>Impact</Typography>
+          <div style={{ display: "flex" }}>
+            <Typography style={{ marginRight: 6 }}>
+              {/* {impact.toFixed(1)} */}
+              {Math.round(impact)}
+            </Typography>
+            <div className={classes.scoreBarsContainer}>
+              <div
+                className={classes.scoreBars}
+                style={{
+                  width: ((impact || 0) / MAX_IMPACT_SCORE || 0) * 40
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Typography style={{ marginRight: 6 }}>Interdependence</Typography>
+          <div style={{ display: "flex" }}>
+            <Typography style={{ marginRight: 6 }}>
+              {/* {interdependence.toFixed(1)} */}
+              {Math.round(interdependence)}
+            </Typography>
+            <div className={classes.scoreBarsContainer}>
+              <div
+                className={classes.scoreBars}
+                style={{
+                  width: ((interdependence || 0) / maxInterdependence || 0) * 40
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   constructGraph = props => {
     const getImpactColor = impactPct => {
       const colorIdx = Math.min(
@@ -275,15 +356,19 @@ class HierarchicalVisualization extends Component {
         const itemScores = (this.props.scores.project || {})[proj.ID] || {};
         const interdependence = itemScores.interdependence || 0;
         const impact = itemScores.impact || 0;
+        const assurance = itemScores.assurance || 0;
         const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
         const value = interdependence / maxProjectInterdependence;
-        const title = `<div><p>Project Name:&nbsp${
-          proj.Name
-        }</p><p>Impact Score:&nbsp;${impact.toFixed(
-          1
-        )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
-          1
-        )}</p></div>`;
+        const title = this.getEdgePopupContents(
+          "Project",
+          proj.Name,
+          null,
+          null,
+          impact,
+          interdependence,
+          maxProjectInterdependence,
+          assurance
+        );
         return {
           from: "P_" + parentId,
           to: "P_" + proj.ID,
@@ -339,18 +424,15 @@ class HierarchicalVisualization extends Component {
           );
           const value = interdependence / maxProjectToProductInterdependence;
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
-          const title = `<div><p>Product Name:&nbsp${
-            prod.Name
-          }</p><p>Project Name:&nbsp;${
-            (projectsMap[prid] || {}).Name
-          }</p><p>Impact Score:&nbsp;${(maxImpact !== -Infinity
-            ? maxImpact
-            : 0
-          ).toFixed(
-            1
-          )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
-            1
-          )}</p></div>`;
+          const title = this.getEdgePopupContents(
+            "Product",
+            prod.Name,
+            "Project",
+            (projectsMap[prid] || {}).Name,
+            maxImpact !== -Infinity ? maxImpact : 0,
+            interdependence,
+            maxProjectToProductInterdependence
+          );
           return {
             from: "P_" + prid,
             to: "PR_" + prod.ID,
@@ -406,18 +488,15 @@ class HierarchicalVisualization extends Component {
           );
           const value = interdependence / maxProductToSupplierInterdependence;
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
-          const title = `<div><p>Supplier Name:&nbsp;${
-            (suppliersMap[supId] || {}).Name
-          }</p><p>Product Name:&nbsp;${
-            prod.Name
-          }</p><p>Impact Score:&nbsp;${(maxImpact !== -Infinity
-            ? maxImpact
-            : 0
-          ).toFixed(
-            1
-          )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
-            1
-          )}</p></div>`;
+          const title = this.getEdgePopupContents(
+            "Supplier",
+            (suppliersMap[supId] || {}).Name,
+            "Product",
+            prod.Name,
+            maxImpact,
+            interdependence,
+            maxProductToSupplierInterdependence
+          );
           return {
             from: "PR_" + prod.ID,
             to: "S_" + supId,
