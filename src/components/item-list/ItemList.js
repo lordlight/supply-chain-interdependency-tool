@@ -388,12 +388,13 @@ class ItemList extends Component {
       selectedItem = list.filter(row => row.ID === selected.resourceId)[0];
       if (selectedItem) {
         const selectedImpact = selectedItem["score.impact"] || 0;
-        list.forEach(
-          row =>
-            (row["delta"] = Math.abs(
-              (row["score.impact"] || 0) - selectedImpact
-            ))
-        );
+        // make sure selected always sorts first
+        selectedItem.delta = -1;
+        list.forEach(row => {
+          if (row.delta == null) {
+            row.delta = Math.abs((row["score.impact"] || 0) - selectedImpact);
+          }
+        });
       }
     }
 
@@ -439,7 +440,7 @@ class ItemList extends Component {
             //     : null
             // }
           >
-            {i === 0 && selectedItem && selectedItem.ID === row.ID && (
+            {selectedItem && selectedItem.ID === row.ID && (
               <span>&rArr;&nbsp;</span>
             )}
             {row.Name}
