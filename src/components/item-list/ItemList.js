@@ -171,6 +171,15 @@ class ItemList extends Component {
     window.scrollTo(0, 0);
   };
 
+  getScoresMaxAndAvg = scores => {
+    const maxscore = Math.max(...scores);
+    const avgscore = scores.reduce((acc, val) => acc + val, 0) / scores.length;
+    return {
+      max: maxscore !== -Infinity ? maxscore : 0,
+      avg: avgscore || 0
+    };
+  };
+
   render() {
     const { classes } = this.props;
     if (this.props.currentType == null) {
@@ -253,7 +262,6 @@ class ItemList extends Component {
         cssClass: classes.scoreCol,
         sortType: "score.criticality.max"
       },
-
       hasAccess && {
         label: "Access",
         tooltip: "Sort by access",
@@ -320,19 +328,22 @@ class ItemList extends Component {
 
         // the following must be in this order
         if (hasCriticality) {
-          listItem["score.criticality.max"] = Math.max(
-            ...Object.values(riskSet[item.ID].Criticality)
+          const scores = this.getScoresMaxAndAvg(
+            Object.values(riskSet[item.ID].Criticality)
           );
+          listItem["score.criticality.max"] = scores.max;
         }
         if (hasAccess) {
-          listItem["score.access.max"] = Math.max(
-            ...Object.values(riskSet[item.ID].Access)
+          const scores = this.getScoresMaxAndAvg(
+            Object.values(riskSet[item.ID].Access)
           );
+          listItem["score.access.max"] = scores.max;
         }
         if (hasDependency) {
-          listItem["score.dependency.max"] = Math.max(
-            ...Object.values(riskSet[item.ID].Dependency)
+          const scores = this.getScoresMaxAndAvg(
+            Object.values(riskSet[item.ID].Dependency)
           );
+          listItem["score.dependency.max"] = scores.max;
         }
 
         const numQuestions = getNumQuestionsForResource(item, questions);

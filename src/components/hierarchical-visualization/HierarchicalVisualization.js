@@ -343,7 +343,10 @@ class HierarchicalVisualization extends Component {
             prod.Name
           }</p><p>Project Name:&nbsp;${
             (projectsMap[prid] || {}).Name
-          }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
+          }</p><p>Impact Score:&nbsp;${(maxImpact !== -Infinity
+            ? maxImpact
+            : 0
+          ).toFixed(
             1
           )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
             1
@@ -407,7 +410,10 @@ class HierarchicalVisualization extends Component {
             (suppliersMap[supId] || {}).Name
           }</p><p>Product Name:&nbsp;${
             prod.Name
-          }</p><p>Impact Score:&nbsp;${maxImpact.toFixed(
+          }</p><p>Impact Score:&nbsp;${(maxImpact !== -Infinity
+            ? maxImpact
+            : 0
+          ).toFixed(
             1
           )}</p><p>Interdependence Score:&nbsp;${interdependence.toFixed(
             1
