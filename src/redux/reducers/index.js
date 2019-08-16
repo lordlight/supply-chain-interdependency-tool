@@ -15,7 +15,8 @@ import {
   UPDATE_TEMP_RESPONSES,
   UPDATE_TYPE_RISK,
   RESET,
-  UPDATE_SCORES
+  UPDATE_SCORES,
+  SET_SELECTED_RESOURCE
 } from "../actions";
 
 const ASSETS = [
@@ -69,7 +70,8 @@ const initialState = {
   productResponses: {},
   projectResponses: {},
   tempResponses: {},
-  preferences: {}
+  preferences: {},
+  selectedResource: null
 };
 
 const _ensureResponses = (resources, responses) => {
@@ -312,6 +314,11 @@ function rootReducer(state = initialState, action) {
       supplierQuestions: state.supplierQuestions,
       productQuestions: state.productQuestions,
       projectQuestions: state.projectQuestions
+    };
+  } else if (action.type === SET_SELECTED_RESOURCE) {
+    return {
+      ...state,
+      selectedResource: action.payload
     };
   }
   return state;

@@ -9,7 +9,12 @@ import { ForceGraph2D } from "react-force-graph";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 import store from "../../redux/store";
-import { updatePreferences } from "../../redux/actions";
+import {
+  updatePreferences,
+  updateNavState,
+  updateCurrentType,
+  setSelectedResource
+} from "../../redux/actions";
 import { connect } from "react-redux";
 
 import { getCellMultiples } from "../../utils/general-utils";
@@ -20,6 +25,12 @@ const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 const HIDE_UNCONNECTED_RESOURCES = false;
+
+const RESOURCE_TYPES = {
+  P: "projects",
+  PR: "products",
+  S: "suppliers"
+};
 
 const mapState = state => ({
   suppliers: state.suppliers,
@@ -126,7 +137,8 @@ class HierarchicalVisualization extends Component {
     impact,
     interdependence,
     maxInterdependence,
-    assurance
+    assurance,
+    showHint = true
   ) => {
     const { classes } = this.props;
 
@@ -212,10 +224,12 @@ class HierarchicalVisualization extends Component {
             </div>
           </div>
         </div>
-        {/* <Typography
-          variant="caption"
-          style={{ fontStyle: "italic" }}
-        >{`double-click to see ${type} metrics`}</Typography> */}
+        {showHint && (
+          <Typography
+            variant="caption"
+            style={{ fontStyle: "italic" }}
+          >{`double-click to see ${type} metrics`}</Typography>
+        )}
       </div>
     );
   };
@@ -683,17 +697,6 @@ class HierarchicalVisualization extends Component {
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
-
-      // const title = `<div><p style="font-weight:bold;">Organization</p><p>${
-      //   proj.Name
-      // }</p><p>Impact:&nbsp;${impact.toFixed(
-      //   1
-      // )}</p><p>Interdependence:&nbsp;${interdependence.toFixed(1)}</p></div>`;
-      // const title = ReactDOMServer.renderToString(
-      //   <div>
-      //     <p style={{ fontWeight: "bold" }}>Organization</p>
-      //   </div>
-      // );
       const title = this.getNodePopupContents(
         "Organization",
         proj.Name,
@@ -701,7 +704,7 @@ class HierarchicalVisualization extends Component {
         interdependence,
         interdependence,
         assurance,
-        assurance
+        false
       );
       const nodeId = "P_" + proj.ID;
       return {
@@ -778,8 +781,8 @@ class HierarchicalVisualization extends Component {
     },
     edges: {
       color: {
-        hover: "#7f0000",
-        highlight: "#7f0000"
+        hover: "#00007f",
+        highlight: "#00007f"
       },
       scaling: {
         max: 10
@@ -798,6 +801,30 @@ class HierarchicalVisualization extends Component {
   firstDraw = true;
 
   events = {
+    doubleClick: props => {
+      // store.dispatch(updateNavState({ navState: value }));
+      const target = props.nodes[0];
+      if (target) {
+        const elements = target.split("_", 2);
+        const rtype = elements.shift();
+        const rid = elements.join("_");
+        const resource = RESOURCE_TYPES[rtype];
+        const organizationsIds = this.props.projects
+          .filter(p => !p.parent)
+          .map(o => o.ID);
+        if (resource && rid && organizationsIds.indexOf(rid) === -1) {
+          store.dispatch(
+            setSelectedResource({ resourceType: resource, resourceId: rid })
+          );
+          store.dispatch(
+            updateCurrentType({
+              currentType: resource
+            })
+          );
+          store.dispatch(updateNavState({ navState: resource }));
+        }
+      }
+    },
     stabilized: () => {
       if (this.firstDraw) {
         const scale = this.props.preferences["viz.hierarchical.scale"];
@@ -813,7 +840,6 @@ class HierarchicalVisualization extends Component {
         });
         this.firstDraw = false;
         setTimeout(() => this.setState({ visible: true }), 0);
-        console.log("NETWORK", this.network);
       }
     },
     startStabilizing: () => {

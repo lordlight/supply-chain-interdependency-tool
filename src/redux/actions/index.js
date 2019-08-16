@@ -16,6 +16,7 @@ export const UPDATE_TEMP_RESPONSES = "UPDATE_TEMP_RESPONSES";
 export const UPDATE_TYPE_RISK = "UPDATE_TYPE_RISK";
 export const UPDATE_SCORES = "UPDATE_SCORES";
 export const RESET = "RESET";
+export const SET_SELECTED_RESOURCE = "SET_SELECTED_RESOURCE";
 
 // Action creators
 export function addSuppliers(payload) {
@@ -84,4 +85,11 @@ export function updateScores(payload) {
 
 export function reset() {
   return { type: RESET };
+}
+
+export function setSelectedResource(payload) {
+  return {
+    type: SET_SELECTED_RESOURCE,
+    payload
+  };
 }

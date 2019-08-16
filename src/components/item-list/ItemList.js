@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import store from "../../redux/store";
-import { updateCurrentItem } from "../../redux/actions";
+import { updateCurrentItem, setSelectedResource } from "../../redux/actions";
 import { connect } from "react-redux";
 
 import { ItemVisualCard, QuestionStatusCard } from "../../components";
@@ -63,7 +63,8 @@ const mapState = state => ({
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
   projectResponses: state.projectResponses,
-  scores: state.scores
+  scores: state.scores,
+  selected: state.selectedResource
 });
 
 const styles = theme => ({
@@ -146,10 +147,17 @@ const styles = theme => ({
 });
 
 class ItemList extends Component {
-  state = {
-    sortBy: "Name",
-    sortDir: "asc"
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      sortBy:
+        props.selected && props.selected.resourceType === props.currentType
+          ? "delta"
+          : "Name",
+      sortDir: "asc",
+      selected: props.selected
+    };
+  }
 
   handleItemSelection = (event, item) => {
     store.dispatch(updateCurrentItem({ currentItem: item }));
@@ -163,7 +171,13 @@ class ItemList extends Component {
       if (this.state.sortDir === "asc") {
         newSortDir = "desc";
       }
-      this.setState({ sortDir: newSortDir });
+      this.setState({ sortDir: newSortDir, selected: null });
+    }
+  };
+
+  componentWillMount = () => {
+    if (this.props.selected) {
+      store.dispatch(setSelectedResource(null));
     }
   };
 
@@ -181,16 +195,16 @@ class ItemList extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    if (this.props.currentType == null) {
+    const { classes, currentType: type } = this.props;
+    const { selected } = this.state;
+
+    if (type == null) {
       return (
         <div className={"item-list"}>
           Current type is null in the current session.
         </div>
       );
     }
-
-    let type = this.props.currentType;
 
     let items = null;
     let questions = null;
@@ -361,6 +375,28 @@ class ItemList extends Component {
       return listItem;
     });
 
+    const maxImpact = Math.max(...list.map(row => row["score.impact"] || 0));
+    const maxInterdependence = Math.max(
+      ...list.map(row => row["score.interdependence"] || 0)
+    );
+    const maxAssurance = Math.max(
+      ...list.map(row => row["score.assurance"] || 0)
+    );
+
+    let selectedItem;
+    if (selected && selected.resourceType === type) {
+      selectedItem = list.filter(row => row.ID === selected.resourceId)[0];
+      if (selectedItem) {
+        const selectedImpact = selectedItem["score.impact"] || 0;
+        list.forEach(
+          row =>
+            (row["delta"] = Math.abs(
+              (row["score.impact"] || 0) - selectedImpact
+            ))
+        );
+      }
+    }
+
     list.sort((a, b) => {
       if (a._cscrm_active > b._cscrm_active) {
         return -1;
@@ -378,13 +414,6 @@ class ItemList extends Component {
       }
     });
 
-    const maxImpact = Math.max(...list.map(row => row["score.impact"] || 0));
-    const maxInterdependence = Math.max(
-      ...list.map(row => row["score.interdependence"] || 0)
-    );
-    const maxAssurance = Math.max(
-      ...list.map(row => row["score.assurance"] || 0)
-    );
     const rows = list.map((row, i) => {
       const scoreValues = [
         hasCriticality &&
@@ -402,7 +431,19 @@ class ItemList extends Component {
       ].filter(Boolean);
       return row._cscrm_active ? (
         <TableRow key={row.ID}>
-          <TableCell className={classes.lastOfCell}>{row.Name}</TableCell>
+          <TableCell
+            className={classes.lastOfCell}
+            // style={
+            //   i === 0 && selectedItem && selectedItem.ID === row.ID
+            //     ? { fontWeight: "bold", fontSize: 16 }
+            //     : null
+            // }
+          >
+            {i === 0 && selectedItem && selectedItem.ID === row.ID && (
+              <span>&rArr;&nbsp;</span>
+            )}
+            {row.Name}
+          </TableCell>
           <TableCell className={classes.cell} style={{ whiteSpace: "nowrap" }}>
             <div className={classes.scoreColPart}>
               {row["score.impact"] != null
