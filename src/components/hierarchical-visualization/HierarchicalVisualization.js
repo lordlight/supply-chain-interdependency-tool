@@ -328,7 +328,6 @@ class HierarchicalVisualization extends Component {
     const { products, suppliers, projects, preferences } = props;
 
     const nodePositions = preferences["viz.hierarchical.nodes"] || {};
-    console.log("NODE POS", nodePositions);
 
     const organizations = props.projects.filter(p => !p.parent);
     const myOrganization = organizations[0] || {};
@@ -784,9 +783,6 @@ class HierarchicalVisualization extends Component {
         hover: "#00007f",
         highlight: "#00007f"
       },
-      scaling: {
-        max: 10
-      },
       arrows: {
         to: {
           enabled: false
@@ -798,7 +794,17 @@ class HierarchicalVisualization extends Component {
     }
   };
 
+  getNodeDescendents = (n, results) => {
+    const connected = this.network.getConnectedNodes(n, "to");
+    connected.forEach(c => {
+      results.add(c);
+      this.getNodeDescendents(c, results);
+    });
+  };
+
   firstDraw = true;
+
+  selected = new Set();
 
   events = {
     doubleClick: props => {
@@ -824,6 +830,29 @@ class HierarchicalVisualization extends Component {
           store.dispatch(updateNavState({ navState: resource }));
         }
       }
+    },
+    selectNode: props => {
+      props.nodes.forEach(n => {
+        if (!this.selected.has(n)) {
+          this.selected.add(n);
+          const descendents = new Set();
+          this.getNodeDescendents(n, descendents);
+          descendents.forEach(n => this.selected.add(n));
+        }
+      });
+      this.network.selectNodes(Array.from(this.selected));
+    },
+    deselectNode: props => {
+      const nodeSet = new Set(props.nodes);
+      Array.from(this.selected).forEach(n => {
+        if (!nodeSet.has(n)) {
+          this.selected.delete(n);
+          const descendents = new Set();
+          this.getNodeDescendents(n, descendents);
+          descendents.forEach(n => this.selected.delete(n));
+        }
+      });
+      this.network.selectNodes(Array.from(this.selected));
     },
     stabilized: () => {
       if (this.firstDraw) {
