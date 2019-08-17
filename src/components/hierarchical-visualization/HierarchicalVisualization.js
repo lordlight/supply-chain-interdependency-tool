@@ -102,21 +102,23 @@ class HierarchicalVisualization extends Component {
   };
 
   componentDidMount() {
-    console.log("did mount");
     window.addEventListener("beforeunload", this.syncProperties);
   }
 
   syncProperties = () => {
-    const scale = this.network.getScale();
-    const vp = this.network.getViewPosition();
-    const nodePositions = this.network.getPositions();
-    const preferences = {
-      "viz.hierarchical.scale": scale,
-      "viz.hierarchical.position": vp,
-      "viz.hierarchical.nodes": nodePositions
-    };
-    store.dispatch(updatePreferences(preferences));
-    ipcRenderer.send("update-preferences", preferences);
+    const { suppliers, products, projects } = this.props;
+    if (suppliers.length > 0 && products.length > 0 && projects.length > 0) {
+      const nodePositions = this.network.getPositions();
+      const scale = this.network.getScale();
+      const vp = this.network.getViewPosition();
+      const preferences = {
+        "viz.hierarchical.scale": scale,
+        "viz.hierarchical.position": vp,
+        "viz.hierarchical.nodes": nodePositions
+      };
+      store.dispatch(updatePreferences(preferences));
+      ipcRenderer.send("update-preferences", preferences);
+    }
   };
 
   componentWillUnmount() {
@@ -141,6 +143,12 @@ class HierarchicalVisualization extends Component {
     showHint = true
   ) => {
     const { classes } = this.props;
+
+    impact = impact !== -Infinity ? impact || 0 : 0;
+    interdependence = interdependence !== -Infinity ? interdependence || 0 : 0;
+    maxInterdependence =
+      maxInterdependence !== -Infinity ? maxInterdependence || 0 : 0;
+    assurance = assurance != -Infinity ? assurance || 0 : 0;
 
     return ReactDOMServer.renderToString(
       <div>
@@ -172,7 +180,7 @@ class HierarchicalVisualization extends Component {
               <div
                 className={classes.scoreBars}
                 style={{
-                  width: ((impact || 0) / MAX_IMPACT_SCORE || 0) * 40
+                  width: (impact / MAX_IMPACT_SCORE || 0) * 40
                 }}
               />
             </div>
@@ -195,7 +203,7 @@ class HierarchicalVisualization extends Component {
               <div
                 className={classes.scoreBars}
                 style={{
-                  width: ((interdependence || 0) / maxInterdependence || 0) * 40
+                  width: (interdependence / maxInterdependence || 0) * 40
                 }}
               />
             </div>
@@ -218,7 +226,7 @@ class HierarchicalVisualization extends Component {
               <div
                 className={classes.scoreBars}
                 style={{
-                  width: ((assurance || 0) / 100 || 0) * 40
+                  width: (assurance / 100 || 0) * 40
                 }}
               />
             </div>
@@ -244,6 +252,11 @@ class HierarchicalVisualization extends Component {
     maxInterdependence
   ) => {
     const { classes } = this.props;
+
+    impact = impact !== -Infinity ? impact || 0 : 0;
+    interdependence = interdependence !== -Infinity ? interdependence || 0 : 0;
+    maxInterdependence =
+      maxInterdependence !== -Infinity ? maxInterdependence || 0 : 0;
 
     return ReactDOMServer.renderToString(
       <div>
@@ -282,7 +295,7 @@ class HierarchicalVisualization extends Component {
               <div
                 className={classes.scoreBars}
                 style={{
-                  width: ((impact || 0) / MAX_IMPACT_SCORE || 0) * 40
+                  width: (impact / MAX_IMPACT_SCORE || 0) * 40
                 }}
               />
             </div>
@@ -305,7 +318,7 @@ class HierarchicalVisualization extends Component {
               <div
                 className={classes.scoreBars}
                 style={{
-                  width: ((interdependence || 0) / maxInterdependence || 0) * 40
+                  width: (interdependence / maxInterdependence || 0) * 40
                 }}
               />
             </div>
@@ -368,7 +381,8 @@ class HierarchicalVisualization extends Component {
         projectEdgesSeen.add(parentId);
         const itemScores = (this.props.scores.project || {})[proj.ID] || {};
         const interdependence = itemScores.interdependence || 0;
-        const impact = itemScores.impact || 0;
+        const impact =
+          itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
         const assurance = itemScores.assurance || 0;
         const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
         const value = interdependence / maxProjectInterdependence;
@@ -398,7 +412,8 @@ class HierarchicalVisualization extends Component {
         const projectIds = getCellMultiples(prod["Project ID"] || "");
         return projectIds.map(prid => {
           const supplyLines =
-            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+            ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
+            [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
           const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const interdependence = slmatches.reduce(
@@ -428,7 +443,8 @@ class HierarchicalVisualization extends Component {
           projectEdgesSeen.add(prid);
 
           const supplyLines =
-            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+            ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
+            [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
           const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const interdependence = slmatches.reduce(
@@ -466,7 +482,8 @@ class HierarchicalVisualization extends Component {
         const supplierIds = getCellMultiples(prod["Supplier ID"] || "");
         const supplierEdges = supplierIds.map(supId => {
           const supplyLines =
-            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+            ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
+            [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
           const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const interdependence = slmatches.reduce(
@@ -492,7 +509,8 @@ class HierarchicalVisualization extends Component {
           productEdgesSeen.add(prod.ID);
           supplierEdgesSeen.add(supId);
           const supplyLines =
-            (this.props.scores.product[prod.ID] || {}).supplyLines || [];
+            ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
+            [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
           const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const interdependence = slmatches.reduce(
@@ -506,7 +524,7 @@ class HierarchicalVisualization extends Component {
             (suppliersMap[supId] || {}).Name,
             "Product",
             prod.Name,
-            maxImpact,
+            maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
             maxProductToSupplierInterdependence
           );
@@ -543,7 +561,8 @@ class HierarchicalVisualization extends Component {
     );
     const projectNodes = activeProjects.map(proj => {
       const itemScores = resourceScores[proj.ID] || {};
-      const impact = itemScores.impact || 0;
+      const impact =
+        itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
@@ -553,16 +572,8 @@ class HierarchicalVisualization extends Component {
         impact,
         interdependence,
         maxInterdependence,
-        assurance,
-        maxAssurance
+        assurance
       );
-      // const title = `<div><p>Project Name:&nbsp${
-      //   proj.Name
-      // }</p><p>Project Impact Score:&nbsp;${impact.toFixed(
-      //   1
-      // )}</p><p>Project Interdependence Score:&nbsp;${interdependence.toFixed(
-      //   1
-      // )}</p></div>`;
       const level = Math.max((proj.Level || "").split(".").length - 1, 1);
       curNodeLevel = Math.max(curNodeLevel, level);
       const nodeId = "P_" + proj.ID;
@@ -602,7 +613,8 @@ class HierarchicalVisualization extends Component {
     );
     const productNodes = activeProducts.map(prod => {
       const itemScores = resourceScores[prod.ID] || {};
-      const impact = itemScores.impact || 0;
+      const impact =
+        itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
@@ -612,16 +624,8 @@ class HierarchicalVisualization extends Component {
         impact,
         interdependence,
         maxInterdependence,
-        assurance,
-        maxAssurance
+        assurance
       );
-      // const title = `<div><p>Product Name:&nbsp${
-      //   prod.Name
-      // }</p><p>Product Impact Score:&nbsp${impact.toFixed(
-      //   1
-      // )}</p><p>Product Interdependence Score:&nbsp${interdependence.toFixed(
-      //   1
-      // )}</p></div>`;
       const nodeId = "PR_" + prod.ID;
       return {
         id: nodeId,
@@ -652,7 +656,8 @@ class HierarchicalVisualization extends Component {
     );
     const supplierNodes = activeSuppliers.map(sup => {
       const itemScores = resourceScores[sup.ID] || {};
-      const impact = itemScores.impact || 0;
+      const impact =
+        itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
@@ -664,13 +669,6 @@ class HierarchicalVisualization extends Component {
         maxInterdependence,
         assurance
       );
-      // const title = `<div><p>Supplier Name:&nbsp${
-      //   sup.Name
-      // }</p><p>Supplier Impact Score:&nbsp${impact.toFixed(
-      //   1
-      // )}</p><p>Supplier Interdependence Score:&nbsp${interdependence.toFixed(
-      //   1
-      // )}</p></div>`;
       const nodeId = "S_" + sup.ID;
       return {
         id: nodeId,
@@ -692,7 +690,8 @@ class HierarchicalVisualization extends Component {
     resourceScores = this.props.scores.project || {};
     const organizationNodes = organizations.map(proj => {
       const itemScores = resourceScores[proj.ID] || {};
-      const impact = itemScores.impact || 0;
+      const impact =
+        itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
       const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;

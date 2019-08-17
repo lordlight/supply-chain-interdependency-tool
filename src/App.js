@@ -241,118 +241,124 @@ class App extends Component {
 
           return { [key]: nextProps[key] };
         } else {
-          // If not a response change, pass along an empty object (so it is ignored).
-          return {};
+          // If not a response change, pass along null (so it is ignored).
+          return null;
         }
         //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
-      });
-    //console.log("diff: ", diff);
-    if (diff !== {}) {
+      })
+      .filter(Boolean);
+    // console.log("diff: ", diff);
+    if (diff.length > 0) {
       console.log("response update: ", diff);
       ipcRenderer.send("response-update", diff);
     }
 
-    const suppliersRisk =
-      nextProps.suppliers.length > 0
-        ? calculateItemRisk(
-            "suppliers",
-            nextProps.supplierResponses,
-            nextProps.supplierQuestions,
-            nextProps.suppliers
-          )
-        : null;
-    const productsRisk =
-      nextProps.products.length > 0
-        ? calculateItemRisk(
-            "products",
-            nextProps.productResponses,
-            nextProps.productQuestions,
-            nextProps.products
-          )
-        : null;
-    const projectsRisk =
-      nextProps.projects.length > 0
-        ? calculateItemRisk(
-            "projects",
-            nextProps.projectResponses,
-            nextProps.projectQuestions,
-            nextProps.projects
-          )
-        : null;
+    // TODO: SJR see if there is a better place to do score recalculation...
 
-    // TEMP - Do risk calculation (just for testing; will figure out most appropriate place later)
-    if (nextProps.suppliers.length > 0) {
-      store.dispatch(
-        updateTypeRisk({
-          type: "suppliers",
-          itemsRisk: suppliersRisk
-        })
-      );
-    }
-    if (nextProps.products.length > 0) {
-      store.dispatch(
-        updateTypeRisk({
-          type: "products",
-          itemsRisk: productsRisk
-        })
-      );
-    }
-    if (nextProps.projects.length > 0) {
-      store.dispatch(
-        updateTypeRisk({
-          type: "projects",
-          itemsRisk: projectsRisk
-        })
-      );
-    }
+    // could be other conditions that cause recalculate as well later...
+    const recalculateScores = diff.length > 0;
+    if (recalculateScores) {
+      const suppliersRisk =
+        nextProps.suppliers.length > 0
+          ? calculateItemRisk(
+              "suppliers",
+              nextProps.supplierResponses,
+              nextProps.supplierQuestions,
+              nextProps.suppliers
+            )
+          : null;
+      const productsRisk =
+        nextProps.products.length > 0
+          ? calculateItemRisk(
+              "products",
+              nextProps.productResponses,
+              nextProps.productQuestions,
+              nextProps.products
+            )
+          : null;
+      const projectsRisk =
+        nextProps.projects.length > 0
+          ? calculateItemRisk(
+              "projects",
+              nextProps.projectResponses,
+              nextProps.projectQuestions,
+              nextProps.projects
+            )
+          : null;
 
-    let assetsRisk = null;
-    if (nextProps.assets.length > 0) {
-      const organizations = nextProps.projects.filter(proj => !proj.parent);
-      if (organizations.length > 0) {
-        const parentId = organizations[0].ID;
-        const projectResponses = {};
-        nextProps.assets.forEach(proj => {
-          const responses = {};
-          Object.entries(proj.default_responses).forEach(entry => {
-            responses[`${entry[0]}|${parentId}`] = entry[1];
-          });
-          projectResponses[proj.ID] = responses;
-        });
-        const assets = nextProps.assets.map(pr => {
-          return {
-            ...pr,
-            parent: organizations[0],
-            "Parent ID": organizations[0].ID
-          };
-        });
-        assetsRisk = calculateItemRisk(
-          "assets",
-          projectResponses,
-          nextProps.projectQuestions,
-          assets
-        );
+      if (nextProps.suppliers.length > 0) {
         store.dispatch(
           updateTypeRisk({
-            type: "assets",
-            itemsRisk: assetsRisk
+            type: "suppliers",
+            itemsRisk: suppliersRisk
           })
         );
       }
-    }
+      if (nextProps.products.length > 0) {
+        store.dispatch(
+          updateTypeRisk({
+            type: "products",
+            itemsRisk: productsRisk
+          })
+        );
+      }
+      if (nextProps.projects.length > 0) {
+        store.dispatch(
+          updateTypeRisk({
+            type: "projects",
+            itemsRisk: projectsRisk
+          })
+        );
+      }
 
-    if (suppliersRisk && productsRisk && projectsRisk && assetsRisk) {
-      const scores = computeImpacts(
-        projectsRisk,
-        productsRisk,
-        suppliersRisk,
-        assetsRisk,
-        nextProps.projects,
-        nextProps.products,
-        nextProps.suppliers,
-        nextProps.assets
-      );
-      store.dispatch(updateScores(scores));
+      let assetsRisk = null;
+      if (nextProps.assets.length > 0) {
+        const organizations = nextProps.projects.filter(proj => !proj.parent);
+        if (organizations.length > 0) {
+          const parentId = organizations[0].ID;
+          const projectResponses = {};
+          nextProps.assets.forEach(proj => {
+            const responses = {};
+            Object.entries(proj.default_responses).forEach(entry => {
+              responses[`${entry[0]}|${parentId}`] = entry[1];
+            });
+            projectResponses[proj.ID] = responses;
+          });
+          const assets = nextProps.assets.map(pr => {
+            return {
+              ...pr,
+              parent: organizations[0],
+              "Parent ID": organizations[0].ID
+            };
+          });
+          assetsRisk = calculateItemRisk(
+            "assets",
+            projectResponses,
+            nextProps.projectQuestions,
+            assets
+          );
+          store.dispatch(
+            updateTypeRisk({
+              type: "assets",
+              itemsRisk: assetsRisk
+            })
+          );
+        }
+      }
+
+      if (suppliersRisk && productsRisk && projectsRisk && assetsRisk) {
+        const scores = computeImpacts(
+          projectsRisk,
+          productsRisk,
+          suppliersRisk,
+          assetsRisk,
+          nextProps.projects,
+          nextProps.products,
+          nextProps.suppliers,
+          nextProps.assets
+        );
+        store.dispatch(updateScores(scores));
+      }
     }
   }
 
@@ -375,7 +381,9 @@ class App extends Component {
   handleAboutOpen = event =>
     this.setState({ aboutOpen: true, drawerOpen: false });
   handleAboutClose = event => this.setState({ aboutOpen: false });
-  handleClearAllData = event => ipcRenderer.send("clear-all-data");
+  handleClearAllData = event => {
+    ipcRenderer.send("clear-all-data");
+  };
 
   handleClearDialogClose = () => {
     this.setState({ clearDialogOpen: false });
@@ -525,6 +533,7 @@ class App extends Component {
             <ListItem
               button
               onClick={() => this.setState({ clearDialogOpen: true })}
+              disabled={value === "visualizations"}
             >
               <ListItemText primary="Clear All Data..." />
             </ListItem>

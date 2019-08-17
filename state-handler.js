@@ -12,20 +12,22 @@ const { parse } = require("json2csv");
 const stripBom = require("strip-bom"); // Needed because fs has no encoding, like utf-8-sig in python, for files with BOM (byte order mark)
 const stripBomStream = require("strip-bom-stream");
 
-const MUTABLE_DATA = {
-  suppliers: [],
-  products: [],
-  projects: [],
-  supplierResponses: {},
-  productResponses: {},
-  projectResponses: {}
+mutableData = () => {
+  return {
+    suppliers: [],
+    products: [],
+    projects: [],
+    supplierResponses: {},
+    productResponses: {},
+    projectResponses: {}
+  };
 };
 
 let sessionData = {
   supplierQuestions: [],
   productQuestions: [],
   projectQuestions: [],
-  ...MUTABLE_DATA
+  ...mutableData()
 };
 
 // Constants for file names that will contain the data.
@@ -381,8 +383,9 @@ ipcMain.on("clear-all-data", (event, req) => {
   fs.emptyDirSync(dataPath);
   sessionData = {
     ...sessionData,
-    ...MUTABLE_DATA
+    ...mutableData()
   };
   store.clear();
+  console.log(">>>", "send clear all response");
   event.sender.send("clear-all-data-response", { status: 0 });
 });
