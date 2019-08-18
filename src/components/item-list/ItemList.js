@@ -4,7 +4,11 @@ import store from "../../redux/store";
 import { updateCurrentItem, setSelectedResource } from "../../redux/actions";
 import { connect } from "react-redux";
 
-import { ItemVisualCard, QuestionStatusCard } from "../../components";
+import {
+  ItemVisualCard,
+  TreemapCard,
+  QuestionStatusCard
+} from "../../components";
 
 // import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
 
@@ -554,6 +558,7 @@ class ItemList extends Component {
       <div className={classes.itemList}>
         <div className={classes.overview}>
           <ItemVisualCard />
+          <TreemapCard />
           <QuestionStatusCard />
         </div>
         {rows.length > 0 ? (

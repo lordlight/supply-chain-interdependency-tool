@@ -5,6 +5,7 @@ export { default as ImportDialog } from "./import-dialog/ImportDialog";
 export { default as ItemList } from "./item-list/ItemList";
 export { default as ItemOverview } from "./item-overview/ItemOverview";
 export { default as ItemVisualCard } from "./item-visual-card/ItemVisualCard";
+export { default as TreemapCard } from "./treemap-card/TreemapCard";
 export { default as List } from "./list/List";
 export { default as QuestionList } from "./question-list/QuestionList";
 export { default as Question } from "./question/Question";
