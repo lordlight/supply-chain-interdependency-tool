@@ -52,7 +52,7 @@ const options = {
     callbacks: {
       label: tooltipItem => `${tooltipItem.value} Suppliers`,
       title: tooltipItem => {
-        const bucket = `${BUCKETS[tooltipItem[0].index]} score`;
+        const bucket = `${BUCKETS[tooltipItem[0].index]} assurance`;
         return bucket;
       }
     }
@@ -62,7 +62,11 @@ const options = {
       {
         // display: false,
         categoryPercentage: 1.0,
-        barPercentage: 1.0
+        barPercentage: 1.0,
+        scaleLabel: {
+          display: true,
+          labelString: "Assurance"
+        }
       }
     ],
     yAxes: [

@@ -5,6 +5,8 @@ import { connect } from "react-redux";
 
 import { withStyles } from "@material-ui/core/styles";
 
+import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
+
 const styles = theme => ({
   cell: {
     display: "table-cell",
@@ -20,7 +22,8 @@ const styles = theme => ({
 
 const mapState = state => ({
   products: state.products,
-  productsRisk: state.productsRisk
+  productsRisk: state.productsRisk,
+  scores: state.scores
 });
 
 class ProductsChart extends Component {
@@ -37,14 +40,41 @@ class ProductsChart extends Component {
   render = () => {
     const buckets = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
 
-    Object.values(this.props.productsRisk).forEach(risk => {
-      // const score = Math.max(risk.score || 100, 0);
-      const score = Math.max(...Object.values(risk.Dependency), 0);
-      const col = Math.min(Math.floor(score * 0.03), 2);
-      const criticality = Math.max(...Object.values(risk.Criticality), 0);
-      const row = Math.min(Math.floor(criticality * 3.0), 2);
+    const products = Object.values(this.props.products);
+    const productScores = this.props.scores.product || {};
+
+    let maxInterdependence = Math.max(
+      ...(products.map(
+        prod => (productScores[prod.ID] || {}).interdependence
+      ) || 0)
+    );
+    products.forEach(prod => {
+      const scores = productScores[prod.ID] || {};
+      const impact = scores.Impact !== -Infinity ? scores.impact || 0 : 0;
+      const interdependence =
+        scores.Interdependence !== -Infinity ? scores.interdependence || 0 : 0;
+      const col = Math.min(Math.floor((impact / MAX_IMPACT_SCORE) * 3), 2);
+      const row = Math.min(
+        Math.floor(
+          (interdependence /
+            (maxInterdependence !== -Infinity ? maxInterdependence : 0)) *
+            3.0
+        ),
+        2
+      );
       buckets[row][col]++;
     });
+    // Object.values(this.props.productsRisk).forEach(risk => {
+    //   // const score = Math.max(risk.score || 100, 0);
+    //   const score = Math.max(...Object.values(risk.Dependency), 0);
+    //   const col = Math.min(Math.floor(score * 0.03), 2);
+    //   const interdependence = Math.max(
+    //     ...Object.values(risk.Interdependence),
+    //     0
+    //   );
+    //   const row = Math.min(Math.floor(interdependence * 3.0), 2);
+    //   buckets[row][col]++;
+    // });
     const numProducts = (this.props.products || []).length;
 
     const { classes } = this.props;
@@ -60,7 +90,7 @@ class ProductsChart extends Component {
         <div
           style={{
             display: "table",
-            marginTop: 25,
+            marginTop: 16,
             marginBottom: 0,
             marginLeft: "auto",
             marginRight: "auto"
@@ -121,18 +151,18 @@ class ProductsChart extends Component {
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
-              left: 40,
-              bottom: 87
+              left: 14,
+              bottom: 96
             }}
           >
-            CRITICALITY
+            INTERDEPENDENCE
           </Typography>
           <Typography
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
               left: 74,
-              top: 30
+              top: 21
             }}
           >
             High
@@ -142,10 +172,19 @@ class ProductsChart extends Component {
               position: "absolute",
               transform: "rotate(-90deg)",
               left: 74,
-              bottom: 30
+              bottom: 39
             }}
           >
             Low
+          </Typography>
+          <Typography
+            style={{
+              position: "absolute",
+              left: 150,
+              bottom: 4
+            }}
+          >
+            IMPACT
           </Typography>
           <Typography
             style={{
