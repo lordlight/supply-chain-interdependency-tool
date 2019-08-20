@@ -22,6 +22,13 @@ const data = {
         "rgba(255, 0, 0, 0.8)",
         "rgba(255, 0, 0, 1.0)"
       ],
+      // backgroundColor: [
+      //   "rgba(18, 101, 156, 0.2)",
+      //   "rgba(18, 101, 156, 0.4)",
+      //   "rgba(18, 101, 156, 0.6)",
+      //   "rgba(18, 101, 156, 0.8)",
+      //   "rgba(18, 101, 156, 1.0)"
+      // ],
       data: [5, 6, 4, 3, 2]
     }
   ]
@@ -31,6 +38,7 @@ const options = {
   plugins: {
     datalabels: {
       display: true
+      // color: "black"
     }
   },
   animation: false,

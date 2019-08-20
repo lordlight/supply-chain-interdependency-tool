@@ -4,7 +4,9 @@ import Tab from "@material-ui/core/Tab";
 
 import {
   HierarchicalVisualization,
-  TreemapVisualization
+  TreemapVisualization,
+  CandlestickVisualization,
+  ScatterplotsVisualization
 } from "./../../components";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -67,12 +69,20 @@ class Visualizations extends Component {
           onChange={this.handleVisualizationChange}
         >
           <Tab value="hierarchy" label="Hierarchy" />
-          <Tab value="treemap" label="Tree Map" />
+          {/* <Tab value="treemap" label="Tree Map" /> */}
+          <Tab value="candlestick" label="Candlestick" />
+          <Tab value="scatterplots" label="Scatterplots" />
         </Tabs>
         {this.state.visualization === "hierarchy" && (
           <HierarchicalVisualization />
         )}
-        {this.state.visualization === "treemap" && <TreemapVisualization />}
+        {this.state.visualization === "candlestick" && (
+          <CandlestickVisualization />
+        )}{" "}
+        {this.state.visualization === "scatterplots" && (
+          <ScatterplotsVisualization />
+        )}
+        {/* {this.state.visualization === "treemap" && <TreemapVisualization />} */}
       </div>
     );
   }

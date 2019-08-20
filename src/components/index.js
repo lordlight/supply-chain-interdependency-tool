@@ -20,4 +20,10 @@ export {
 export {
   default as TreemapVisualization
 } from "./treemap-visualization/TreemapVisualization";
+export {
+  default as CandlestickVisualization
+} from "./candlestick-visualization/CandlestickVisualization";
+export {
+  default as ScatterplotsVisualization
+} from "./scatterplots-visualization/ScatterplotsVisualization";
 export { default as TypeCard } from "./type-card/TypeCard";
