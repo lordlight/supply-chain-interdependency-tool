@@ -34,7 +34,7 @@ class TreemapCard extends Component {
 
     return (
       <Card className={classes.card}>
-        <TreemapChart resourceType={type} labels={true} />
+        <TreemapChart resourceType={type} labels={false} />
       </Card>
     );
   }
