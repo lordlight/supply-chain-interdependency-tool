@@ -30,7 +30,7 @@ class ProductsChart extends Component {
   getCellColor = (row, col, buckets, numProducts) => {
     const alpha =
       numProducts > 0 ? (0.9 * buckets[row][col]) / numProducts + 0.05 : 0;
-    return `rgba(255, 0, 0, ${alpha})`;
+    return `rgba(18, 101, 156, ${alpha})`;
   };
 
   getCellTooltip = (row, col, buckets) => {
