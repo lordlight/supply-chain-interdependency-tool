@@ -53,15 +53,16 @@ class ProductsChart extends Component {
       const impact = scores.Impact !== -Infinity ? scores.impact || 0 : 0;
       const interdependence =
         scores.Interdependence !== -Infinity ? scores.interdependence || 0 : 0;
-      const col = Math.min(Math.floor((impact / MAX_IMPACT_SCORE) * 3), 2);
-      const row = Math.min(
-        Math.floor(
-          (interdependence /
-            (maxInterdependence !== -Infinity ? maxInterdependence : 0)) *
-            3.0
-        ),
-        2
-      );
+      const col = Math.min(Math.floor((impact / MAX_IMPACT_SCORE) * 3), 2) || 0;
+      const row =
+        Math.min(
+          Math.floor(
+            (interdependence /
+              (maxInterdependence !== -Infinity ? maxInterdependence : 0)) *
+              3.0
+          ),
+          2
+        ) || 0;
       buckets[row][col]++;
     });
     // Object.values(this.props.productsRisk).forEach(risk => {
