@@ -8,12 +8,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
-import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
-import Popover from "@material-ui/core/Popover";
 
 import BookmarkIcon from "@material-ui/icons/Bookmark";
 import InfoIcon from "@material-ui/icons/Info";
+
+import Tooltip from "@material-ui/core/Tooltip";
 
 import { getQuestionResponse } from "../../utils/general-utils";
 
@@ -32,6 +32,14 @@ const styles = theme => ({
   },
   typography: {
     padding: theme.spacing.unit
+  },
+  tooltip: {
+    backgroundColor: "white",
+    color: "black",
+    fontSize: 14,
+    boxShadow: theme.shadows[1],
+    // maxWidth: "none",
+    overflow: "auto"
   }
 });
 
@@ -41,28 +49,8 @@ const mapState = state => ({
 });
 
 class Question extends Component {
-  state = {
-    anchorEl: null
-  };
-
   handleChange = event => {
     this.props.updateResponse(this.props.questionId, event.target.value - 1);
-    /*store.dispatch(
-            answerQuestion({
-                type: this.props.currentType,
-                itemId: this.props.currentItem.ID,
-                queId: this.props.questionId,
-                ansInd: event.target.value-1 
-            })
-        );*/
-  };
-
-  handleInfoClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleInfoClose = event => {
-    this.setState({ anchorEl: null });
   };
 
   render() {
@@ -85,8 +73,6 @@ class Question extends Component {
       }
     }
 
-    const open = Boolean(this.state.anchorEl);
-
     return (
       <TableRow style={{ border: "none" }}>
         <TableCell
@@ -96,55 +82,50 @@ class Question extends Component {
         >
           <FormLabel component="legend">
             <div style={{ display: "flex", alignItems: "center" }}>
-              <BookmarkIcon
-                color="primary"
-                style={{ visibility: response === 0 ? "visible" : "hidden" }}
-              />
-              {/* {response === 0 && <BookmarkIcon color="primary" />} */}
+              <Tooltip
+                title="Bookmarked questions are those that have not been answered yet."
+                classes={{ tooltip: classes.tooltip }}
+              >
+                <IconButton
+                  disableRipple
+                  size="small"
+                  style={{
+                    minWidth: 0,
+                    padding: 0,
+                    width: 24,
+                    height: 24
+                  }}
+                >
+                  <BookmarkIcon
+                    color="primary"
+                    style={{
+                      visibility: response === 0 ? "visible" : "hidden"
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
               <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
                 {this.props.questionText}
               </span>
               {this.props.question.Notes && (
-                <React.Fragment>
+                <Tooltip
+                  title={this.props.question.Notes}
+                  classes={{ tooltip: classes.tooltip }}
+                >
                   <IconButton
                     disableRipple
                     size="small"
-                    onClick={this.handleInfoClick}
                     style={{
                       minWidth: 0,
                       padding: 0,
                       width: 24,
                       height: 24,
-                      marginLeft: 12
+                      marginLeft: 6
                     }}
                   >
-                    {/* <InfoIcon color="primary" style={{ width: 16, height: 16 }} /> */}
                     <InfoIcon color="primary" style={{ fontSize: 20 }} />
-
-                    {/* <Typography color="primary" style={{ fontSize: 12 }}>
-                    <InfoIcon style={{ width: 16, height: 16 }} />
-                    <div style={{ float: "right" }}>details</div>
-                  </Typography> */}
                   </IconButton>
-                  <Popover
-                    // id={id}
-                    open={open}
-                    anchorEl={this.state.anchorEl}
-                    onClose={this.handleInfoClose}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "center"
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "center"
-                    }}
-                  >
-                    <Typography className={classes.typography}>
-                      {this.props.question.Notes}
-                    </Typography>
-                  </Popover>
-                </React.Fragment>
+                </Tooltip>
               )}
             </div>
           </FormLabel>
