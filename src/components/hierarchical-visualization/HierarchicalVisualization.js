@@ -764,17 +764,18 @@ class HierarchicalVisualization extends Component {
         label: {
           enabled: true
         },
-        min: 5,
+        min: 16,
         max: 120
       }
     },
     layout: {
       hierarchical: {
         direction: "UD",
-        sortMethod: "directed",
+        edgeMinimization: false,
+        blockShifting: false,
         levelSeparation: 600,
         nodeSpacing: 150,
-        parentCentralization: false
+        parentCentralization: true
       }
     },
     edges: {
