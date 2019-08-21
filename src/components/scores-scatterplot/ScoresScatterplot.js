@@ -82,6 +82,7 @@ class ScoresScatterplot extends Component {
       >
         <ResponsiveScatterPlot
           data={data}
+          useMesh={false}
           xScale={{ type: "linear", min: 0, max: MAX_IMPACT_SCORE }}
           colors="rgba(18, 101, 156, 0.33)"
           blendMode="multiply"
