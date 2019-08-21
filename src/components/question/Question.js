@@ -96,36 +96,11 @@ class Question extends Component {
         >
           <FormLabel component="legend">
             <div style={{ display: "flex", alignItems: "center" }}>
-              {response === 0 && (
-                // <span
-                //   style={{
-                //     verticalAlign: "middle"
-                //     // color: "primary"
-                //   }}
-                // >
-                // <Typography
-                //   color="primary"
-                //   style={{
-                //     float: "left",
-                //     verticalAlign: "middle",
-                //     marginRight: 6
-                //   }}
-                // >
-                <BookmarkIcon color="primary" />
-                // </Typography>
-                // </span>
-              )}
-
-              {/* <span
-              style={{
-                fontWeight: "bolder",
-                fontSize: "larger",
-                verticalAlign: "middle",
-                color: "blue"
-              }}
-            >
-              {response === 0 ? "! " : ""}
-            </span> */}
+              <BookmarkIcon
+                color="primary"
+                style={{ visibility: response === 0 ? "visible" : "hidden" }}
+              />
+              {/* {response === 0 && <BookmarkIcon color="primary" />} */}
               <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
                 {this.props.questionText}
               </span>
