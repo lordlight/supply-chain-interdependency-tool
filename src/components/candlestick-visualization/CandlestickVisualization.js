@@ -4,6 +4,12 @@ import { SizeMe } from "react-sizeme";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 
+import store from "../../redux/store";
+import {
+  updateNavState,
+  updateCurrentType,
+  setSelectedResource
+} from "../../redux/actions";
 import { connect } from "react-redux";
 
 const mapState = state => ({
@@ -34,6 +40,7 @@ class CandlestickVisualization extends Component {
           }, {})
         ).sort();
         return {
+          id: supplierId,
           y: impacts,
           type: "box",
           name: sup.Name || "<Unknown>",
@@ -48,9 +55,12 @@ class CandlestickVisualization extends Component {
       .sort((a, b) => Math.max(...b.y) - Math.max(...a.y));
   };
 
+  selected = null;
+  lastClicked = null;
+  lastClickedTimestamp = 0;
+
   render() {
     const data = this.createData();
-    console.log(data);
 
     return (
       <SizeMe monitorHeight monitorWidth>
@@ -66,16 +76,10 @@ class CandlestickVisualization extends Component {
             <Plot
               data={data}
               layout={{
-                // autosize: true,
-                // width: "100%",
-                // height: "100%",
                 width: size.width,
                 height: size.height,
                 title: "Supplier Impact",
                 margin: {
-                  // t: 10,
-                  // l: 10,
-                  // r: 10,
                   b: 200
                 },
                 showlegend: false,
@@ -100,6 +104,38 @@ class CandlestickVisualization extends Component {
                 }
               }}
               config={{ displayModeBar: false }}
+              onClick={x => {
+                const selected = x.points[0];
+                if (selected) {
+                  const timestamp = new Date().getTime();
+                  if (
+                    this.lastClicked === selected.data.id &&
+                    timestamp - this.lastClickedTimestamp <= 500
+                  ) {
+                    store.dispatch(
+                      setSelectedResource({
+                        resourceType: "suppliers",
+                        resourceId: this.lastClicked
+                      })
+                    );
+                    store.dispatch(
+                      updateCurrentType({
+                        currentType: "suppliers"
+                      })
+                    );
+                    store.dispatch(
+                      updateNavState({
+                        navState: "suppliers"
+                      })
+                    );
+                    this.lastClicked = null;
+                    this.lastClickedTimestamp = 0;
+                  } else {
+                    this.lastClicked = selected.data.id;
+                    this.lastClickedTimestamp = timestamp;
+                  }
+                }
+              }}
             />
           </div>
         )}

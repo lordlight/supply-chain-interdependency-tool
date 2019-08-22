@@ -4,7 +4,12 @@ import { Typography } from "@material-ui/core";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 
-// import store from '../../redux/store';
+import store from "../../redux/store";
+import {
+  updateNavState,
+  updateCurrentType,
+  setSelectedResource
+} from "../../redux/actions";
 import { connect } from "react-redux";
 
 const Rainbow = require("rainbowvis.js");
@@ -54,7 +59,7 @@ class ScoresScatterplot extends Component {
         id: resourceType,
         data: Object.values(resources || {}).map(n => {
           return {
-            id: n.ID,
+            rid: n.ID,
             name: n.Name,
             x: Math.round((resourceScores[n.ID] || {}).impact || 0),
             y: Math.round((resourceScores[n.ID] || {}).interdependence || 0)
@@ -68,6 +73,9 @@ class ScoresScatterplot extends Component {
     this.setState({
       resource: event.target.value
     });
+
+  lastClicked = null;
+  lastClickedTimestamp = 0;
 
   render() {
     const data = this.constructData(this.props);
@@ -97,6 +105,35 @@ class ScoresScatterplot extends Component {
             legend: "impact",
             legendPosition: "middle",
             legendOffset: 42
+          }}
+          onClick={(node, event) => {
+            const timestamp = new Date().getTime();
+            if (
+              this.lastClicked === node.data.rid &&
+              timestamp - this.lastClickedTimestamp <= 500
+            ) {
+              store.dispatch(
+                setSelectedResource({
+                  resourceType: this.props.resourceType,
+                  resourceId: this.lastClicked
+                })
+              );
+              store.dispatch(
+                updateCurrentType({
+                  currentType: this.props.resourceType
+                })
+              );
+              store.dispatch(
+                updateNavState({
+                  navState: this.props.resourceType
+                })
+              );
+              this.lastClicked = null;
+              this.lastClickedTimestamp = 0;
+            } else {
+              this.lastClicked = node.data.rid;
+              this.lastClickedTimestamp = timestamp;
+            }
           }}
           tooltip={({ node }) => (
             <div style={{ backgroundColor: "lightgray", padding: 3 }}>
