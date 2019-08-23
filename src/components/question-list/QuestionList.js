@@ -11,7 +11,7 @@ import {
   updateTempResponses
 } from "../../redux/actions";
 
-import { Question, SupplierDetails } from "../../components/";
+import { Question, ResourceDetails, SupplierDetails } from "../../components/";
 
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -30,6 +30,9 @@ import { getQuestionResponse } from "../../utils/general-utils";
 const styles = theme => ({
   questionList: {
     padding: "32px 8px 80px 44px"
+  },
+  details: {
+    padding: "32px 8px 64px 44px"
   },
   footer: {
     marginLeft: "24px",
@@ -372,16 +375,31 @@ class QuestionList extends Component {
 
     const isDirty = this.isDirty();
 
+    let details;
+    if (type === "suppliers") {
+      details = <SupplierDetails supplier={item} />;
+    } else if (type === "products") {
+      details = (
+        <ResourceDetails
+          resource={item}
+          resourceName="Product"
+          ignore={["Project ID", "Supplier ID"]}
+        />
+      );
+    } else if (type === "projects") {
+      details = (
+        <ResourceDetails
+          resource={item}
+          resourceName="Project"
+          ignore={["children", "parent", "Parent ID", "Level"]}
+        />
+      );
+    }
+
     return (
       <React.Fragment>
-        {type === "suppliers" && (
-          <React.Fragment>
-            <div className={classes.questionList}>
-              <SupplierDetails supplier={item} />
-            </div>
-            <Divider />
-          </React.Fragment>
-        )}
+        <div className={classes.details}>{details}</div>
+        <Divider />
         <div className={classes.questionList}>
           {accessRows.length > 0 && (
             <React.Fragment>

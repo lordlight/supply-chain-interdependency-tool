@@ -12,6 +12,7 @@ export { default as Question } from "./question/Question";
 export {
   default as QuestionStatusCard
 } from "./question-status-card/QuestionStatusCard";
+export { default as ResourceDetails } from "./resource-details/ResourceDetails";
 export { default as SupplierDetails } from "./supplier-details/SupplierDetails";
 export { default as Visualizations } from "./visualizations/Visualizations";
 export {

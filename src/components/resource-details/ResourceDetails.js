@@ -21,7 +21,7 @@ const styles = theme => ({
   }
 });
 
-class SupplierDetails extends Component {
+class ResourceDetails extends Component {
   state = {
     dialogOpen: false,
     allDetails: false
@@ -36,22 +36,12 @@ class SupplierDetails extends Component {
   };
 
   render() {
-    const { classes, supplier = {} } = this.props;
+    const { classes, ignore = [], resourceName, resource = {} } = this.props;
 
-    let {
-      Name: name,
-      "Street Address": streetAddress,
-      City: city,
-      State: state,
-      Zip: zip,
-      Website: website,
-      ID: supplierId,
-      "Contact Name": contactName,
-      "Contact Email": contactEmail,
-      "Contact Phone": contactPhone,
-      ...additionalDetails
-    } = supplier;
+    let { ID: resourceId, Name: name, ...additionalDetails } = resource;
+    ignore.forEach(i => delete additionalDetails[i]);
     KNOWN_ITEM_ANNOTATIONS.forEach(k => delete additionalDetails[k]);
+
     additionalDetails = Object.entries(additionalDetails)
       .filter(entry => entry[1] != null && entry[1] !== "")
       .sort((a, b) => {
@@ -64,16 +54,7 @@ class SupplierDetails extends Component {
         }
       });
     const hasAdditionalDetails = additionalDetails.length > 0;
-    const hasContact = contactName || contactEmail || contactPhone;
-    let colSize;
-    if (hasContact && hasAdditionalDetails) {
-      colSize = 4;
-    } else if (hasContact || hasAdditionalDetails) {
-      colSize = 6;
-    } else {
-      colSize = 12;
-    }
-    const hasAddress = city || state || zip;
+    const colSize = hasAdditionalDetails ? 6 : 12;
 
     return (
       <Grid container direction="row" spacing={16}>
@@ -83,55 +64,14 @@ class SupplierDetails extends Component {
               <Typography className={classes.heading} component="div">
                 {name}
               </Typography>
-              {streetAddress && (
-                <Typography className={classes.content} component="div">
-                  {streetAddress}
-                </Typography>
-              )}
-              {hasAddress && (
-                <Typography className={classes.content} component="div">
-                  {city}, {state} {zip}
-                </Typography>
-              )}
             </Grid>
             <Grid item>
-              {website && (
-                <Typography className={classes.content} component="div">
-                  {website}
-                </Typography>
-              )}
               <Typography className={classes.content} component="div">
-                Supplier ID: {supplierId}
+                {resourceName} ID: {resourceId}
               </Typography>
             </Grid>
           </Grid>
         </Grid>
-        {hasContact && (
-          <Grid item xs={12} sm={colSize}>
-            <Typography
-              className={classes.heading}
-              component="div"
-              style={{ marginBottom: 16 }}
-            >
-              Contact:
-            </Typography>
-            {contactName && (
-              <Typography className={classes.content} component="div">
-                {contactName}
-              </Typography>
-            )}
-            {contactEmail && (
-              <Typography className={classes.content} component="div">
-                {contactEmail}
-              </Typography>
-            )}
-            {contactPhone && (
-              <Typography className={classes.content} component="div">
-                {contactPhone}
-              </Typography>
-            )}
-          </Grid>
-        )}
         {hasAdditionalDetails && (
           <Grid item xs={12} sm={colSize}>
             {!this.state.allDetails && (
@@ -141,7 +81,7 @@ class SupplierDetails extends Component {
                 color="primary"
                 onClick={this.showAllDetails}
               >
-                All Supplier Details...
+                All {resourceName} Details...
               </Button>
             )}
             {this.state.allDetails && (
@@ -167,4 +107,4 @@ class SupplierDetails extends Component {
   }
 }
 
-export default withStyles(styles)(SupplierDetails);
+export default withStyles(styles)(ResourceDetails);
