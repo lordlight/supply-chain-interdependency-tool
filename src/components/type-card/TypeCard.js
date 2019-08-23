@@ -14,6 +14,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 
+import { TypeSummary } from "./../../components";
+
 import store from "../../redux/store";
 import { connect } from "react-redux";
 import {
@@ -117,22 +119,25 @@ class TypeCard extends Component {
           {this.props.type === "products" && <ProductsChart />}
           {this.props.type === "projects" && <ProjectsChart />}
           <CardContent>
-            <Typography gutterBottom className={classes.title}>
+            {/* <Typography gutterBottom className={classes.title}>
               {this.props.type}
             </Typography>
             <Typography gutterBottom className={classes.heading}>
               {this.props.items.length > 0
                 ? this.props.items.length + " " + this.props.type
                 : "No " + this.props.type + " provided"}
-            </Typography>
-            <Typography
+            </Typography> */}
+
+            <TypeSummary currentType={this.props.type} />
+
+            {/* <Typography
               className={classes.desc}
               color="textSecondary"
               component="p"
             >
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Typography>
+            </Typography> */}
           </CardContent>
           <CardActions>
             <Button

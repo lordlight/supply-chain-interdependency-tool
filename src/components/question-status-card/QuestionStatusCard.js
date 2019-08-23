@@ -28,6 +28,8 @@ import {
   updateImportState
 } from "../../redux/actions";
 
+import { TypeSummary } from "./../../components";
+
 import { getNumQuestionsForResource } from "../../utils/general-utils";
 
 const mapState = state => ({
@@ -62,14 +64,14 @@ const styles = theme => ({
     fontWeight: "regular",
     textTransform: "capitalize"
   },
-  heading: {
-    fontSize: 25,
-    textTransform: "capitalize"
-  },
-  inactive: {
-    fontSize: 16,
-    color: "gray"
-  },
+  // heading: {
+  //   fontSize: 25,
+  //   textTransform: "capitalize"
+  // },
+  // inactive: {
+  //   fontSize: 16,
+  //   color: "gray"
+  // },
   slider: {
     padding: "22px 0px"
     // width: "90%"
@@ -254,21 +256,21 @@ class QuestionStatusCard extends Component {
     const { classes } = this.props;
 
     const type = this.props.currentType;
-    let items, itemsInactive, questions, responses;
+    let items, questions, responses;
 
     if (type === "suppliers") {
       items = [...this.props.suppliers];
-      itemsInactive = [...this.props.suppliersInactive];
+      // itemsInactive = [...this.props.suppliersInactive];
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
     } else if (type === "products") {
       items = [...this.props.products];
-      itemsInactive = [...this.props.productsInactive];
+      // itemsInactive = [...this.props.productsInactive];
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
     } else if (type === "projects") {
       items = [...this.props.projects].filter(proj => !!proj.parent);
-      itemsInactive = [...this.props.projectsInactive];
+      // itemsInactive = [...this.props.projectsInactive];
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
     }
@@ -313,7 +315,10 @@ class QuestionStatusCard extends Component {
           <Typography gutterBottom className={classes.title}>
             {type.substring(0, type.length - 1)} question status
           </Typography>
-          {itemsInactive.length > 0 ? (
+
+          <TypeSummary currentType={type} />
+
+          {/* {itemsInactive.length > 0 ? (
             <div style={{ display: "flex", alignItems: "baseline" }}>
               <Typography gutterBottom className={classes.heading}>
                 {items.length} {type}
@@ -338,7 +343,7 @@ class QuestionStatusCard extends Component {
           </Typography>
           <Typography className={classes.zero} component="div">
             {numZero} {type} with no data
-          </Typography>
+          </Typography> */}
         </CardContent>
         <CardActions style={{ justifyContent: "flex-end" }}>
           {items.length === 0 ? (

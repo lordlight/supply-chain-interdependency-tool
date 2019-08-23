@@ -27,3 +27,4 @@ export {
   default as ScatterplotsVisualization
 } from "./scatterplots-visualization/ScatterplotsVisualization";
 export { default as TypeCard } from "./type-card/TypeCard";
+export { default as TypeSummary } from "./type-summary/TypeSummary";
