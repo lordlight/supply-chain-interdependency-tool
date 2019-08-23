@@ -293,21 +293,21 @@ class QuestionStatusCard extends Component {
       hasAssurance && "Assurance"
     ].filter(Boolean);
 
-    let numCompleted = 0,
-      numPartial = 0,
-      numZero = 0;
+    // let numCompleted = 0,
+    //   numPartial = 0,
+    //   numZero = 0;
 
-    items.forEach(item => {
-      let numResp = Object.keys(responses[item.ID] || []).length;
-      const numQuestions = getNumQuestionsForResource(item, questions);
-      if (numResp >= numQuestions) {
-        numCompleted += 1;
-      } else if (numResp > 0) {
-        numPartial += 1;
-      } else {
-        numZero += 1;
-      }
-    });
+    // items.forEach(item => {
+    //   let numResp = Object.keys(responses[item.ID] || []).length;
+    //   const numQuestions = getNumQuestionsForResource(item, questions);
+    //   if (numResp >= numQuestions) {
+    //     numCompleted += 1;
+    //   } else if (numResp > 0) {
+    //     numPartial += 1;
+    //   } else {
+    //     numZero += 1;
+    //   }
+    // });
 
     return (
       <Card className={classes.card}>

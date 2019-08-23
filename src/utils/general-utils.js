@@ -33,3 +33,10 @@ export function getNumQuestionsForResource(item, questions) {
     })
     .reduce((total, cnt) => total + cnt);
 }
+
+export function getLatestResponseForResource(responses) {
+  const timestamps = Object.values(responses)
+    .map(r => getQuestionResponseTimestamp(r))
+    .filter(val => !!val);
+  return Math.max(...timestamps);
+}

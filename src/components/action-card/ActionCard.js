@@ -70,14 +70,14 @@ const styles = theme => ({
 
 class ActionCard extends Component {
   render() {
-    const { classes } = this.props;
+    const { classes, type, items, title, plural, emptyMessage } = this.props;
 
     let tempImg = recommendationImg;
-    if (this.props.type === "checklist") {
+    if (type === "checklist") {
       tempImg = checklistImg;
     }
 
-    const itemElements = this.props.items.map((item, i) => (
+    const itemElements = items.map((item, i) => (
       <Typography key={i} className={classes.item}>
         [ ] {item}
       </Typography>
@@ -89,10 +89,10 @@ class ActionCard extends Component {
           <CardContent className={classes.content}>
             <img src={tempImg} alt="Image" className={classes.img} />
             <Typography gutterBottom className={classes.title}>
-              {this.props.title}
+              {title}
             </Typography>
             <Typography gutterBottom className={classes.heading}>
-              {this.props.plural}
+              {plural}
             </Typography>
             <Typography
               component="div"
@@ -101,7 +101,7 @@ class ActionCard extends Component {
               color="textPrimary"
               fontWeight="bold"
             >
-              {itemElements}
+              {itemElements.length > 0 ? itemElements : emptyMessage || ""}
             </Typography>
           </CardContent>
         </Card>

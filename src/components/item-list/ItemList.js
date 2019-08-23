@@ -24,10 +24,12 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import {
-  getQuestionResponseTimestamp,
-  getNumQuestionsForResource
+  // getQuestionResponseTimestamp,
+  getNumQuestionsForResource,
+  getLatestResponseForResource
 } from "../../utils/general-utils";
 import { Typography } from "@material-ui/core";
+import { get } from "http";
 
 function getAge(diff) {
   const formatResult = (val, unit) => {
@@ -367,11 +369,15 @@ class ItemList extends Component {
         const numQuestions = getNumQuestionsForResource(item, questions);
         listItem.completion =
           100 * (Object.keys(responses[item.ID]).length / numQuestions);
-        const lastResponded = Math.max(
-          ...Object.values(responses[item.ID] || {})
-            .map(val => getQuestionResponseTimestamp(val))
-            .filter(val => !!val)
+        const lastResponded = getLatestResponseForResource(
+          responses[item.ID] || {}
         );
+        // Math.max(
+        //   ...Object.values(responses[item.ID] || {})
+        //     .map(val => getQuestionResponseTimestamp(val))
+        //     .filter(val => !!val)
+        // );
+
         listItem.age = now - lastResponded; // will be infinity if no responses
         listItem.action =
           Object.keys(responses[item.ID]).length === 0 ? "Start" : "Edit";
