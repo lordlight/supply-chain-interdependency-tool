@@ -6,23 +6,18 @@ const NORMALIZED_VALUES = {
   suppliers_assurance: 100,
   products_access: 100,
   products_dependency: 100,
-  products_criticality: 1,
-  projects_criticality: 10,
-  assets_criticality: 10
+  products_criticality: 100,
+  projects_criticality: 100,
+  assets_criticality: 100
 };
 
 // weighting for final scoring
-const DEPENDENCY_WEIGHT = 1.0;
+const DEPENDENCY_WEIGHT = 0.25;
 const ASSET_WEIGHTS = {
-  PA: 1.0,
-  SDA: 1.0,
-  ICTA: 1.0
+  PA: 0.25,
+  SDA: 0.25,
+  ICTA: 0.25
 };
-// const ASSET_WEIGHTS = {
-//   PA: 1 / 3,
-//   SDA: 1 / 3,
-//   ICTA: 1 / 3
-// };
 
 export const MAX_IMPACT_SCORE =
   (DEPENDENCY_WEIGHT +
@@ -275,7 +270,7 @@ export function computeImpacts(
         const prcrit =
           (Object.entries(project.Criticality || {})[0] || [])[1] || 0;
         // const adscore = (assurance * dpscore * crscore * prcrit) / 1000.0;
-        const dscore = (dpscore * crscore * prcrit) / 10.0;
+        const dscore = (dpscore * crscore * prcrit) / 10000.0;
         const adscoreEntry = {
           projectId,
           productId,
@@ -288,7 +283,7 @@ export function computeImpacts(
         const [assetId, assetScores] = entry;
         let score =
           (Object.entries(assetScores.Criticality || {})[0] || [])[1] || 0;
-        let normalizeFactor = 0.1;
+        let normalizeFactor = 1;
         Object.entries(scores.Access).forEach(acentry => {
           const [akey, acscore] = acentry;
           const curAssetId = akey.split("|")[1];
@@ -305,7 +300,7 @@ export function computeImpacts(
             normalizeFactor *= 100;
           }
         });
-        if (normalizeFactor > 0.1) {
+        if (normalizeFactor > 1) {
           score /= normalizeFactor;
           const accessScoreEntry = { assetId, productId, supplierId, score };
           accessScoreEntries.push(accessScoreEntry);
