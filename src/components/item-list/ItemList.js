@@ -169,7 +169,7 @@ class ItemList extends Component {
 
   updateSortHandler = (event, sortType) => {
     if (sortType !== this.state.sortBy) {
-      this.setState({ sortBy: sortType, sortDir: "asc" });
+      this.setState({ sortBy: sortType, sortDir: "asc", selected: null });
     } else {
       let newSortDir = "asc";
       if (this.state.sortDir === "asc") {

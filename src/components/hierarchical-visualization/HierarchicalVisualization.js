@@ -815,10 +815,16 @@ class HierarchicalVisualization extends Component {
         const rtype = elements.shift();
         const rid = elements.join("_");
         const resource = RESOURCE_TYPES[rtype];
-        const organizationsIds = this.props.projects
-          .filter(p => !p.parent)
-          .map(o => o.ID);
-        if (resource && rid && organizationsIds.indexOf(rid) === -1) {
+        if (resource && rid) {
+          if (resource === "projects") {
+            const organizationsIds = this.props.projects
+              .filter(p => !p.parent)
+              .map(o => o.ID);
+            if (organizationsIds.indexOf(rid) !== -1) {
+              console.log("NO ORG VISIT");
+              return;
+            }
+          }
           store.dispatch(
             setSelectedResource({ resourceType: resource, resourceId: rid })
           );
