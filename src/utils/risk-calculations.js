@@ -333,7 +333,11 @@ export function computeImpacts(
         (acc, val) => acc + val.score * (ASSET_WEIGHTS[val.assetId] || 0),
         0
       );
-    return { ...entry, score };
+    const supplyLineAccessScores = accessScores.reduce((acc, as) => {
+      acc[as.assetId] = as.score;
+      return acc;
+    }, {});
+    return { ...entry, score, accessScores: supplyLineAccessScores };
   });
 
   supplyLineScores.forEach(entry => {
@@ -348,7 +352,7 @@ export function computeImpacts(
 
   Object.values(scores).forEach(resourceInfo =>
     Object.values(resourceInfo).forEach(info => {
-      info.impact = Math.max(...info.supplyLines.map(sl => sl.score), 0);
+      info.impact = computeImpactFromSupplyLines(info.supplyLines);
       info.interdependence = info.supplyLines
         .map(sl => sl.score)
         .reduce((acc, val) => acc + val, 0);
@@ -370,6 +374,26 @@ export function computeImpacts(
 
   console.log("SCORES", scores);
   return scores;
+}
+
+export function computeImpactFromSupplyLines(supplyLines) {
+  // find max dependency score
+  const dependencyScore =
+    Math.max(...supplyLines.map(sl => sl.dependencyScore), 0) *
+    DEPENDENCY_WEIGHT;
+  // find each asset max score
+  const accessScores = Object.entries(ASSET_WEIGHTS).map(entry => {
+    const [assetId, assetWeight] = entry;
+    const access = Math.max(
+      ...supplyLines.map(sl => sl.accessScores[assetId] || 0)
+    );
+    return access * assetWeight;
+  });
+  const impact =
+    dependencyScore + accessScores.reduce((acc, val) => acc + val, 0);
+  const oldImpact = Math.max(...supplyLines.map(sl => sl.score), 0);
+  console.log({ impact, oldImpact });
+  return impact;
 }
 
 function getMaxScore(questions, questionType) {

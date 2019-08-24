@@ -7,7 +7,10 @@ import { withStyles } from "@material-ui/core/styles";
 import Graph from "react-graph-vis";
 import { ForceGraph2D } from "react-force-graph";
 
-import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
+import {
+  MAX_IMPACT_SCORE,
+  computeImpactFromSupplyLines
+} from "../../utils/risk-calculations";
 import store from "../../redux/store";
 import {
   updatePreferences,
@@ -415,7 +418,10 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
-          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          // const maxImpact = Math.max(
+          //   ...slmatches.map(m => m.score || 0)
+          // );
+          const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
             0
@@ -446,7 +452,9 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
-          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          console.log("MAXIMPACT!!!!");
+          const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
             0
@@ -485,7 +493,8 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
             0
@@ -512,7 +521,8 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-          const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
+          const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
             0
