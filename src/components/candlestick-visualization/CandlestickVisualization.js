@@ -78,7 +78,7 @@ class CandlestickVisualization extends Component {
               layout={{
                 width: size.width,
                 height: size.height,
-                title: "Supplier Impact",
+                title: "Product Impact by Supplier",
                 margin: {
                   b: 200
                 },
