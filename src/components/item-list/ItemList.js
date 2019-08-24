@@ -166,6 +166,9 @@ class ItemList extends Component {
   }
 
   handleItemSelection = (event, item) => {
+    if (this.state.selected) {
+      store.dispatch(setSelectedResource(this.state.selected));
+    }
     store.dispatch(updateCurrentItem({ currentItem: item }));
   };
 
