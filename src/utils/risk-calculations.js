@@ -391,8 +391,8 @@ export function computeImpactFromSupplyLines(supplyLines) {
   });
   const impact =
     dependencyScore + accessScores.reduce((acc, val) => acc + val, 0);
-  const oldImpact = Math.max(...supplyLines.map(sl => sl.score), 0);
-  console.log({ impact, oldImpact });
+  // const oldImpact = Math.max(...supplyLines.map(sl => sl.score), 0);
+  // console.log({ impact, oldImpact });
   return impact;
 }
 
