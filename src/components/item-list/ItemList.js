@@ -29,7 +29,62 @@ import {
   getLatestResponseForResource
 } from "../../utils/general-utils";
 import { Typography } from "@material-ui/core";
-import { get } from "http";
+
+const MULTIPLES_POLICIES = {
+  MAX: 0,
+  SUM: 1,
+  AVG: 2,
+  ALL: 3
+};
+
+const MULTIPLES_FIELDS = {
+  [MULTIPLES_POLICIES.MAX]: {
+    suffixes: { sort: "max", display: "max" },
+    hint: "max"
+  },
+  [MULTIPLES_POLICIES.SUM]: {
+    suffixes: { sort: "sum", display: "sum" },
+    hint: "sum"
+  },
+  [MULTIPLES_POLICIES.AVG]: {
+    suffixes: { sort: "avg", display: "avg" },
+    hint: "avg"
+  },
+  [MULTIPLES_POLICIES.ALL]: {
+    suffixes: { sort: "sum", display: "all" },
+    hint: null
+  }
+};
+
+const MULTIPLES_OPTIONS = {
+  Access: {
+    policy: MULTIPLES_POLICIES.MAX,
+    prefix: "score.access"
+  },
+  Dependency: {
+    policy: MULTIPLES_POLICIES.MAX,
+    prefix: "score.dependency"
+  },
+  Criticality: {
+    policy: MULTIPLES_POLICIES.MAX,
+    prefix: "score.criticality"
+  }
+};
+
+function formatMultiplesValue(policy, val) {
+  if (
+    policy === MULTIPLES_POLICIES.MAX ||
+    policy === MULTIPLES_POLICIES.SUM ||
+    policy === MULTIPLES_POLICIES.AVG
+  ) {
+    return val.toFixed(1);
+  } else if (policy === MULTIPLES_POLICIES.ALL) {
+    // TODO: SJR
+    return JSON.stringify(val);
+  } else {
+    return val;
+  }
+}
 
 function getAge(diff) {
   const formatResult = (val, unit) => {
@@ -108,7 +163,7 @@ const styles = theme => ({
     minWidth: 180
   },
   metricCol: {
-    textTransform: "capitalize",
+    // textTransform: "capitalize",
     backgroundColor: "#cbcbcb",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -118,7 +173,7 @@ const styles = theme => ({
     }
   },
   scoreCol: {
-    textTransform: "capitalize",
+    // textTransform: "capitalize",
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -126,7 +181,7 @@ const styles = theme => ({
     // minWidth: 89
   },
   questionCol: {
-    textTransform: "capitalize",
+    // textTransform: "capitalize",
     backgroundColor: "#ededed",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -155,6 +210,16 @@ const styles = theme => ({
 class ItemList extends Component {
   constructor(props) {
     super(props);
+    Object.entries(MULTIPLES_OPTIONS).forEach(entry => {
+      const [metric, options] = entry;
+      const hint = MULTIPLES_FIELDS[options.policy].hint;
+      const suffixes = MULTIPLES_FIELDS[options.policy].suffixes;
+      options.fields = {
+        sort: `${options.prefix}.${suffixes.sort}`,
+        display: `${options.prefix}.${suffixes.display}`,
+        label: `${metric}${hint ? ` (${hint})` : ""}`
+      };
+    });
     this.state = {
       sortBy:
         props.selected && props.selected.resourceType === props.currentType
@@ -194,13 +259,28 @@ class ItemList extends Component {
     window.scrollTo(0, 0);
   };
 
-  getScoresMaxAndAvg = scores => {
+  getScoresMaxSumAndAvg = scores => {
     const maxscore = Math.max(...scores);
-    const avgscore = scores.reduce((acc, val) => acc + val, 0) / scores.length;
+    const sumscore = scores.reduce((acc, val) => acc + val, 0);
+    const avgscore = sumscore / scores.length;
     return {
       max: maxscore !== -Infinity ? maxscore : 0,
+      sum: sumscore || 0,
       avg: avgscore || 0
     };
+  };
+
+  handleMultiples = (policy, multiples, field, sortField) => {
+    const scores = this.getScoresMaxSumAndAvg(Object.values(multiples));
+    if (policy === MULTIPLES_POLICIES.MAX) {
+      return [[field, scores.max]];
+    } else if (policy === MULTIPLES_POLICIES.AVG) {
+      return [[field, scores.avg]];
+    } else if (policy === MULTIPLES_POLICIES.SUM) {
+      return [[field, scores.sum]];
+    } else if (policy === MULTIPLES_POLICIES.ALL) {
+      return [[field, multiples], [sortField, scores.sum]];
+    }
   };
 
   render() {
@@ -280,22 +360,22 @@ class ItemList extends Component {
         sortType: "score.assurance"
       },
       hasCriticality && {
-        label: "Criticality",
+        label: MULTIPLES_OPTIONS.Criticality.fields.label,
         tooltip: "Sort by criticality",
         cssClass: classes.scoreCol,
-        sortType: "score.criticality.max"
+        sortType: MULTIPLES_OPTIONS.Criticality.fields.sort
       },
       hasAccess && {
-        label: "Access",
+        label: MULTIPLES_OPTIONS.Access.fields.label,
         tooltip: "Sort by access",
         cssClass: classes.scoreCol,
-        sortType: "score.access.max"
+        sortType: MULTIPLES_OPTIONS.Access.fields.sort
       },
       hasDependency && {
-        label: "Dependency",
+        label: MULTIPLES_OPTIONS.Dependency.fields.label,
         tooltip: "Sort by dependency",
         cssClass: classes.scoreCol,
-        sortType: "score.dependency.max"
+        sortType: MULTIPLES_OPTIONS.Dependency.fields.sort
       },
       {
         label: "Questions Complete",
@@ -351,22 +431,36 @@ class ItemList extends Component {
 
         // the following must be in this order
         if (hasCriticality) {
-          const scores = this.getScoresMaxAndAvg(
-            Object.values(riskSet[item.ID].Criticality)
+          const fields = this.handleMultiples(
+            MULTIPLES_OPTIONS.Criticality.policy,
+            riskSet[item.ID].Criticality,
+            MULTIPLES_OPTIONS.Criticality.fields.display
           );
-          listItem["score.criticality.max"] = scores.max;
+          fields.forEach(entry => (listItem[entry[0]] = entry[1]));
         }
         if (hasAccess) {
-          const scores = this.getScoresMaxAndAvg(
-            Object.values(riskSet[item.ID].Access)
+          const fields = this.handleMultiples(
+            MULTIPLES_OPTIONS.Access.policy,
+            riskSet[item.ID].Access,
+            MULTIPLES_OPTIONS.Access.fields.display
           );
-          listItem["score.access.max"] = scores.max;
+          fields.forEach(entry => (listItem[entry[0]] = entry[1]));
+          // const scores = this.getScoresMaxSumAndAvg(
+          //   Object.values(riskSet[item.ID].Access)
+          // );
+          // listItem["score.access.max"] = scores.max;
         }
         if (hasDependency) {
-          const scores = this.getScoresMaxAndAvg(
-            Object.values(riskSet[item.ID].Dependency)
+          const fields = this.handleMultiples(
+            MULTIPLES_OPTIONS.Dependency.policy,
+            riskSet[item.ID].Dependency,
+            MULTIPLES_OPTIONS.Dependency.fields.display
           );
-          listItem["score.dependency.max"] = scores.max;
+          fields.forEach(entry => (listItem[entry[0]] = entry[1]));
+          // const scores = this.getScoresMaxSumAndAvg(
+          //   Object.values(riskSet[item.ID].Dependency)
+          // );
+          // listItem["score.dependency.max"] = scores.max;
         }
 
         const numQuestions = getNumQuestionsForResource(item, questions);
@@ -431,16 +525,25 @@ class ItemList extends Component {
     const rows = list.map((row, i) => {
       const scoreValues = [
         hasCriticality &&
-          (row["score.criticality.max"] != null
-            ? row["score.criticality.max"].toFixed(1)
+          (row[MULTIPLES_OPTIONS.Criticality.fields.display] != null
+            ? formatMultiplesValue(
+                MULTIPLES_OPTIONS.Criticality.policy,
+                row[MULTIPLES_OPTIONS.Criticality.fields.display]
+              )
             : "N/A"),
         hasAccess &&
-          (row["score.access.max"] != null
-            ? row["score.access.max"].toFixed(1)
+          (row[MULTIPLES_OPTIONS.Access.fields.display] != null
+            ? formatMultiplesValue(
+                MULTIPLES_OPTIONS.Access.policy,
+                row[MULTIPLES_OPTIONS.Access.fields.display]
+              )
             : "N/A"),
         hasDependency &&
-          (row["score.dependency.max"] != null
-            ? row["score.dependency.max"].toFixed(1)
+          (row[MULTIPLES_OPTIONS.Dependency.fields.display] != null
+            ? formatMultiplesValue(
+                MULTIPLES_OPTIONS.Dependency.policy,
+                row[MULTIPLES_OPTIONS.Dependency.fields.display]
+              )
             : "N/A")
       ].filter(Boolean);
       return row._cscrm_active ? (

@@ -453,7 +453,6 @@ class HierarchicalVisualization extends Component {
             [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
           // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
-          console.log("MAXIMPACT!!!!");
           const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
