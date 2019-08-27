@@ -385,7 +385,8 @@ export function computeImpactFromSupplyLines(supplyLines) {
   const accessScores = Object.entries(ASSET_WEIGHTS).map(entry => {
     const [assetId, assetWeight] = entry;
     const access = Math.max(
-      ...supplyLines.map(sl => sl.accessScores[assetId] || 0)
+      ...supplyLines.map(sl => sl.accessScores[assetId] || 0),
+      0
     );
     return access * assetWeight;
   });
