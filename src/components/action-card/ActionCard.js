@@ -79,7 +79,7 @@ class ActionCard extends Component {
 
     const itemElements = items.map((item, i) => (
       <Typography key={i} className={classes.item}>
-        [ ] {item}
+        &bull; {item}
       </Typography>
     ));
 
