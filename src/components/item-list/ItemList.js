@@ -336,7 +336,7 @@ class ItemList extends Component {
           <br></br>
           <div>
             The impact score is derived from the scores of all supply lines in
-            which the {supplierLabel} participates. (Every {productLabel} a{" "}
+            which the {supplierLabel} participates. (Every {productLabel} the{" "}
             {supplierLabel} provides constitutes a separate supply line, and{" "}
             {productLabelPlural} used in multiple {projectLabelPlural} count as
             separate supply lines).
@@ -344,7 +344,7 @@ class ItemList extends Component {
           <br></br>
           <div>
             To affect this score, you most likely must change the amount of
-            access a {supplierLabel} has to your organization. Three factors
+            access the {supplierLabel} has to your organization. Three factors
             affect this score, and the first two are harder to change because
             they represent how important your {productLabelPlural} are: (1)
             Criticality questions for {productLabelPlural} supplied and{" "}
@@ -361,7 +361,7 @@ class ItemList extends Component {
             The interdependence score indicates the influence of a particular{" "}
             {supplierLabel} -- how many {productLabelPlural} do they supply, and
             for how much of your organization (how many {projectLabelPlural},
-            programs, business units)? It is an unbounded score -- if a{" "}
+            programs, business units)? It is an unbounded score -- if the{" "}
             {supplierLabel} supplies more {productLabelPlural}, the score will
             go up.
           </div>
@@ -378,11 +378,11 @@ class ItemList extends Component {
             {supplierLabelPlural}, so you aren't overly dependent on a few{" "}
             {supplierLabelPlural}, although there is some additional risk, and
             adding {supplierLabelPlural} means more vetting. Reducing the number
-            of {productLabelPlural} (through simplification or{" "}
+            of {productLabelPlural} (through simplification of{" "}
             {projectLabelPlural} or elimination of deprecated{" "}
             {productLabelPlural}) can also improve this score, since you are
             reducing the total number of supply lines. Improving the score of
-            individual supply lines (e.g. by reducing the level of access a{" "}
+            individual supply lines (e.g. by reducing the level of access the{" "}
             {supplierLabel} has to your organization) will help as well.
           </div>
         </div>
@@ -400,7 +400,7 @@ class ItemList extends Component {
           </div>
           <br></br>
           <div>
-            Improving this score requires working with {supplierLabel} (e.g.
+            Improving this score requires working with the {supplierLabel} (e.g.
             ensuring they have insurance, fallback partnerships with other
             vendors, backup inventory).
           </div>
@@ -409,8 +409,8 @@ class ItemList extends Component {
       accessTooltip = (
         <div>
           <div>
-            The access scores indicates how much access a {supplierLabel} has to
-            your organization.
+            The access scores indicates how much access the {supplierLabel} has
+            to your organization.
           </div>
           <br></br>
           <div>
@@ -420,7 +420,7 @@ class ItemList extends Component {
           </div>
           <br></br>
           <div>
-            To affect these scores, you must change the level of access a{" "}
+            To affect these scores, you must change the level of access the{" "}
             {supplierLabel} has (and changing the answer to the question on the{" "}
             {supplierLabel} Questions screen).
           </div>
@@ -444,16 +444,16 @@ class ItemList extends Component {
           <div>
             The impact score is derived from the scores for supply lines that
             include this {productLabel} (if there are multiple{" "}
-            {supplierLabelPlural} for this
-            {productLabel} or the {productLabel} is used in multiple{" "}
-            {projectLabelPlural}, those are separate supply lines).
+            {supplierLabelPlural} for this {productLabel} or the {productLabel}{" "}
+            is used in multiple {projectLabelPlural}, those are separate supply
+            lines).
           </div>
           <br></br>
           <div>
             To affect this score, you most likely must change the amount of
             access {supplierLabelPlural} of this {productLabel} have to your
             organization. There are three factors that affect this score: (1)
-            criticality questions for a {productLabel} and the{" "}
+            criticality questions for the {productLabel} and the{" "}
             {projectLabelPlural} where it is used; (2) dependency questions for
             this {productLabel}, and (3) access questions for the{" "}
             {supplierLabelPlural} of this {productLabel}.
@@ -464,10 +464,10 @@ class ItemList extends Component {
         <div>
           <div>
             The interdependence score indicates the interconnected influence of
-            a {productLabel} -- how many {supplierLabelPlural} supply the{" "}
+            the {productLabel} -- how many {supplierLabelPlural} supply the{" "}
             {productLabel}, and how many {projectLabelPlural} is it used in (as
             well as the criticality of those {supplierLabelPlural} and{" "}
-            {projectLabelPlural}) It is an unbounded score -- if a{" "}
+            {projectLabelPlural}) It is an unbounded score -- if the{" "}
             {productLabel} has more {supplierLabelPlural} or is used in more{" "}
             {projectLabelPlural}, the score will go up.
           </div>
@@ -483,7 +483,7 @@ class ItemList extends Component {
           <div>
             Improving this score may require you to lower {productLabel} and{" "}
             {supplierLabel} impact scores, or simplify your supply chain (e.g.
-            in the case that there are many {supplierLabelPlural} supplying a{" "}
+            in the case that there are many {supplierLabelPlural} supplying the{" "}
             {productLabel}).
           </div>
         </div>
@@ -511,7 +511,7 @@ class ItemList extends Component {
       criticalityTooltip = (
         <div>
           The criticality score is based on your answers to the questions about
-          criticality of a {productLabel} to {projectLabelPlural} they're
+          criticality of the {productLabel} to {projectLabelPlural} they're
           connected to and the organization as a whole.
         </div>
       );
@@ -525,8 +525,8 @@ class ItemList extends Component {
       dependencyTooltip = (
         <div>
           The dependency score is based on your answers to the questions about
-          your reliance on a {productLabel} -- e.g. can you switch to another{" "}
-          {productLabel} if necessary? Do you maintain a reserve?
+          your reliance on a given {supplierLabel} -- e.g. can you switch to
+          another {supplierLabel} if necessary? Do you maintain a reserve?
         </div>
       );
     } else if (type === "projects") {
@@ -558,7 +558,7 @@ class ItemList extends Component {
             {productLabelPlural} supplied to the {projectLabel}; (2) dependency
             questions for the products and {supplierLabelPlural} that supply
             them; (3) access questions for the {supplierLabelPlural} that supply{" "}
-            {productLabelPlural} for this {projectLabel}). Because this is a
+            {productLabelPlural} for this {projectLabel}. Because this is a
             "worst case" score, focus on the {productLabelPlural} and{" "}
             {supplierLabelPlural} with the greatest impact scores first.
           </div>
@@ -567,9 +567,9 @@ class ItemList extends Component {
       interdependenceTooltip = (
         <div>
           <div>
-            The interdependence score indicates the interconnected nature of a{" "}
+            The interdependence score indicates the interconnected nature of the{" "}
             {projectLabel} -- because it may involve many {productLabelPlural}{" "}
-            from many {supplierLabelPlural}. It is an unbounded score -- if a{" "}
+            from many {supplierLabelPlural}. It is an unbounded score -- if the{" "}
             {projectLabel} involves more {productLabelPlural} and/or more{" "}
             {supplierLabelPlural}, the score will go up.
           </div>
@@ -582,7 +582,7 @@ class ItemList extends Component {
           <br></br>
           <div>
             Improving this score may require you to simplify your supply chain
-            (using fewer {productLabelPlural} or {supplierLabelPlural} for a{" "}
+            (using fewer {productLabelPlural} or {supplierLabelPlural} for the{" "}
             {projectLabel}) or reducing impact scores for the{" "}
             {productLabelPlural} and {supplierLabelPlural} connected to this{" "}
             {projectLabel}.
