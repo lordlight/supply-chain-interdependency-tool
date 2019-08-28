@@ -403,9 +403,9 @@ class QuestionList extends Component {
         <div className={classes.questionList}>
           {accessRows.length > 0 && (
             <React.Fragment>
-              {/* <Typography variant="subtitle2" className={classes.sectionTitle}>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
                 Access Questions
-              </Typography> */}
+              </Typography>
               <Table className={this.props.table} border={0}>
                 <TableBody>{accessRows}</TableBody>
               </Table>
@@ -413,9 +413,9 @@ class QuestionList extends Component {
           )}
           {criticalityRows.length > 0 && (
             <React.Fragment>
-              {/* <Typography variant="subtitle2" className={classes.sectionTitle}>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
                 Criticality Questions
-              </Typography> */}
+              </Typography>
               <Table className={this.props.table} border={0}>
                 <TableBody>{criticalityRows}</TableBody>
               </Table>
@@ -423,9 +423,9 @@ class QuestionList extends Component {
           )}
           {dependencyRows.length > 0 && (
             <React.Fragment>
-              {/* <Typography variant="subtitle2" className={classes.sectionTitle}>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
                 Dependency Questions
-              </Typography> */}
+              </Typography>
               <Table className={this.props.table} border={0}>
                 <TableBody>{dependencyRows}</TableBody>
               </Table>
@@ -433,9 +433,9 @@ class QuestionList extends Component {
           )}
           {assuranceRows.length > 0 && (
             <React.Fragment>
-              {/* <Typography variant="subtitle2" className={classes.sectionTitle}>
+              <Typography variant="subtitle2" className={classes.sectionTitle}>
                 Assurance Questions
-              </Typography> */}
+              </Typography>
               <Table className={this.props.table} border={0}>
                 <TableBody>{assuranceRows}</TableBody>
               </Table>
@@ -461,17 +461,6 @@ class QuestionList extends Component {
               </Button>
             </div>
           </div>
-          {/*<Snackbar
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }}
-                    open={true}
-                    ContentProps={{
-                        'aria-describedby': 'message-id',
-                    }}
-                    message={<span id="message-id">Current Risk: {riskVal}</span>}
-                />*/}
         </div>
         <Dialog
           onClose={() => this.setState({ confirmDialogOpen: false })}
