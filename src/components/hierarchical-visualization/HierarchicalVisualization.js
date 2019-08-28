@@ -20,7 +20,11 @@ import {
 } from "../../redux/actions";
 import { connect } from "react-redux";
 
-import { getCellMultiples } from "../../utils/general-utils";
+import {
+  getCellMultiples,
+  getColorScheme,
+  ResourcesDesignators
+} from "../../utils/general-utils";
 
 const Rainbow = require("rainbowvis.js");
 
@@ -91,10 +95,13 @@ class HierarchicalVisualization extends Component {
   constructor(props) {
     super(props);
     this.rainbow = new Rainbow();
-    this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
+    // this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
+    const colorscheme = getColorScheme(props.preferences);
+    this.rainbow.setSpectrum(...colorscheme);
     this.impact_colors = [...Array(101).keys()].map(
       i => `#${this.rainbow.colorAt(i)}`
     );
+    this.nodePositions = props.preferences["viz.hierarchical.nodes"] || {};
     this.constructGraph(props);
   }
 
@@ -133,7 +140,30 @@ class HierarchicalVisualization extends Component {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    this.constructGraph(this.props);
+    const preferences = (this.props || {}).preferences || {};
+    const prevPreferences = (prevProps || {}).preferences || {};
+    if (
+      preferences["viz.colorscheme"] != prevPreferences["viz.colorscheme"] ||
+      preferences["resources.designators"] !=
+        prevPreferences["resource.designators"]
+    ) {
+      console.log("WSSFDFDFDFDSFDSFAAAAAAH");
+      // const colorscheme = getColorScheme(this.props.preferences);
+      // this.rainbow.setSpectrum(...colorscheme);
+      // this.impact_colors = [...Array(101).keys()].map(
+      //   i => `#${this.rainbow.colorAt(i)}`
+      // );
+      this.nodePositions = this.network.getPositions();
+      const scale = this.network.getScale();
+      const position = this.network.getViewPosition();
+      const moveToOptions = {
+        ...(scale && { scale }),
+        ...(position && { position })
+      };
+      this.constructGraph(this.props);
+      this.network.setData(this.graph);
+      setTimeout(() => this.network.moveTo(moveToOptions), 0);
+    }
   };
 
   getNodePopupContents = (
@@ -343,7 +373,10 @@ class HierarchicalVisualization extends Component {
 
     const { products, suppliers, projects, preferences } = props;
 
-    const nodePositions = preferences["viz.hierarchical.nodes"] || {};
+    const resourceDesignators = new ResourcesDesignators(preferences);
+
+    // const nodePositions = preferences["viz.hierarchical.nodes"] || {};
+    const nodePositions = this.nodePositions;
 
     const organizations = props.projects.filter(p => !p.parent);
     const myOrganization = organizations[0] || {};
@@ -390,7 +423,8 @@ class HierarchicalVisualization extends Component {
         const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
         const value = interdependence / maxProjectInterdependence;
         const title = this.getEdgePopupContents(
-          "Project",
+          resourceDesignators.get("Project"),
+          // "Project",
           proj.Name,
           null,
           null,
@@ -461,9 +495,11 @@ class HierarchicalVisualization extends Component {
           const value = interdependence / maxProjectToProductInterdependence;
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
-            "Product",
+            resourceDesignators.get("Product"),
+            // "Product",
             prod.Name,
-            "Project",
+            resourceDesignators.get("Project"),
+            // "Project",
             (projectsMap[prid] || {}).Name,
             maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
@@ -529,9 +565,11 @@ class HierarchicalVisualization extends Component {
           const value = interdependence / maxProductToSupplierInterdependence;
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
-            "Supplier",
+            resourceDesignators.get("Supplier"),
+            // "Supplier",
             (suppliersMap[supId] || {}).Name,
-            "Product",
+            resourceDesignators.get("Project"),
+            // "Product",
             prod.Name,
             maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
@@ -576,7 +614,8 @@ class HierarchicalVisualization extends Component {
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
-        "Project",
+        resourceDesignators.get("Project"),
+        // "Project",
         proj.Name,
         impact,
         interdependence,
@@ -628,7 +667,8 @@ class HierarchicalVisualization extends Component {
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
-        "Product",
+        resourceDesignators.get("Product"),
+        // "Product",
         prod.Name,
         impact,
         interdependence,
@@ -671,7 +711,8 @@ class HierarchicalVisualization extends Component {
       const interdependence = itemScores.interdependence || 0;
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
-        "Supplier",
+        resourceDesignators.get("Supplier"),
+        // "Supplier",
         sup.Name,
         impact,
         interdependence,
@@ -904,7 +945,13 @@ class HierarchicalVisualization extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, preferences } = this.props;
+
+    const colorscheme = getColorScheme(preferences);
+    this.rainbow.setSpectrum(...colorscheme);
+    this.impact_colors = [...Array(101).keys()].map(
+      i => `#${this.rainbow.colorAt(i)}`
+    );
 
     return (
       <div

@@ -18,11 +18,18 @@ import {
   updateTempResponses,
   updateTypeRisk,
   updateScores,
+  updatePreferences,
   reset
 } from "./redux/actions";
 
 // Risk calculation
 import { calculateItemRisk, computeImpacts } from "./utils/risk-calculations";
+import {
+  ResourcesDesignators,
+  AVAILABLE_COLORSCHEMES,
+  DEFAULT_COLORSCHEME
+} from "./utils/general-utils";
+
 // Material UI
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -42,7 +49,14 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Button
+  Button,
+  Grid,
+  TextField,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  FormControlLabel
 } from "@material-ui/core";
 
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
@@ -53,6 +67,7 @@ import ChevronRight from "@material-ui/icons/ChevronRight";
 
 import { version, versiondate, fullname } from "../package.json";
 import About from "./imgs/about.png";
+import { getAll } from "@tweenjs/tween.js";
 // import About from "./components/about/About";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
@@ -189,6 +204,9 @@ const styles = theme => ({
     position: "absolute",
     left: 40,
     bottom: 72
+  },
+  preferences: {
+    width: "100%"
   }
 });
 
@@ -205,14 +223,31 @@ const mapState = state => ({
   projectQuestions: state.projectQuestions,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses
+  projectResponses: state.projectResponses,
+  preferences: state.preferences
 });
 
 class App extends Component {
   state = {
     drawerOpen: false,
     clearDialogOpen: false,
-    aboutOpen: false
+    aboutOpen: false,
+    preferencesDialogOpen: false,
+    designators: {
+      project: "",
+      Project: "",
+      projects: "",
+      Projects: "",
+      product: "",
+      Product: "",
+      products: "",
+      Products: "",
+      supplier: "",
+      suppliers: "",
+      Supplier: "",
+      Suppliers: ""
+    },
+    colorscheme: DEFAULT_COLORSCHEME
   };
 
   componentDidMount() {
@@ -389,13 +424,68 @@ class App extends Component {
     this.setState({ clearDialogOpen: false });
   };
 
+  handlePreferencesDialogOpen = () => {
+    const preferences = this.props.preferences;
+    this.setState({
+      preferencesDialogOpen: true,
+      designators: {
+        project: "",
+        Project: "",
+        projects: "",
+        Projects: "",
+        product: "",
+        Product: "",
+        products: "",
+        Products: "",
+        supplier: "",
+        suppliers: "",
+        Supplier: "",
+        Suppliers: "",
+        ...(preferences["resources.designators"] || {})
+      },
+      colorscheme: preferences["viz.colorscheme"] || DEFAULT_COLORSCHEME
+    });
+  };
+
+  handlePreferencesDialogClose = () => {
+    this.setState({ preferencesDialogOpen: false });
+  };
+
+  updateResourceDesignators = () => {
+    const { designators } = this.state;
+    const preferences = {
+      "resources.designators": {
+        ...designators
+      }
+    };
+    store.dispatch(updatePreferences(preferences));
+    ipcRenderer.send("update-preferences", preferences);
+  };
+
+  updateColorScheme = () => {
+    const { colorscheme } = this.state;
+    const preferences = {
+      "viz.colorscheme": colorscheme
+    };
+    store.dispatch(updatePreferences(preferences));
+    ipcRenderer.send("update-preferences", preferences);
+  };
+
   render() {
-    const { classes } = this.props;
+    const { classes, preferences = {} } = this.props;
+
     const value = this.props.navState;
     const mainProps = { currentType: null };
     const suppProps = { currentType: "suppliers" };
     const prodProps = { currentType: "products" };
     const projProps = { currentType: "projects" };
+
+    const resourceDesignators = new ResourcesDesignators(preferences);
+
+    let colorSchemes = { ...AVAILABLE_COLORSCHEMES };
+    delete colorSchemes[DEFAULT_COLORSCHEME];
+    colorSchemes = [DEFAULT_COLORSCHEME, ...Object.keys(colorSchemes)];
+
     return (
       <MuiThemeProvider theme={theme}>
         <AppBar
@@ -449,7 +539,7 @@ class App extends Component {
                   selected: classes.tabSelected
                 }}
                 value="suppliers"
-                label="Suppliers"
+                label={resourceDesignators.getPlural("Supplier")}
                 onClick={e => this.handleTabChange(e, suppProps)}
               />
               <Tab
@@ -458,7 +548,7 @@ class App extends Component {
                   selected: classes.tabSelected
                 }}
                 value="products"
-                label="Products"
+                label={resourceDesignators.getPlural("Product")}
                 onClick={e => this.handleTabChange(e, prodProps)}
               />
               <Tab
@@ -467,7 +557,7 @@ class App extends Component {
                   selected: classes.tabSelected
                 }}
                 value="projects"
-                label="Projects"
+                label={resourceDesignators.getPlural("Project")}
                 onClick={e => this.handleTabChange(e, projProps)}
               />
               <Tab
@@ -491,11 +581,11 @@ class App extends Component {
               <Typography className={classes.questionsToolbarText}>
                 {(() => {
                   if (this.props.currentType === "suppliers")
-                    return "Supplier ";
+                    return `${resourceDesignators.get("Supplier")} `;
                   else if (this.props.currentType === "products")
-                    return "Product ";
+                    return `${resourceDesignators.get("Product")} `;
                   else if (this.props.currentType === "projects")
-                    return "Project ";
+                    return `${resourceDesignators.get("Project")} `;
                 })()}
                 Questions: {this.props.currentItem.Name}
               </Typography>
@@ -521,10 +611,10 @@ class App extends Component {
             <ListItem button onClick={this.handleAboutOpen}>
               <ListItemText primary="About..." />
             </ListItem>
-            <ListItem button>
+            {/* <ListItem button>
               <ListItemText primary="Edit Question Weightings..." />
-            </ListItem>
-            <ListItem button>
+            </ListItem> */}
+            <ListItem button onClick={this.handlePreferencesDialogOpen}>
               <ListItemText primary="Preferences..." />
             </ListItem>
           </List>
@@ -601,6 +691,141 @@ class App extends Component {
           <Typography className={classes.aboutVersion}>
             {`Version ${version} - ${versiondate}`}
           </Typography>
+        </Dialog>
+        <Dialog
+          onClose={() => this.setState({ preferencesDialogOpen: false })}
+          aria-labelledby="preferences-dialog-title"
+          open={this.state.preferencesDialogOpen}
+          classes={{ paper: classes.preferences }}
+        >
+          <DialogTitle id="preferences-dialog-title">
+            Set User Preferences
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="subtitle1" style={{ marginBottom: 12 }}>
+              Resource Designations
+            </Typography>
+            <DialogContentText style={{ marginBottom: 12 }}>
+              Modify how resources are labeled in in the application. If no
+              plural form is provided, plural is presumed to be the resource
+              designation with an &quot;s&quot; appended.
+            </DialogContentText>
+            <Grid container direction="column" style={{ marginBottom: 12 }}>
+              {/* <Grid container direction="row" spacing={8}>
+                <Grid item xs={2}>
+                  Resource
+                </Grid>
+                <Grid item xs={5}>
+                  User-defined Designation
+                </Grid>
+                <Grid item xs={5}>
+                  Plural (optional)
+                </Grid>
+              </Grid> */}
+              {[
+                ["Project", "project", "Projects", "projects"],
+                ["Product", "product", "Products", "products"],
+                ["Supplier", "supplier", "Suppliers", "suppliers"]
+              ].map(entry => {
+                const [resource, lresource, resources, lresources] = entry;
+                return (
+                  <Grid
+                    key={resource}
+                    container
+                    direction="row"
+                    style={{ alignItems: "center" }}
+                    spacing={8}
+                  >
+                    <Grid item xs={2}>
+                      <Typography>{resource}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <TextField
+                        label="User Designation"
+                        value={this.state.designators[resource]}
+                        onChange={event =>
+                          this.setState({
+                            designators: {
+                              ...this.state.designators,
+                              [resource]: event.target.value,
+                              [lresource]: event.target.value.toLowerCase()
+                            }
+                          })
+                        }
+                        margin="dense"
+                      />
+                    </Grid>
+                    <Grid item xs={5}>
+                      <TextField
+                        label="Plural (optional)"
+                        value={this.state.designators[resources]}
+                        onChange={event =>
+                          this.setState({
+                            designators: {
+                              ...this.state.designators,
+                              [resources]: event.target.value,
+                              [lresources]: event.target.value.toLowerCase()
+                            }
+                          })
+                        }
+                        margin="dense"
+                      />
+                    </Grid>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            <Divider />
+            <Typography
+              variant="subtitle1"
+              style={{ marginTop: 12, marginBottom: 12 }}
+            >
+              Visualization Color Schemes
+            </Typography>
+            <DialogContentText style={{ marginBottom: 12 }}>
+              Choose the color scheme to be used for visualizations.
+            </DialogContentText>
+            <Grid container direction="column">
+              <FormControl
+                component="fieldset"
+                // className={classes.formControl}
+              >
+                <RadioGroup
+                  aria-label="colorscheme"
+                  name="colorscheme"
+                  // className={classes.group}
+                  value={this.state.colorscheme}
+                  onChange={event =>
+                    this.setState({ colorscheme: event.target.value })
+                  }
+                >
+                  {colorSchemes.map(scheme => (
+                    <FormControlLabel
+                      key={scheme}
+                      value={scheme}
+                      control={<Radio color="primary" />}
+                      label={scheme}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handlePreferencesDialogClose} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                this.updateResourceDesignators();
+                this.updateColorScheme();
+                this.handlePreferencesDialogClose();
+              }}
+              color="primary"
+            >
+              OK
+            </Button>
+          </DialogActions>
         </Dialog>
       </MuiThemeProvider>
     );

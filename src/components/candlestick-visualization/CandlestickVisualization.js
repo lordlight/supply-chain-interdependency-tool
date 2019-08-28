@@ -4,6 +4,8 @@ import { SizeMe } from "react-sizeme";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 
+import { ResourcesDesignators } from "../../utils/general-utils";
+
 import store from "../../redux/store";
 import {
   updateNavState,
@@ -62,6 +64,10 @@ class CandlestickVisualization extends Component {
   render() {
     const data = this.createData();
 
+    const resourceDesignators = new ResourcesDesignators(
+      this.props.preferences
+    );
+
     return (
       <SizeMe monitorHeight monitorWidth>
         {({ size }) => (
@@ -78,7 +84,9 @@ class CandlestickVisualization extends Component {
               layout={{
                 width: size.width,
                 height: size.height,
-                title: "Product Impact by Supplier",
+                title: `${resourceDesignators.get(
+                  "Product"
+                )} Impact by ${resourceDesignators.get("Supplier")}`,
                 margin: {
                   b: 200
                 },

@@ -4,9 +4,12 @@ import "chartjs-plugin-datalabels";
 
 import { connect } from "react-redux";
 
+import { ResourcesDesignators } from "../../utils/general-utils";
+
 const mapState = state => ({
   suppliers: state.suppliers,
-  suppliersRisk: state.suppliersRisk
+  suppliersRisk: state.suppliersRisk,
+  preferences: state.preferences
 });
 
 const BUCKETS = ["0-20", "20-40", "40-60", "60-80", "80-100"];
@@ -27,68 +30,137 @@ const data = {
   ]
 };
 
-const options = {
-  plugins: {
-    datalabels: {
-      display: true,
-      color: "black"
-    }
-  },
-  animation: false,
-  layout: {
-    padding: {
-      left: 12,
-      right: 12,
-      top: 24,
-      bottom: 0
-    }
-  },
-  responsive: false,
-  maintainAspectRatio: false,
-  legend: {
-    display: false
-  },
-  tooltips: {
-    enabled: true,
-    callbacks: {
-      label: tooltipItem => `${tooltipItem.value} Suppliers`,
-      title: tooltipItem => {
-        const bucket = `${BUCKETS[tooltipItem[0].index]} assurance`;
-        return bucket;
-      }
-    }
-  },
-  scales: {
-    xAxes: [
-      {
-        // display: false,
-        categoryPercentage: 1.0,
-        barPercentage: 1.0,
-        scaleLabel: {
-          display: true,
-          labelString: "Assurance"
-        }
-      }
-    ],
-    yAxes: [
-      {
-        ticks: {
-          beginAtZero: true,
-          stepSize: 1,
-          maxTicksLimit: 50,
-          display: false
-        },
-        scaleLabel: {
-          display: true,
-          labelString: "# Suppliers"
-        }
-      }
-    ]
-  }
-};
+// const options = {
+//   plugins: {
+//     datalabels: {
+//       display: true,
+//       color: "black"
+//     }
+//   },
+//   animation: false,
+//   layout: {
+//     padding: {
+//       left: 12,
+//       right: 12,
+//       top: 24,
+//       bottom: 0
+//     }
+//   },
+//   responsive: false,
+//   maintainAspectRatio: false,
+//   legend: {
+//     display: false
+//   },
+//   tooltips: {
+//     enabled: true,
+//     callbacks: {
+//       label: tooltipItem => `${tooltipItem.value} Suppliers`,
+//       title: tooltipItem => {
+//         const bucket = `${BUCKETS[tooltipItem[0].index]} assurance`;
+//         return bucket;
+//       }
+//     }
+//   },
+//   scales: {
+//     xAxes: [
+//       {
+//         // display: false,
+//         categoryPercentage: 1.0,
+//         barPercentage: 1.0,
+//         scaleLabel: {
+//           display: true,
+//           labelString: "Assurance"
+//         }
+//       }
+//     ],
+//     yAxes: [
+//       {
+//         ticks: {
+//           beginAtZero: true,
+//           stepSize: 1,
+//           maxTicksLimit: 50,
+//           display: false
+//         },
+//         scaleLabel: {
+//           display: true,
+//           labelString: "# Suppliers"
+//         }
+//       }
+//     ]
+//   }
+// };
 
 class SuppliersChart extends Component {
   render = () => {
+    const resourceDesignators = new ResourcesDesignators(
+      this.props.preferences
+    );
+
+    const options = {
+      plugins: {
+        datalabels: {
+          display: true,
+          color: "black"
+        }
+      },
+      animation: false,
+      layout: {
+        padding: {
+          left: 12,
+          right: 12,
+          top: 24,
+          bottom: 0
+        }
+      },
+      responsive: false,
+      maintainAspectRatio: false,
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: true,
+        callbacks: {
+          label: tooltipItem =>
+            `${tooltipItem.value} ${
+              tooltipItem.value == 1
+                ? resourceDesignators.get("Supplier")
+                : resourceDesignators.getPlural("Supplier")
+            }`,
+          title: tooltipItem => {
+            const bucket = `${BUCKETS[tooltipItem[0].index]} assurance`;
+            return bucket;
+          }
+        }
+      },
+      scales: {
+        xAxes: [
+          {
+            // display: false,
+            categoryPercentage: 1.0,
+            barPercentage: 1.0,
+            scaleLabel: {
+              display: true,
+              labelString: "Assurance"
+            }
+          }
+        ],
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1,
+              maxTicksLimit: 50,
+              display: false
+            },
+            scaleLabel: {
+              display: true,
+              labelString: "# Suppliers"
+            }
+          }
+        ]
+      }
+    };
+
     const buckets = [0, 0, 0, 0, 0];
     Object.values(this.props.suppliersRisk)
       .map(risk => risk.Assurance || 100)

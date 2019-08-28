@@ -6,6 +6,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
+import { getColorScheme } from "../../utils/general-utils";
 
 // import store from '../../redux/store';
 import { connect } from "react-redux";
@@ -22,7 +23,8 @@ const mapState = state => ({
   projectsRisk: state.projectsRisk,
   scores: state.scores,
   productQuestions: state.productQuestions,
-  supplierQuestions: state.supplierQuestions
+  supplierQuestions: state.supplierQuestions,
+  preferences: state.preferences
 });
 
 const RESOURCE_NAMES = {
@@ -39,7 +41,9 @@ class TreemapChart extends Component {
   constructor(props) {
     super(props);
     this.rainbow = new Rainbow();
-    this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
+    // this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
+    const colorscheme = getColorScheme(props.preferences);
+    this.rainbow.setSpectrum(...colorscheme);
     this.impact_colors = [...Array(101).keys()].map(
       i => `#${this.rainbow.colorAt(i)}`
     );
@@ -94,6 +98,12 @@ class TreemapChart extends Component {
 
   render() {
     const root = this.constructTree(this.props);
+
+    const colorscheme = getColorScheme(this.props.preferences);
+    this.rainbow.setSpectrum(...colorscheme);
+    this.impact_colors = [...Array(101).keys()].map(
+      i => `#${this.rainbow.colorAt(i)}`
+    );
 
     return (
       <ResponsiveTreeMap

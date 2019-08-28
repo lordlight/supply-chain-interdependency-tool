@@ -6,7 +6,10 @@ import Typography from "@material-ui/core/Typography";
 
 import { connect } from "react-redux";
 
-import { getNumQuestionsForResource } from "../../utils/general-utils";
+import {
+  getNumQuestionsForResource,
+  ResourcesDesignators
+} from "../../utils/general-utils";
 
 const mapState = state => ({
   suppliers: state.suppliers,
@@ -20,7 +23,8 @@ const mapState = state => ({
   projectQuestions: state.projectQuestions,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses
+  projectResponses: state.projectResponses,
+  preferences: state.preferences
 });
 
 const styles = theme => ({
@@ -36,26 +40,31 @@ const styles = theme => ({
 
 class TypeSummary extends Component {
   render() {
-    const { classes } = this.props;
+    const { classes, preferences = {} } = this.props;
+
+    const resourceDesignators = new ResourcesDesignators(preferences);
 
     const type = this.props.currentType;
-    let items, itemsInactive, questions, responses;
+    let items, itemsInactive, questions, responses, typeDisplay;
 
     if (type === "suppliers") {
       items = [...this.props.suppliers];
       itemsInactive = [...this.props.suppliersInactive];
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
+      typeDisplay = resourceDesignators.getPlural("supplier");
     } else if (type === "products") {
       items = [...this.props.products];
       itemsInactive = [...this.props.productsInactive];
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
+      typeDisplay = resourceDesignators.getPlural("product");
     } else if (type === "projects") {
       items = [...this.props.projects].filter(proj => !!proj.parent);
       itemsInactive = [...this.props.projectsInactive];
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
+      typeDisplay = resourceDesignators.getPlural("project");
     }
 
     let numCompleted = 0,
@@ -78,14 +87,14 @@ class TypeSummary extends Component {
     if (items.length === 0) {
       title = (
         <Typography gutterBottom className={classes.heading}>
-          {"No " + type + " provided"}
+          {`No ${typeDisplay} provided`}
         </Typography>
       );
     } else if (itemsInactive.length > 0) {
       title = (
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <Typography gutterBottom className={classes.heading}>
-            {items.length} {type}
+            {items.length} {typeDisplay}
           </Typography>
           <Typography gutterBottom className={classes.inactive}>
             &nbsp;(+ {itemsInactive.length} inactive)
@@ -98,7 +107,7 @@ class TypeSummary extends Component {
     } else {
       title = (
         <Typography gutterBottom className={classes.heading}>
-          {items.length} {type}:
+          {items.length} {typeDisplay}:
         </Typography>
       );
     }
@@ -108,13 +117,13 @@ class TypeSummary extends Component {
         {items.length > 0 && (
           <React.Fragment>
             <Typography className={classes.complete} component="div">
-              {numCompleted} {type} with complete data
+              {numCompleted} {typeDisplay} with complete data
             </Typography>
             <Typography className={classes.partial} component="div">
-              {numPartial} {type} with partial data
+              {numPartial} {typeDisplay} with partial data
             </Typography>
             <Typography className={classes.zero} component="div">
-              {numZero} {type} with no data
+              {numZero} {typeDisplay} with no data
             </Typography>
           </React.Fragment>
         )}

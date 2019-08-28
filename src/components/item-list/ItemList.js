@@ -26,7 +26,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import {
   // getQuestionResponseTimestamp,
   getNumQuestionsForResource,
-  getLatestResponseForResource
+  getLatestResponseForResource,
+  ResourcesDesignators
 } from "../../utils/general-utils";
 import { Typography } from "@material-ui/core";
 
@@ -125,7 +126,8 @@ const mapState = state => ({
   productResponses: state.productResponses,
   projectResponses: state.projectResponses,
   scores: state.scores,
-  selected: state.selectedResource
+  selected: state.selectedResource,
+  preferences: state.preferences
 });
 
 const styles = theme => ({
@@ -284,8 +286,10 @@ class ItemList extends Component {
   };
 
   render() {
-    const { classes, currentType: type } = this.props;
+    const { classes, preferences, currentType: type } = this.props;
     const { selected } = this.state;
+
+    const resourceDesignators = new ResourcesDesignators(preferences);
 
     if (type == null) {
       return (
@@ -308,6 +312,13 @@ class ItemList extends Component {
     let criticalityTooltip = "Sort by criticality";
     let dependencyTooltip = "Sort by dependency";
 
+    const supplierLabel = resourceDesignators.get("supplier");
+    const supplierLabelPlural = resourceDesignators.getPlural("supplier");
+    const productLabel = resourceDesignators.get("product");
+    const productLabelPlural = resourceDesignators.getPlural("product");
+    const projectLabel = resourceDesignators.get("project");
+    const projectLabelPlural = resourceDesignators.getPlural("project");
+
     if (type === "suppliers") {
       items = [...this.props.suppliers, ...this.props.suppliersInactive];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
@@ -319,53 +330,60 @@ class ItemList extends Component {
         <div>
           <div>
             The impact score indicates the highest negative potential impact if
-            the supplier fails. Scored between 1 and 100, where 100 is
+            the {supplierLabel} fails. Scored between 1 and 100, where 100 is
             catastrophic failure for the organization.
           </div>
           <br></br>
           <div>
             The impact score is derived from the scores of all supply lines in
-            which the supplier participates. (Every product a supplier provides
-            constitutes a separate supply line, and products used in multiple
-            projects count as separate supply lines).
+            which the {supplierLabel} participates. (Every {productLabel} a{" "}
+            {supplierLabel} provides constitutes a separate supply line, and{" "}
+            {productLabelPlural} used in multiple {projectLabelPlural} count as
+            separate supply lines).
           </div>
           <br></br>
           <div>
             To affect this score, you most likely must change the amount of
-            access a supplier has to your organization Three factors affect this
-            score, and the first two are harder to change because they represent
-            how important your projects are: (1) Criticality questions for
-            products supplied and projects they're used in; (2) Dependency
-            questions for products from this supplier; and (3) Access questions
-            for this supplier and the products they supply.
+            access a {supplierLabel} has to your organization. Three factors
+            affect this score, and the first two are harder to change because
+            they represent how important your {productLabelPlural} are: (1)
+            Criticality questions for {productLabelPlural} supplied and{" "}
+            {projectLabelPlural} they're used in; (2) Dependency questions for{" "}
+            {productLabelPlural} from this {supplierLabel}; and (3) Access
+            questions for this {supplierLabel} and the {productLabelPlural} they
+            supply.
           </div>
         </div>
       );
       interdependenceTooltip = (
         <div>
           <div>
-            The interdependence score indicates the influence of a particular
-            supplier -- how many products do they supply, and for how much of
-            your organization (how many projects, programs, business units)? It
-            is an unbounded score -- if a supplier supplies more products, the
-            score will go up.
+            The interdependence score indicates the influence of a particular{" "}
+            {supplierLabel} -- how many {productLabelPlural} do they supply, and
+            for how much of your organization (how many {projectLabelPlural},
+            programs, business units)? It is an unbounded score -- if a{" "}
+            {supplierLabel} supplies more {productLabelPlural}, the score will
+            go up.
           </div>
           <br></br>
           <div>
             The interdependence score is the sum of all supply line scores in
-            which the supplier participates (a supply line is one supplier
-            supplying one product for one project).
+            which the {supplierLabel} participates (a supply line is one{" "}
+            {supplierLabel} supplying one {productLabel} for one {projectLabel}
+            ).
           </div>
           <br></br>
           <div>
-            Improving this score may require you to involve more suppliers, so
-            you aren't overly dependent on a few suppliers, although there is
-            some additional risk, and adding suppliers means more vetting.
-            Reducing the number of products (through simplification or projects
-            or elimination of deprecated products) can also improve this score,
-            since you are reducing the total number of supply lines. Improving
-            the score of individual supply lines (e.g. by reducing the level of
-            access a supplier has to your organization) will help as well.
+            Improving this score may require you to involve more{" "}
+            {supplierLabelPlural}, so you aren't overly dependent on a few{" "}
+            {supplierLabelPlural}, although there is some additional risk, and
+            adding {supplierLabelPlural} means more vetting. Reducing the number
+            of {productLabelPlural} (through simplification or{" "}
+            {projectLabelPlural} or elimination of deprecated{" "}
+            {productLabelPlural}) can also improve this score, since you are
+            reducing the total number of supply lines. Improving the score of
+            individual supply lines (e.g. by reducing the level of access a{" "}
+            {supplierLabel} has to your organization) will help as well.
           </div>
         </div>
       );
@@ -373,7 +391,7 @@ class ItemList extends Component {
         <div>
           <div>
             The Assurance Score indicates how completely your organization has
-            implemented SCRM mitigations for a particular supplier.
+            implemented SCRM mitigations for a particular {supplierLabel}.
           </div>
           <br></br>
           <div>
@@ -382,29 +400,29 @@ class ItemList extends Component {
           </div>
           <br></br>
           <div>
-            Improving this score requires working with suppliers (e.g. ensuring
-            they have insurance, fallback partnerships with other vendors,
-            backup inventory).
+            Improving this score requires working with {supplierLabel} (e.g.
+            ensuring they have insurance, fallback partnerships with other
+            vendors, backup inventory).
           </div>
         </div>
       );
       accessTooltip = (
         <div>
           <div>
-            The access scores indicates how much access a supplier has to your
-            organization.
+            The access scores indicates how much access a {supplierLabel} has to
+            your organization.
           </div>
           <br></br>
           <div>
             The access scores are calculated from the answers to questions that
-            involve supplier access to your networks, information systems, and
-            physical facilities.
+            involve {supplierLabel} access to your networks, information
+            systems, and physical facilities.
           </div>
           <br></br>
           <div>
-            To affect these scores, you must change the level of access a
-            supplier has (and changing the answer to the question on the
-            Supplier Questions screen).
+            To affect these scores, you must change the level of access a{" "}
+            {supplierLabel} has (and changing the answer to the question on the{" "}
+            {supplierLabel} Questions screen).
           </div>
         </div>
       );
@@ -418,25 +436,27 @@ class ItemList extends Component {
       impactTooltip = (
         <div>
           <div>
-            The impact score indicates the highest negative potential impact if
-            suppliers of this product fail. Scored between 1 and 100, where 100
-            is catastrophic failure for the organization.
+            The impact score indicates the highest negative potential impact if{" "}
+            {supplierLabelPlural} of this {productLabel} fail. Scored between 1
+            and 100, where 100 is catastrophic failure for the organization.
           </div>
           <br></br>
           <div>
             The impact score is derived from the scores for supply lines that
-            include this product (if there are multiple suppliers for this
-            product or the product is used in multiple projects, those are
-            separate supply lines).
+            include this {productLabel} (if there are multiple{" "}
+            {supplierLabelPlural} for this
+            {productLabel} or the {productLabel} is used in multiple{" "}
+            {projectLabelPlural}, those are separate supply lines).
           </div>
           <br></br>
           <div>
             To affect this score, you most likely must change the amount of
-            access suppliers of this product have to your organization. There
-            are three factors that affect this score: (1) criticality questions
-            for a product and the projects where it is used; (2) dependency
-            questions for this product, and (3) access questions for the
-            suppliers of this product.
+            access {supplierLabelPlural} of this {productLabel} have to your
+            organization. There are three factors that affect this score: (1)
+            criticality questions for a {productLabel} and the{" "}
+            {projectLabelPlural} where it is used; (2) dependency questions for
+            this {productLabel}, and (3) access questions for the{" "}
+            {supplierLabelPlural} of this {productLabel}.
           </div>
         </div>
       );
@@ -444,23 +464,27 @@ class ItemList extends Component {
         <div>
           <div>
             The interdependence score indicates the interconnected influence of
-            a product -- how many suppliers supply the product, and how many
-            projects is it used in (as well as the criticality of those
-            suppliers and projects) It is an unbounded score -- if a product has
-            more suppliers or is used in more projects, the score will go up.
+            a {productLabel} -- how many {supplierLabelPlural} supply the{" "}
+            {productLabel}, and how many {projectLabelPlural} is it used in (as
+            well as the criticality of those {supplierLabelPlural} and{" "}
+            {projectLabelPlural}) It is an unbounded score -- if a{" "}
+            {productLabel} has more {supplierLabelPlural} or is used in more{" "}
+            {projectLabelPlural}, the score will go up.
           </div>
           <br></br>
           <div>
             The interdependence score is the sum of all supply line scores which
-            involve the product (if there are multiple suppliers for this
-            product or the product is used in multiple projects, those are
-            separate supply lines).
+            involve the {productLabel} (if there are multiple{" "}
+            {supplierLabelPlural} for this {productLabel} or the {productLabel}{" "}
+            is used in multiple {projectLabelPlural}, those are separate supply
+            lines).
           </div>
           <br></br>
           <div>
-            Improving this score may require you to lower product and supplier
-            impact scores, or simplify your supply chain (e.g. in the case that
-            there are many suppliers supplying a product).
+            Improving this score may require you to lower {productLabel} and{" "}
+            {supplierLabel} impact scores, or simplify your supply chain (e.g.
+            in the case that there are many {supplierLabelPlural} supplying a{" "}
+            {productLabel}).
           </div>
         </div>
       );
@@ -468,7 +492,8 @@ class ItemList extends Component {
         <div>
           <div>
             The Assurance Score indicates how completely your organization has
-            implemented SCRM mitigations for suppliers of this product.
+            implemented SCRM mitigations for {supplierLabelPlural} of this{" "}
+            {productLabel}.
           </div>
           <br></br>
           <div>
@@ -477,31 +502,31 @@ class ItemList extends Component {
           </div>
           <br></br>
           <div>
-            Improving this score requires working with suppliers (e.g. ensuring
-            they have insurance, fallback partnerships with other vendors,
-            backup inventory).
+            Improving this score requires working with {supplierLabelPlural}{" "}
+            (e.g. ensuring they have insurance, fallback partnerships with other
+            vendors, backup inventory).
           </div>
         </div>
       );
       criticalityTooltip = (
         <div>
           The criticality score is based on your answers to the questions about
-          criticality of a product to projects they're connected to and the
-          organization as a whole.
+          criticality of a {productLabel} to {projectLabelPlural} they're
+          connected to and the organization as a whole.
         </div>
       );
       accessTooltip = (
         <div>
           The access score is based on your answers to the questions about
-          whether products are connected to your information systems and to your
-          customers' systems.
+          whether {productLabelPlural} are connected to your information systems
+          and to your customers' systems.
         </div>
       );
       dependencyTooltip = (
         <div>
           The dependency score is based on your answers to the questions about
-          your reliance on a product -- e.g. can you switch to another product
-          if necessary? Do you maintain a reserve?
+          your reliance on a {productLabel} -- e.g. can you switch to another{" "}
+          {productLabel} if necessary? Do you maintain a reserve?
         </div>
       );
     } else if (type === "projects") {
@@ -517,46 +542,50 @@ class ItemList extends Component {
         <div>
           <div>
             The impact score indicates the highest negative potential impact if
-            the project fails. Scored between 1 and 100, where 100 is
+            the {projectLabel} fails. Scored between 1 and 100, where 100 is
             catastrophic failure for the organization.
           </div>
           <br></br>
           <div>
             The impact score is derived from the scores of supply lines that
-            involve the project (all products used in this project from all
-            suppliers).
+            involve the {projectLabel} (all {productLabelPlural} used in this{" "}
+            {projectLabel} from all {supplierLabelPlural}).
           </div>
           <br></br>
           <div>
             To affect this score, you must consider three factors: (1)
-            criticality questions for the project as well as the products
-            supplied to the project; (2) dependency questions for the products
-            and suppliers that supply them; (3) access questions for the
-            suppliers that supply products for this project). Because this is a
-            "worst case" score, focus on the products and suppliers with the
-            greatest impact scores first.
+            criticality questions for the {projectLabel} as well as the{" "}
+            {productLabelPlural} supplied to the {projectLabel}; (2) dependency
+            questions for the products and {supplierLabelPlural} that supply
+            them; (3) access questions for the {supplierLabelPlural} that supply{" "}
+            {productLabelPlural} for this {projectLabel}). Because this is a
+            "worst case" score, focus on the {productLabelPlural} and{" "}
+            {supplierLabelPlural} with the greatest impact scores first.
           </div>
         </div>
       );
       interdependenceTooltip = (
         <div>
           <div>
-            The interdependence score indicates the interconnected nature of a
-            project -- because it may involve many products from many suppliers.
-            It is an unbounded score -- if a project involves more products
-            and/or more suppliers, the score will go up.
+            The interdependence score indicates the interconnected nature of a{" "}
+            {projectLabel} -- because it may involve many {productLabelPlural}{" "}
+            from many {supplierLabelPlural}. It is an unbounded score -- if a{" "}
+            {projectLabel} involves more {productLabelPlural} and/or more{" "}
+            {supplierLabelPlural}, the score will go up.
           </div>
           <br></br>
           <div>
             The interdependence score is the sum of all supply line scores that
-            lead to the project (all products and suppliers connected to this
-            project).
+            lead to the {projectLabel} (all {productLabelPlural} and{" "}
+            {supplierLabelPlural} connected to this {projectLabel}).
           </div>
           <br></br>
           <div>
             Improving this score may require you to simplify your supply chain
-            (using fewer products or suppliers for a project) or reducing impact
-            scores for the products and suppliers connected to this project.
+            (using fewer {productLabelPlural} or {supplierLabelPlural} for a{" "}
+            {projectLabel}) or reducing impact scores for the{" "}
+            {productLabelPlural} and {supplierLabelPlural} connected to this{" "}
+            {projectLabel}.
           </div>
         </div>
       );
@@ -564,8 +593,8 @@ class ItemList extends Component {
         <div>
           <div>
             The Assurance Score indicates how completely your organization has
-            implemented SCRM mitigations for suppliers connected with this
-            project.
+            implemented SCRM mitigations for {supplierLabelPlural} connected
+            with this {projectLabel}.
           </div>
           <br></br>
           <div>
@@ -574,16 +603,16 @@ class ItemList extends Component {
           </div>
           <br></br>
           <div>
-            Improving this score requires working with suppliers (e.g. ensuring
-            they have insurance, fallback partnerships with other vendors,
-            backup inventory).
+            Improving this score requires working with {supplierLabelPlural}{" "}
+            (e.g. ensuring they have insurance, fallback partnerships with other
+            vendors, backup inventory).
           </div>
         </div>
       );
       criticalityTooltip = (
         <div>
           The criticality score is based on your answer to the question about
-          how critical this project is to your company/business/mission.
+          how critical this {projectLabel} is to your company/business/mission.
         </div>
       );
     }
@@ -598,7 +627,7 @@ class ItemList extends Component {
 
     const headerDetails = [
       {
-        label: type.substring(0, type.length - 1),
+        label: resourceDesignators.get(type.substring(0, type.length - 1)),
         tooltip: "Sort by name",
         cssClass: classes.titleCol,
         sortType: "Name"

@@ -12,8 +12,6 @@ import {
 } from "../../redux/actions";
 import { connect } from "react-redux";
 
-const Rainbow = require("rainbowvis.js");
-
 const mapState = state => ({
   suppliers: state.suppliers,
   products: state.products,
@@ -22,15 +20,6 @@ const mapState = state => ({
 });
 
 class ScoresScatterplot extends Component {
-  constructor(props) {
-    super(props);
-    this.rainbow = new Rainbow();
-    this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
-    this.impact_colors = [...Array(101).keys()].map(
-      i => `#${this.rainbow.colorAt(i)}`
-    );
-  }
-
   getImpactColor = impactPct => {
     const colorIdx = Math.min(
       Math.floor((1 - impactPct) * this.impact_colors.length),

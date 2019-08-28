@@ -5,7 +5,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { ActionCard } from "../../components/";
 import {
   getNumQuestionsForResource,
-  getLatestResponseForResource
+  getLatestResponseForResource,
+  ResourcesDesignators
 } from "../../utils/general-utils";
 
 import { connect } from "react-redux";
@@ -80,7 +81,8 @@ const mapState = state => ({
   projectQuestions: state.projectQuestions,
   supplierResponses: state.supplierResponses,
   productResponses: state.productResponses,
-  projectResponses: state.projectResponses
+  projectResponses: state.projectResponses,
+  preferences: state.preferences
 });
 
 class TodosCard extends Component {
@@ -141,15 +143,19 @@ class TodosCard extends Component {
       productQuestions,
       projects: allProjects,
       projectResponses,
-      projectQuestions
+      projectQuestions,
+      preferences
     } = this.props;
 
     const projects = allProjects.filter(p => !!p.parent);
 
+    const resourceDesignators = new ResourcesDesignators(preferences);
+
     const importItems = [
-      [suppliers, "supplier"],
-      [products, "product"],
-      [projects, "project"]
+      // [suppliers, "supplier"],
+      [suppliers, resourceDesignators.get("supplier")],
+      [products, resourceDesignators.get("product")],
+      [projects, resourceDesignators.get("project")]
     ]
       .map(entry => this.importTodoItem(...entry))
       .filter(Boolean);
@@ -159,11 +165,29 @@ class TodosCard extends Component {
         suppliers,
         supplierQuestions,
         supplierResponses,
-        "supplier",
-        "suppliers"
+        resourceDesignators.get("supplier"),
+        resourceDesignators.getPlural("supplier")
+        // "supplier",
+        // "suppliers"
       ],
-      [products, productQuestions, productResponses, "product", "products"],
-      [projects, projectQuestions, projectResponses, "project", "projects"]
+      [
+        products,
+        productQuestions,
+        productResponses,
+        resourceDesignators.get("product"),
+        resourceDesignators.getPlural("product")
+        // "product",
+        // "products"
+      ],
+      [
+        projects,
+        projectQuestions,
+        projectResponses,
+        resourceDesignators.get("project"),
+        resourceDesignators.getPlural("project")
+        // "project",
+        // "projects"
+      ]
     ]
       .map(entry => this.answerQuestionsTodoItem(...entry))
       .filter(Boolean);
@@ -174,9 +198,9 @@ class TodosCard extends Component {
         : [];
 
     const ageItems = [
-      [suppliers, supplierResponses, "supplier"],
-      [products, productResponses, "product"],
-      [projects, projectResponses, "project"]
+      [suppliers, supplierResponses, resourceDesignators.get("supplier")],
+      [products, productResponses, resourceDesignators.get("product")],
+      [projects, projectResponses, resourceDesignators.get("project")]
     ]
       .map(entry => this.responseAgeTodoItem(...entry))
       .filter(Boolean);

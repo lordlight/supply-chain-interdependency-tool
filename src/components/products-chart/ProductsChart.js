@@ -7,6 +7,8 @@ import { withStyles } from "@material-ui/core/styles";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 
+import { ResourcesDesignators } from "../../utils/general-utils";
+
 const styles = theme => ({
   cell: {
     display: "table-cell",
@@ -23,7 +25,8 @@ const styles = theme => ({
 const mapState = state => ({
   products: state.products,
   productsRisk: state.productsRisk,
-  scores: state.scores
+  scores: state.scores,
+  preferences: state.preferences
 });
 
 class ProductsChart extends Component {
@@ -34,7 +37,9 @@ class ProductsChart extends Component {
   };
 
   getCellTooltip = (row, col, buckets) => {
-    return `${buckets[row][col]} Products`;
+    const count = buckets[row][col];
+    const label = count == 1 ? this.label : this.labelPlural;
+    return `${count} ${label}`;
   };
 
   render = () => {
@@ -42,6 +47,12 @@ class ProductsChart extends Component {
 
     const products = Object.values(this.props.products);
     const productScores = this.props.scores.product || {};
+
+    const resourceDesignators = new ResourcesDesignators(
+      this.props.preferences
+    );
+    this.label = resourceDesignators.get("Product");
+    this.labelPlural = resourceDesignators.getPlural("Product");
 
     let maxInterdependence = Math.max(
       ...(products.map(
@@ -65,17 +76,7 @@ class ProductsChart extends Component {
         ) || 0;
       buckets[row][col]++;
     });
-    // Object.values(this.props.productsRisk).forEach(risk => {
-    //   // const score = Math.max(risk.score || 100, 0);
-    //   const score = Math.max(...Object.values(risk.Dependency), 0);
-    //   const col = Math.min(Math.floor(score * 0.03), 2);
-    //   const interdependence = Math.max(
-    //     ...Object.values(risk.Interdependence),
-    //     0
-    //   );
-    //   const row = Math.min(Math.floor(interdependence * 3.0), 2);
-    //   buckets[row][col]++;
-    // });
+
     const numProducts = (this.props.products || []).length;
 
     const { classes } = this.props;
