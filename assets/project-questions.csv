@@ -1,4 +1,4 @@
-ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Relation
+ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Relation,Question Info Text
 1.2,ID.AM-5,How critical is this project to the acquirer's mission/business?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1 (highly critical)"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10 (not critical at all)"" | value=100;label=""I don't know""","IF 1, RAISE 100
 IF 2, RAISE 90
 IF 3, RAISE 80
@@ -12,4 +12,5 @@ IF 10, RAISE 10;","Present examples of:
 1) a business support project, such as an HR or payroll system
 2) a business output project, such as product/service development or delivery.
 
-Dave's Bubble: Refer to criticality analysis in dave's bubble",Criticality,Parent ID
+Dave's Bubble: Refer to criticality analysis in dave's bubble",Criticality,Parent ID,"Final criticality takes into account identified interdependencies, controls, and any aspects of the system, subsystem, and component/subcompent operations that may be vulnerable due to systems architecture and design, reliance on a single supplier, or any other factors that were discovered in the overall analysis. This final criticality helps the organization to identify and better understand the systems, subsystems, components and subcomponents that are most essential to their operations and the environment in which 
+they operate. For further information see NISTIR 8179, Criticality Analysis Process Model: Prioritizing Systems and Components, April 2018."

@@ -107,9 +107,9 @@ class Question extends Component {
               <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
                 {this.props.questionText}
               </span>
-              {this.props.question.Notes && (
+              {this.props.question["Question Info Text"] && (
                 <Tooltip
-                  title={this.props.question.Notes}
+                  title={this.props.question["Question Info Text"]}
                   classes={{ tooltip: classes.tooltip }}
                 >
                   <IconButton
