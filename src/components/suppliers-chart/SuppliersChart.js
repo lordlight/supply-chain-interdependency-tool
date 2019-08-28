@@ -30,66 +30,6 @@ const data = {
   ]
 };
 
-// const options = {
-//   plugins: {
-//     datalabels: {
-//       display: true,
-//       color: "black"
-//     }
-//   },
-//   animation: false,
-//   layout: {
-//     padding: {
-//       left: 12,
-//       right: 12,
-//       top: 24,
-//       bottom: 0
-//     }
-//   },
-//   responsive: false,
-//   maintainAspectRatio: false,
-//   legend: {
-//     display: false
-//   },
-//   tooltips: {
-//     enabled: true,
-//     callbacks: {
-//       label: tooltipItem => `${tooltipItem.value} Suppliers`,
-//       title: tooltipItem => {
-//         const bucket = `${BUCKETS[tooltipItem[0].index]} assurance`;
-//         return bucket;
-//       }
-//     }
-//   },
-//   scales: {
-//     xAxes: [
-//       {
-//         // display: false,
-//         categoryPercentage: 1.0,
-//         barPercentage: 1.0,
-//         scaleLabel: {
-//           display: true,
-//           labelString: "Assurance"
-//         }
-//       }
-//     ],
-//     yAxes: [
-//       {
-//         ticks: {
-//           beginAtZero: true,
-//           stepSize: 1,
-//           maxTicksLimit: 50,
-//           display: false
-//         },
-//         scaleLabel: {
-//           display: true,
-//           labelString: "# Suppliers"
-//         }
-//       }
-//     ]
-//   }
-// };
-
 class SuppliersChart extends Component {
   render = () => {
     const resourceDesignators = new ResourcesDesignators(

@@ -57,8 +57,12 @@ const styles = theme => ({
   legendIcon: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
-    width: 80
+    justifyContent: "space-between"
+    // maxWidth: 125
+  },
+  legendText: {
+    maxWidth: 125,
+    overflow: "hidden"
   },
   scoreBarsContainer: {
     height: 15,
@@ -147,7 +151,6 @@ class HierarchicalVisualization extends Component {
       preferences["resources.designators"] !=
         prevPreferences["resource.designators"]
     ) {
-      console.log("WSSFDFDFDFDSFDSFAAAAAAH");
       // const colorscheme = getColorScheme(this.props.preferences);
       // this.rainbow.setSpectrum(...colorscheme);
       // this.impact_colors = [...Array(101).keys()].map(
@@ -953,6 +956,8 @@ class HierarchicalVisualization extends Component {
       i => `#${this.rainbow.colorAt(i)}`
     );
 
+    const resourceDesignators = new ResourcesDesignators(preferences);
+
     return (
       <div
         style={{
@@ -983,9 +988,9 @@ class HierarchicalVisualization extends Component {
             borderColor: "lightgray",
             borderWidth: 2,
             padding: 6,
-            top: 12
+            top: 12,
             // bottom: 6
-            // zIndex: 100
+            zIndex: 10000
           }}
         >
           {/* <Typography variant="h6">Legend</Typography> */}
@@ -1002,8 +1007,10 @@ class HierarchicalVisualization extends Component {
           >
             <div>
               <div className={classes.legendIcon}>
-                <Typography>Project:</Typography>
-                <div>
+                <Typography
+                  className={classes.legendText}
+                >{`${resourceDesignators.get("Project")}:`}</Typography>
+                <div style={{ display: "flex" }}>
                   <div
                     style={{
                       float: "left",
@@ -1031,7 +1038,9 @@ class HierarchicalVisualization extends Component {
                 </div>
               </div>
               <div className={classes.legendIcon}>
-                <Typography>Product:</Typography>
+                <Typography
+                  className={classes.legendText}
+                >{`${resourceDesignators.get("Product")}:`}</Typography>
                 <div
                   style={{
                     width: 22,
@@ -1051,7 +1060,9 @@ class HierarchicalVisualization extends Component {
                 </div>
               </div>
               <div className={classes.legendIcon}>
-                <Typography>Supplier:</Typography>
+                <Typography
+                  className={classes.legendText}
+                >{`${resourceDesignators.get("Supplier")}:`}</Typography>
                 <div
                   style={{
                     width: 0,
