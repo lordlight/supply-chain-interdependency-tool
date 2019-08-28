@@ -796,7 +796,9 @@ class App extends Component {
                   }}
                 >
                   {colorSchemes.map(scheme => (
-                    <MenuItem value={scheme}>{scheme}</MenuItem>
+                    <MenuItem key={scheme} value={scheme}>
+                      {scheme}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
