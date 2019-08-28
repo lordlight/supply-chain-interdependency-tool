@@ -52,11 +52,9 @@ import {
   Button,
   Grid,
   TextField,
-  Radio,
-  RadioGroup,
   FormControl,
-  FormLabel,
-  FormControlLabel
+  Select,
+  MenuItem
 } from "@material-ui/core";
 
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
@@ -786,28 +784,21 @@ class App extends Component {
               Choose the color scheme to be used for visualizations.
             </DialogContentText>
             <Grid container direction="column">
-              <FormControl
-                component="fieldset"
-                // className={classes.formControl}
-              >
-                <RadioGroup
-                  aria-label="colorscheme"
-                  name="colorscheme"
-                  // className={classes.group}
+              <FormControl className={classes.formControl}>
+                <Select
                   value={this.state.colorscheme}
                   onChange={event =>
                     this.setState({ colorscheme: event.target.value })
                   }
+                  inputProps={{
+                    name: "colorscheme",
+                    id: "colorscheme"
+                  }}
                 >
                   {colorSchemes.map(scheme => (
-                    <FormControlLabel
-                      key={scheme}
-                      value={scheme}
-                      control={<Radio color="primary" />}
-                      label={scheme}
-                    />
+                    <MenuItem value={scheme}>{scheme}</MenuItem>
                   ))}
-                </RadioGroup>
+                </Select>
               </FormControl>
             </Grid>
           </DialogContent>
