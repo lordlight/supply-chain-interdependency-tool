@@ -530,9 +530,13 @@ class ItemList extends Component {
         </div>
       );
     } else if (type === "projects") {
-      items = [...this.props.projects, ...this.props.projectsInactive].filter(
-        proj => !!proj.parent
-      );
+      // items = [...this.props.projects, ...this.props.projectsInactive].filter(
+      //   proj => !!proj.parent
+      // );
+      items = [
+        ...this.props.projects.filter(proj => !!proj.parent),
+        ...this.props.projectsInactive
+      ];
       // riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
       riskSet = this.props.projectsRisk;
       questions = this.props.projectQuestions;
@@ -946,12 +950,17 @@ class ItemList extends Component {
       ) : (
         <TableRow key={row.ID}>
           <TableCell
-            className={classes.cell}
+            className={classes.lastOfCell}
             style={{ color: "gray", fontStyle: "italic" }}
           >
             {row.Name + " (inactive)"}
           </TableCell>
           <TableCell />
+          <TableCell />
+          <TableCell />
+          {scoreValues.map((val, i) => (
+            <TableCell key={i}></TableCell>
+          ))}
           <TableCell />
           <TableCell />
           <TableCell />
