@@ -31,8 +31,9 @@ const mapState = state => ({
 
 class ProductsChart extends Component {
   getCellColor = (row, col, buckets, numProducts) => {
+    const count = buckets[row][col];
     const alpha =
-      numProducts > 0 ? (0.9 * buckets[row][col]) / numProducts + 0.05 : 0;
+      numProducts > 0 && count > 0 ? (0.9 * count) / numProducts + 0.05 : 0;
     return `rgba(18, 101, 156, ${alpha})`;
   };
 
@@ -153,8 +154,9 @@ class ProductsChart extends Component {
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
-              left: 14,
-              bottom: 96
+              left: 26,
+              bottom: 96,
+              fontSize: 11
             }}
           >
             INTERDEPENDENCE
@@ -182,8 +184,9 @@ class ProductsChart extends Component {
           <Typography
             style={{
               position: "absolute",
-              left: 150,
-              bottom: 4
+              left: 152,
+              bottom: 4,
+              fontSize: 11
             }}
           >
             IMPACT
