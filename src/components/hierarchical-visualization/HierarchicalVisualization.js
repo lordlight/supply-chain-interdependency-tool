@@ -136,7 +136,6 @@ class HierarchicalVisualization extends Component {
   };
 
   componentWillUnmount() {
-    console.log("will unmount");
     window.removeEventListener("resize", this.resize);
     clearTimeout(this.resizeTimeout);
     this.syncProperties();
@@ -874,7 +873,6 @@ class HierarchicalVisualization extends Component {
               .filter(p => !p.parent)
               .map(o => o.ID);
             if (organizationsIds.indexOf(rid) !== -1) {
-              console.log("NO ORG VISIT");
               return;
             }
           }

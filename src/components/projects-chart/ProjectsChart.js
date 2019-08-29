@@ -91,7 +91,6 @@ class ProjectsChart extends Component {
       node.children = parent.children.map(child => traverse(child));
       return node;
     };
-    // console.log("<><><", this.props.projects);
     // there should be exactly one top-level project
     const org = this.props.projects.filter(proj => !proj.parent)[0];
     if (!org) {

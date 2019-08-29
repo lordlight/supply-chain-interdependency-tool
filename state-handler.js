@@ -209,22 +209,6 @@ saveSessionData = (event, type) => {
           console.log("save csv error: ", csvErr);
           event.sender.send("save-error", csvErr);
         }
-        // json2csv.json2csv(sessionData[resource.type], (err, csv) => {
-        // 	if (!err){
-        // 		fs.writeFile(dataPath + "/" +resource.path, csv, (csvErr) => {
-        // 			if (!csvErr){
-        // 				console.log(resource.type, " saved");
-        // 				event.sender.send('save-confirm', resource.type + " saved");
-        // 			} else {
-        // 				console.log("save csv error: ", csvErr);
-        // 				event.sender.send('save-error', csvErr);
-        // 			}
-        // 		});
-        // 	} else {
-        // 		console.log("save write error: ", err);
-        // 		event.sender.send('save-error', err);
-        // 	}
-        // });
       }
     });
   } else if (type === "responses") {
@@ -266,37 +250,6 @@ updateSessionData = (data, type, keepInactive = false) => {
   return data;
 };
 
-/*getAppRoot = () => {
-	const appPath = app.getPath('exe');
-	const appName = app.getName();
-
-	let appRoot = "";
-
-	console.log("getAppRoot: ", appPath, ", name: ", appName);
-
-	if (process.platform === 'darwin'){
-		console.log("***Platform is MacOS");
-		let appIndex = appPath.indexOf(appName+".app");
-		if (appIndex > -1){
-			appRoot = appPath.substring(0, appIndex);
-		} else {
-			appRoot = app.getAppPath();
-		}
-	} else if (process.platform === 'win32'){
-		console.log("***Platform is Windows");
-		let appIndex = appPath.indexOf(appName+".exe");
-		if (appIndex > -1){
-			appRoot = appPath.substring(0, appIndex);
-		} else {
-			appRoot = app.getAppPath();
-		}
-	} else {
-		appRoot = app.getAppPath();
-	}
-
-	return appRoot;
-}*/
-
 // Functions and event handlers for communicating with data.
 ipcMain.on("renderer-loaded", event => {
   event.sender.send("init-state", sessionData);
@@ -306,7 +259,6 @@ ipcMain.on("renderer-loaded", event => {
 });
 
 ipcMain.on("update-preferences", (event, payload) => {
-  // console.log("UPDATE PREFERENCES", payload);
   store.set(payload);
 });
 
@@ -316,7 +268,6 @@ ipcMain.on("open-import", event => {
 });
 
 ipcMain.on("response-update", (event, changedResponses) => {
-  //console.log("changed: ", changedResponses);
   changedResponses.forEach(responseSet => {
     Object.keys(responseSet).forEach(typeKey => {
       Object.keys(responseSet[typeKey]).forEach(itemKey => {
@@ -362,7 +313,6 @@ ipcMain.on("asynchronous-file-load", (event, req) => {
 
               saveSessionData(event, "resources");
               createCorrespondingResponses();
-              console.log("done");
             });
         } catch (err) {
           response.error = "**ERROR**" + err;
@@ -386,6 +336,5 @@ ipcMain.on("clear-all-data", (event, req) => {
     ...mutableData()
   };
   store.clear();
-  console.log(">>>", "send clear all response");
   event.sender.send("clear-all-data-response", { status: 0 });
 });

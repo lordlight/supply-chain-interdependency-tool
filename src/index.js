@@ -21,7 +21,6 @@ const electron = window.electron;
 const ipcRenderer = electron.ipcRenderer;
 
 // Handle response from the electron main thread/server.
-//store.subscribe(() => console.log("Store accessed: ", store.getState()));
 
 ipcRenderer.on("init-state", (event, arg) => {
   console.log("init state: ", arg);
@@ -58,8 +57,6 @@ ipcRenderer.on("asynchronous-file-response", (event, arg) => {
     } else if (arg.type === "products") {
       store.dispatch(addProducts(arg.data));
     }
-
-    console.log("store: ", store.getState());
 
     //store.dispatch(updateImportState({importState: null}));
     setTimeout(

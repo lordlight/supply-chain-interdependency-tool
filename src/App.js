@@ -277,12 +277,9 @@ class App extends Component {
           // If not a response change, pass along null (so it is ignored).
           return null;
         }
-        //console.log('changed property:', key, 'from', this.props[key], 'to, ', nextProps[key]);
       })
       .filter(Boolean);
-    // console.log("diff: ", diff);
     if (diff.length > 0) {
-      console.log("response update: ", diff);
       ipcRenderer.send("response-update", diff);
     }
 
