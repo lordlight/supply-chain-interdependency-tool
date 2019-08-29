@@ -988,9 +988,9 @@ class HierarchicalVisualization extends Component {
             borderColor: "lightgray",
             borderWidth: 2,
             padding: 6,
-            top: 12,
+            top: 12
             // bottom: 6
-            zIndex: 10000
+            // zIndex: 10000
           }}
         >
           {/* <Typography variant="h6">Legend</Typography> */}
