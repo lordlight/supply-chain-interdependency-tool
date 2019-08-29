@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
+import { line } from "d3-shape";
 import { Typography } from "@material-ui/core";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
@@ -18,6 +19,35 @@ const mapState = state => ({
   projects: state.projects,
   scores: state.scores
 });
+
+const VerticalLineLayer = ({ xScale, yScale }) => {
+  const midx = MAX_IMPACT_SCORE / 2;
+
+  return (
+    <line
+      x1={xScale(midx)}
+      x2={xScale(midx)}
+      y1={yScale(0) || 0}
+      stroke="lightgray"
+      strokeWidth="2"
+    />
+  );
+};
+
+// const HorizontalLineLayer = ({ nodes, xScale, yScale }) => {
+//   const midy = Math.max(...nodes.map(p => p.data.y)) / 2;
+
+//   return (
+//     <line
+//       x1={xScale(0)}
+//       x2={xScale(MAX_IMPACT_SCORE)}
+//       y1={yScale(midy)}
+//       y2={yScale(midy)}
+//       stroke="lightgray"
+//       strokeWidth="2"
+//     />
+//   );
+// };
 
 class ScoresScatterplot extends Component {
   getImpactColor = impactPct => {
@@ -133,6 +163,16 @@ class ScoresScatterplot extends Component {
               <Typography>Interdependence:&nbsp;{node.data.y}</Typography>
             </div>
           )}
+          layers={[
+            "grid",
+            "axes",
+            VerticalLineLayer,
+            // HorizontalLineLayer,
+            "nodes",
+            "markers",
+            "mesh",
+            "legends"
+          ]}
         />
       </div>
     );
