@@ -39,7 +39,9 @@ const styles = theme => ({
     fontSize: 14,
     boxShadow: theme.shadows[1],
     // maxWidth: "none",
-    overflow: "auto"
+    overflow: "visible",
+    whiteSpace: "normal",
+    wordBreak: "break-word"
   }
 });
 
