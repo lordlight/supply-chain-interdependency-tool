@@ -12,5 +12,4 @@ IF 10, RAISE 10;","Present examples of:
 1) a business support project, such as an HR or payroll system
 2) a business output project, such as product/service development or delivery.
 
-Dave's Bubble: Refer to criticality analysis in dave's bubble",Criticality,Parent ID,"Final criticality takes into account identified interdependencies, controls, and any aspects of the system, subsystem, and component/subcompent operations that may be vulnerable due to systems architecture and design, reliance on a single supplier, or any other factors that were discovered in the overall analysis. This final criticality helps the organization to identify and better understand the systems, subsystems, components and subcomponents that are most essential to their operations and the environment in which 
-they operate. For further information see NISTIR 8179, Criticality Analysis Process Model: Prioritizing Systems and Components, April 2018."
+Dave's Bubble: Refer to criticality analysis in dave's bubble",Criticality,Parent ID,"For further information see NISTIR 8179, Criticality Analysis Process Model: Prioritizing Systems and Components, April 2018."
