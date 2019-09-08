@@ -19,8 +19,6 @@ const ASSET_WEIGHTS = {
   ICTA: 0.25
 };
 
-const CONCERN_THRESHOLD = 50;
-
 export const MAX_IMPACT_SCORE =
   (DEPENDENCY_WEIGHT +
     Object.values(ASSET_WEIGHTS).reduce((acc, w) => acc + w, 0)) *
@@ -273,29 +271,15 @@ export function computeImpacts(
           (Object.entries(project.Criticality || {})[0] || [])[1] || 0;
         // const adscore = (assurance * dpscore * crscore * prcrit) / 1000.0;
         const dscore = (dpscore * crscore * prcrit) / 10000.0;
-        const concerns = [];
-        if (dpscore >= CONCERN_THRESHOLD) {
-          concerns.push("dp");
-        }
-        if (crscore >= CONCERN_THRESHOLD) {
-          concerns.push("prodcr");
-        }
-        if (prcrit >= CONCERN_THRESHOLD) {
-          concerns.push("projcr");
-        }
         let adscoreEntry = {
           projectId,
           productId,
           supplierId,
           dependencyScore: dscore
         };
-        if (concerns.length > 0) {
-          adscoreEntry.dependencyConcerns = concerns;
-        }
         dependencyScoreEntries.push(adscoreEntry);
       });
       Object.entries(assetRisks).forEach(entry => {
-        let concerns = [];
         const [assetId, assetScores] = entry;
         let score =
           (Object.entries(assetScores.Criticality || {})[0] || [])[1] || 0;
@@ -306,9 +290,6 @@ export function computeImpacts(
           if (curAssetId === assetId) {
             score *= acscore;
             normalizeFactor *= 100;
-            if (acscore >= CONCERN_THRESHOLD) {
-              concerns.push("p");
-            }
           }
         });
         Object.entries(supplier.Access || {}).forEach(acentry => {
@@ -317,17 +298,11 @@ export function computeImpacts(
           if (curAssetId === assetId) {
             score *= acscore;
             normalizeFactor *= 100;
-            if (acscore >= CONCERN_THRESHOLD) {
-              concerns.push("s");
-            }
           }
         });
         if (normalizeFactor > 1) {
           score /= normalizeFactor;
           let accessScoreEntry = { assetId, productId, supplierId, score };
-          if (concerns.length > 0) {
-            accessScoreEntry.concerns = concerns;
-          }
           accessScoreEntries.push(accessScoreEntry);
         }
       });
@@ -362,16 +337,7 @@ export function computeImpacts(
       acc[as.assetId] = as.score;
       return acc;
     }, {});
-    const supplyLineAccessConcerns = accessScores.reduce((acc, as) => {
-      if (as.concerns) {
-        acc[as.assetId] = as.concerns;
-      }
-      return acc;
-    }, {});
     let rv = { ...entry, score, accessScores: supplyLineAccessScores };
-    if (Object.keys(supplyLineAccessConcerns).length > 0) {
-      rv.accessConcerns = supplyLineAccessConcerns;
-    }
     return rv;
   });
 
@@ -389,14 +355,6 @@ export function computeImpacts(
     Object.values(resourceInfo).forEach(info => {
       info.impact = computeImpactFromSupplyLines(info.supplyLines);
       // keyed by resource id
-      const allConcerns = { projects: {}, products: {}, suppliers: {} };
-      info.supplyLines.forEach(sl => {
-        (sl.dependencyConcerns || []).forEach(concern => {
-          if (concern === "dp") {
-            const prid = sl.productId;
-          }
-        });
-      });
       info.interdependence = info.supplyLines
         .map(sl => sl.score)
         .reduce((acc, val) => acc + val, 0);
