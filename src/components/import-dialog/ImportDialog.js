@@ -186,9 +186,13 @@ class ImportDialog extends Component {
           </DialogContent>
         ) : (
           <div>
-            <DialogContent className={classes.dialogDesc}>
+            {/* <DialogContent className={classes.dialogDesc}>
               Import CSV file of {this.props.type}. Press the choose file button
               or drag a file here. {formatLink}
+            </DialogContent> */}
+            <DialogContent className={classes.dialogDesc}>
+              Import CSV file of {this.props.type}. Press the choose file button
+              or drag a file here.
             </DialogContent>
             <DialogContent
               className={classes.dropTarget}

@@ -1074,9 +1074,9 @@ class HierarchicalVisualization extends Component {
             <div style={{ marginLeft: 24 }}>
               <Typography>Impact</Typography>
               <div style={{ display: "flex" }}>
-                {[...this.impact_colors].reverse().map(c => (
+                {[...this.impact_colors].reverse().map((c, i) => (
                   <div
-                    key={c}
+                    key={i}
                     style={{ width: 2, height: 9, backgroundColor: c }}
                   />
                 ))}
