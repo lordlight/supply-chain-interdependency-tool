@@ -75,12 +75,19 @@ class SuppliersChart extends Component {
       scales: {
         xAxes: [
           {
-            // display: false,
+            ticks: {
+              fontSize: 11,
+              fontFamily: "Arial",
+              fontColor: "rgba(0, 0, 0, 0.87)"
+            },
             categoryPercentage: 1.0,
             barPercentage: 1.0,
             scaleLabel: {
               display: true,
-              labelString: "Assurance"
+              labelString: "Assurance",
+              fontSize: 11,
+              fontFamily: "Arial",
+              fontColor: "rgba(0, 0, 0, 0.87)"
             }
           }
         ],
@@ -94,7 +101,10 @@ class SuppliersChart extends Component {
             },
             scaleLabel: {
               display: true,
-              labelString: "# Suppliers"
+              labelString: "# Suppliers",
+              fontSize: 11,
+              fontFamily: "Arial",
+              fontColor: "rgba(0, 0, 0, 0.87)"
             }
           }
         ]

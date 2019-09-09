@@ -154,58 +154,68 @@ class ProductsChart extends Component {
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
-              left: 26,
+              left: 30,
               bottom: 96,
-              fontSize: 11
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            INTERDEPENDENCE
+            Interdependence
           </Typography>
           <Typography
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
-              left: 74,
-              top: 21
+              left: 81,
+              top: 21,
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            High
+            high
           </Typography>
           <Typography
             style={{
               position: "absolute",
               transform: "rotate(-90deg)",
-              left: 74,
-              bottom: 39
+              left: 81,
+              bottom: 34,
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            Low
+            low
           </Typography>
           <Typography
             style={{
               position: "absolute",
-              left: 152,
+              left: 154,
               bottom: 4,
-              fontSize: 11
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            IMPACT
+            Impact
           </Typography>
           <Typography
             style={{
               position: "absolute",
-              left: 100
+              left: 100,
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            Low
+            low
           </Typography>
           <Typography
             style={{
               position: "absolute",
-              right: 100
+              right: 100,
+              fontSize: 11,
+              fontFamily: "Arial"
             }}
           >
-            High
+            high
           </Typography>
         </div>
       </div>
