@@ -281,27 +281,28 @@ export function computeImpacts(
       });
       Object.entries(assetRisks).forEach(entry => {
         const [assetId, assetScores] = entry;
-        let score =
+        const crit =
           (Object.entries(assetScores.Criticality || {})[0] || [])[1] || 0;
-        let normalizeFactor = 1;
+        let score = 0;
+        let normalizeFactor = 0;
         Object.entries(scores.Access).forEach(acentry => {
           const [akey, acscore] = acentry;
           const curAssetId = akey.split("|")[1];
           if (curAssetId === assetId) {
-            score *= acscore;
-            normalizeFactor *= 100;
+            score += acscore;
+            normalizeFactor += 100;
           }
         });
         Object.entries(supplier.Access || {}).forEach(acentry => {
           const [akey, acscore] = acentry;
           const curAssetId = akey.split("|")[1];
           if (curAssetId === assetId) {
-            score *= acscore;
-            normalizeFactor *= 100;
+            score += acscore;
+            normalizeFactor += 100;
           }
         });
         if (normalizeFactor > 1) {
-          score /= normalizeFactor;
+          score = normalizeFactor > 0 ? crit * (score / normalizeFactor) : 0;
           let accessScoreEntry = { assetId, productId, supplierId, score };
           accessScoreEntries.push(accessScoreEntry);
         }
@@ -374,7 +375,7 @@ export function computeImpacts(
     })
   );
 
-  // console.log("SCORES", scores);
+  console.log("SCORES", scores);
   return scores;
 }
 
