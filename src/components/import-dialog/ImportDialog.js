@@ -207,7 +207,15 @@ class ImportDialog extends Component {
               >
                 choose file...
               </Button>
-              <Typography className={classes.importText} component="div">
+              <Typography
+                className={classes.importText}
+                style={
+                  (this.props.importState || "").includes("**ERROR**")
+                    ? { color: "red" }
+                    : {}
+                }
+                component="div"
+              >
                 {fileText}
               </Typography>
             </DialogContent>

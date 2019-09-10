@@ -229,6 +229,97 @@ saveSessionData = (event, type) => {
   }
 };
 
+const REQUIRED_IMPORT_FIELDS = {
+  products: ["ID", "Name", "Supplier ID", "Project ID"],
+  suppliers: ["ID", "Name"],
+  projects: ["ID", "Level", "Name"]
+};
+
+validateImport = (data, type) => {
+  // types of validation errors:
+  // - empty import
+  // - imported data is not of correct type; does not have the fields required
+  // - all data has all required fields
+  // - no duplicate IDs
+  // - for product relations, no repeats
+
+  // see if any data at all
+  if (data.length === 0) {
+    return { success: false, error: "No data" };
+  }
+
+  // see if required fields even exist in file
+  const fieldsMissing = REQUIRED_IMPORT_FIELDS[type].filter(
+    field => data[0][field] == undefined
+  );
+  if (fieldsMissing.length > 0) {
+    return {
+      success: false,
+      error: `Missing fields: ${fieldsMissing.join(", ")}`
+    };
+  }
+
+  // make sure all rows have required fields
+  const fieldsWithMissing = REQUIRED_IMPORT_FIELDS[type].filter(field =>
+    data.some(row => !row[field])
+  );
+  if (fieldsWithMissing.length > 0) {
+    return {
+      success: false,
+      error: `One or more rows missing these fields: ${fieldsWithMissing.join(
+        ", "
+      )}`
+    };
+  }
+
+  // check for duplicate IDs
+  const allIds = new Set(data.map(row => row.ID));
+  if (allIds.size < data.length) {
+    return {
+      success: false,
+      error: "Import file rows cannot have duplicate IDs"
+    };
+  }
+
+  // the "|" character is reserved
+  if (
+    data.some(row => row.ID.indexOf("|") !== -1 || row.ID.indexOf(";") !== -1)
+  ) {
+    return {
+      success: false,
+      error: 'IDs cannot contain the characters "|" or ";"'
+    };
+  }
+
+  // ensure valid relations (for products)
+  if (type === "products") {
+    const relationFields = ["Supplier ID", "Project ID"];
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+      for (let j = 0; j < relationFields.length; j++) {
+        const field = relationFields[j];
+        relations = row[field].split(";");
+        // for product relations, check no duplicates
+        if (relations.length !== new Set(relations).size) {
+          return {
+            success: false,
+            error: `One or more rows have duplicate relations in ${field}`
+          };
+        }
+        // check no relation contains the reserved character "|"
+        if (relations.some(rel => rel.indexOf("|") !== -1)) {
+          return {
+            success: false,
+            error: `${field} relations cannot contain the character "|"`
+          };
+        }
+      }
+    }
+  }
+
+  return { success: true };
+};
+
 updateSessionData = (data, type, keepInactive = false) => {
   if (sessionData.hasOwnProperty(type)) {
     if (keepInactive) {
@@ -304,15 +395,21 @@ ipcMain.on("asynchronous-file-load", (event, req) => {
               response.data.push(data);
             })
             .on("end", () => {
-              response.data = updateSessionData(
-                response.data,
-                response.type,
-                keepInactive
-              );
-              event.sender.send("asynchronous-file-response", response);
+              const validation = validateImport(response.data, response.type);
+              if (validation.success) {
+                response.data = updateSessionData(
+                  response.data,
+                  response.type,
+                  keepInactive
+                );
+                event.sender.send("asynchronous-file-response", response);
 
-              saveSessionData(event, "resources");
-              createCorrespondingResponses();
+                saveSessionData(event, "resources");
+                createCorrespondingResponses();
+              } else {
+                response.error = "**ERROR**" + validation.error;
+                event.sender.send("asynchronous-file-response", response);
+              }
             });
         } catch (err) {
           response.error = "**ERROR**" + err;
