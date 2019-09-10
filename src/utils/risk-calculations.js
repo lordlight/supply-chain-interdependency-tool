@@ -12,8 +12,8 @@ const NORMALIZED_VALUES = {
 };
 
 // weighting for final scoring
-const DEPENDENCY_WEIGHT = 0.25;
-const ASSET_WEIGHTS = {
+export const DEPENDENCY_WEIGHT = 0.25;
+export const ASSET_WEIGHTS = {
   PA: 0.25,
   SDA: 0.25,
   ICTA: 0.25
@@ -375,7 +375,7 @@ export function computeImpacts(
     })
   );
 
-  console.log("SCORES", scores);
+  // console.log("SCORES", scores);
   return scores;
 }
 

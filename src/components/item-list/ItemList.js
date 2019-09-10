@@ -10,7 +10,7 @@ import {
   QuestionStatusCard
 } from "../../components";
 
-// import { calculateTypeRiskFromItemsRisk } from '../../utils/risk-calculations';
+import { ASSET_WEIGHTS } from "../../utils/risk-calculations";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -59,7 +59,7 @@ const MULTIPLES_FIELDS = {
 
 const MULTIPLES_OPTIONS = {
   Access: {
-    policy: MULTIPLES_POLICIES.MAX,
+    policy: MULTIPLES_POLICIES.SUM,
     prefix: "score.access"
   },
   Dependency: {
@@ -736,12 +736,28 @@ class ItemList extends Component {
           fields.forEach(entry => (listItem[entry[0]] = entry[1]));
         }
         if (hasAccess) {
-          const fields = this.handleMultiples(
-            MULTIPLES_OPTIONS.Access.policy,
-            riskSet[item.ID].Access,
-            MULTIPLES_OPTIONS.Access.fields.display
-          );
-          fields.forEach(entry => (listItem[entry[0]] = entry[1]));
+          let normalizeFactor = 0;
+          const combinedScore = Object.entries(riskSet[item.ID].Access)
+            .map(entry => {
+              const [key, score] = entry;
+              const assetId = key.split("|")[1];
+              const weight = ASSET_WEIGHTS[assetId] || 0;
+              normalizeFactor += weight;
+              return score * weight;
+            })
+            .reduce((acc, score) => acc + score, 0);
+          const score =
+            normalizeFactor > 0 ? combinedScore / normalizeFactor : 0;
+          listItem[MULTIPLES_OPTIONS.Access.fields.sort] = score;
+          // const fields = this.handleMultiples(
+          //   MULTIPLES_OPTIONS.Access.policy,
+          //   riskSet[item.ID].Access,
+          //   MULTIPLES_OPTIONS.Access.fields.display
+          // );
+          // Object.keys(ASSET_WEIGHTS).forEach(assetId => {
+          //   riskSet[item.ID].Access[assetId]
+          // })
+          // fields.forEach(entry => (listItem[entry[0]] = entry[1]));
           // const scores = this.getScoresMaxSumAndAvg(
           //   Object.values(riskSet[item.ID].Access)
           // );
