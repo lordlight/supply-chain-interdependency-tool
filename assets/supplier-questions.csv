@@ -7,22 +7,22 @@ IF 5-10, RAISE 2
 IF > 10, no change; 
 
 ",,Assurance,,,
-1.4,ID.SC-2,How much of the supplier's total business is provided by the acquirer?,"Scale: 1-5 where 5 is ""90%+ and 1 is ""under 5%"" 
+1.4,ID.SC-2,How much of the supplier's total business is provided by your company?,"Scale: 1-5 where 5 is ""90%+ and 1 is ""under 5%"" 
 
 Include option ""I don't know""","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=0;label=""50 - 100%"" | value=10;label=""I don't know""","IF < 25% , RAISE 10
 IF 25-50%, RAISE 5
 IF 50-100, no change; 
 
 ","Note: This question is Assurance instead of Dependency because it is primarily targeting control over a supplier, not supplier stability. ",Assurance,,,
-2.1,PR.AC-1,"Does supplier have access to the acquirer's IT networks, OT systems, or sensitive platforms (e.g., payment portals)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+2.1,PR.AC-1,"Does supplier have access to your company's IT networks, OT systems, or sensitive platforms (e.g., payment portals)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
 ",,Access,ICTA,"Sensitive platforms may include payment portals (e.g., PayPal, Authorize.net, Amazon Payments), inventory systems, logistics platforms, or other cloud services.",2
-2.2,PR.AC-1,Does supplier have access to the acquirer's physical facilities?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+2.2,PR.AC-1,Does supplier have access to the your company's physical facilities?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
 ",,Access,PA,,2
-2.3,PR.AC-4,"Does supplier have access to acquirer-sensitive information (e.g., intellectual property, financial data, internal processes, etc.) or regulated data (e.g., PII, PHI, PCI, etc.) for which the acquirer is responsible?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+2.3,PR.AC-4,"Does supplier have access to your company's sensitive information (e.g., intellectual property, financial data, internal processes, etc.) or regulated data (e.g., PII, PHI, PCI, etc.) for which your company is responsible?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
 ","NIST IR: Define regulated data and the types of regulated data.
@@ -49,7 +49,7 @@ IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
 IF 5 (no concern), no change; ","Internal reference: ""state owned"" - A business or entity where the government or state has significant control through full, majority, or significant minority ownership
-",Assurance,,"This may include suppliers which are heaviliy dependent on one of the acquirer's competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",
+",Assurance,,"This may include suppliers which are heaviliy dependent on one of your competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",
 5.1,ID.SC-3,"How sensitive is the supplier's ability to provide quality products/services to supply chain disruptions, both manmade and natural?","Scale: 1-5 where 1 is ""Very sensitive"" and 5 is ""Very robust""
 
 Include option ""I don't know""","value=10;label=""1 (very sensitive)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (very robust)"" | value=10;label=""I don't know""","IF 1 (very sensitive), RAISE 10
@@ -57,22 +57,22 @@ IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
 IF 5 (very robust), no change; ",,Assurance,,,
-6.1,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to the acquirer?,Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
+6.1,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to your company?,Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;
 ",,Assurance,,,
-6.2,ID.GV-4,Has the acquirer verified the information provided by the supplier on their supplier questionnaire?,"Not verified (self-attestation), documentation review (self-attestation with proof), third party assessment, acquirer audit","value=10;label=""not provided"" | value=9;label=""not verified"" |  value=5;label=""doc review"" | value=3;label=""third-party audit"" | value=0;label=""acquirer audit"" | value=10;label=""I don't know""","IF not provided, RAISE 10
+6.2,ID.GV-4,Has your company verified the information provided by the supplier on their supplier questionnaire?,"Not verified (self-attestation), documentation review (self-attestation with proof), third party assessment, acquirer audit","value=10;label=""not provided"" | value=9;label=""not verified"" |  value=5;label=""doc review"" | value=3;label=""third-party audit"" | value=0;label=""acquirer audit"" | value=10;label=""I don't know""","IF not provided, RAISE 10
 IF not verified, RAISE 9
 IF doc review, RAISE 5
 IF third party audit, RAISE 3
 IF acquirer audit, no change; 
 
 ",,Assurance,,,
-6.3,ID.SC-3,Is the acquirer able to influence this supplier's security practices through supplier agreements?,"Scale: 1-5 where 1 is ""not at all"" and 5 is ""yes, for all products and services""","value=10;label=""1 (not at all)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (yes, for all product)"" | value=10;label=""I don't know""","IF 1 (not at all), RAISE 10
+6.3,ID.SC-3,Is your company able to influence this supplier's security practices through supplier agreements?,"Scale: 1-5 where 1 is ""not at all"" and 5 is ""yes, for all products and services""","value=10;label=""1 (not at all)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (yes, for all product)"" | value=10;label=""I don't know""","IF 1 (not at all), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
 IF 5 (yes, for all product), no change; ",,Assurance,,,
-7.1,ID.SC-2,Does the acquirer know this supplier's sub-suppliers?,Yes/No,"value=5;label=""No existing relationships"" | value=10;label=""No"" | value=5;label=""Some"" | value=0;label=""All"" | value=10;label=""I don't know""","IF yes, offer sub-supplier list import. RAISE 5 if there are no existing relationships. 
+7.1,ID.SC-2,Does your company know this supplier's sub-suppliers?,Yes/No,"value=5;label=""No existing relationships"" | value=10;label=""No"" | value=5;label=""Some"" | value=0;label=""All"" | value=10;label=""I don't know""","IF yes, offer sub-supplier list import. RAISE 5 if there are no existing relationships. 
 IF no, RAISE 10
 
 
@@ -84,5 +84,5 @@ IF All, no change;
 ","V2 feature: ""yes"" invokes sub-supplier import. Tool should dynamically check whether relationships exist. If there is a relationship, positively impact risk score. Import not required for risk score benefit. No form available to fill out in v1.
 
 ",Assurance,,,
-8.1,ID.SC-5,"Has the supplier provided the acquirer with mitigation assurances (e.g. insurance, fallback partnerships with other vendors, etc)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
+8.1,ID.SC-5,"Has the supplier provided your company with mitigation assurances (e.g. insurance, fallback partnerships with other vendors, etc)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;",,Assurance,,,
