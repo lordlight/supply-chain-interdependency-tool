@@ -45,9 +45,12 @@ export function calculateItemRisk(
       );
       if (ckey != null) {
         itemRisk[qtype][ckey] =
-          (itemRisk[qtype][ckey] || 0) + question.Answers[ansInd].val;
+          (itemRisk[qtype][ckey] || 0) +
+          question.Answers[ansInd].val * (question.Weight || 1);
       } else {
-        itemRisk[qtype] = (itemRisk[qtype] || 0) + question.Answers[ansInd].val;
+        itemRisk[qtype] =
+          (itemRisk[qtype] || 0) +
+          question.Answers[ansInd].val * (question.Weight || 1);
       }
     } else if (ckey != null) {
       itemRisk[qtype][ckey] =
@@ -57,7 +60,8 @@ export function calculateItemRisk(
           question.Answers.map(ans => {
             return ans.val;
           })
-        );
+        ) *
+          (question.Weight || 1);
     } else {
       itemRisk[qtype] =
         (itemRisk[qtype] || 0) +
@@ -66,7 +70,8 @@ export function calculateItemRisk(
           question.Answers.map(ans => {
             return ans.val;
           })
-        );
+        ) *
+          (question.Weight || 1);
     }
   };
 
@@ -405,12 +410,13 @@ function getMaxScore(questions, questionType) {
   questions
     .filter(q => q["Type of question"] === questionType)
     .forEach(question => {
-      maxScore += Math.max.apply(
-        Math,
-        question.Answers.map(ans => {
-          return ans.val;
-        })
-      );
+      maxScore +=
+        Math.max.apply(
+          Math,
+          question.Answers.map(ans => {
+            return ans.val;
+          })
+        ) * (question.Weight || 1);
     });
 
   return maxScore;
@@ -426,12 +432,13 @@ function getMaxAccessScore(questions, assetId) {
         getCellMultiples(q["Asset ID"]).indexOf(assetId) !== -1
     )
     .forEach(question => {
-      maxScore += Math.max.apply(
-        Math,
-        question.Answers.map(ans => {
-          return ans.val;
-        })
-      );
+      maxScore +=
+        Math.max.apply(
+          Math,
+          question.Answers.map(ans => {
+            return ans.val;
+          })
+        ) * (question.Weight || 1);
     });
 
   return maxScore;

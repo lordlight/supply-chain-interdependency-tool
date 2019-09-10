@@ -1,27 +1,27 @@
-ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Asset ID,Question Info Text,Version
+ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Asset ID,Question Info Text,Version,Weight
 1.2,ID.SC-2,Does the supplier have fewer than 10 employees?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
-IF no, no change;",,Assurance,,This question helps determine the stability of the supplier. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/),
+IF no, no change;",,Assurance,,This question helps determine the stability of the supplier. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4424689/),,1
 1.3,ID.SC-2,How long has this supplier been in business?,"Range: less than 3 years, less than 5 years, less than 10 years, over 10 years","value=10;label=""< 3 years"" | value=5;label=""3 - 5 years"" | value=2;label=""5 - 10 years"" | value=0;label=""> 10 years"" | value=10;label=""I don't know""","IF < 3, RAISE 10
 IF 3-5, RAISE 5
 IF 5-10, RAISE 2
 IF > 10, no change; 
 
-",,Assurance,,,
+",,Assurance,,,,1
 1.4,ID.SC-2,How much of the supplier's total business is provided by your company?,"Scale: 1-5 where 5 is ""90%+ and 1 is ""under 5%"" 
 
 Include option ""I don't know""","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=0;label=""50 - 100%"" | value=10;label=""I don't know""","IF < 25% , RAISE 10
 IF 25-50%, RAISE 5
 IF 50-100, no change; 
 
-","Note: This question is Assurance instead of Dependency because it is primarily targeting control over a supplier, not supplier stability. ",Assurance,,,
+","Note: This question is Assurance instead of Dependency because it is primarily targeting control over a supplier, not supplier stability. ",Assurance,,,,1
 2.1,PR.AC-1,"Does supplier have access to your company's IT networks, OT systems, or sensitive platforms (e.g., payment portals)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
-",,Access,ICTA,"Sensitive platforms may include payment portals (e.g., PayPal, Authorize.net, Amazon Payments), inventory systems, logistics platforms, or other cloud services.",2
+",,Access,ICTA,"Sensitive platforms may include payment portals (e.g., PayPal, Authorize.net, Amazon Payments), inventory systems, logistics platforms, or other cloud services.",2,1
 2.2,PR.AC-1,Does supplier have access to the your company's physical facilities?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
-",,Access,PA,,2
+",,Access,PA,,2,1
 2.3,PR.AC-4,"Does supplier have access to your company's sensitive information (e.g., intellectual property, financial data, internal processes, etc.) or regulated data (e.g., PII, PHI, PCI, etc.) for which your company is responsible?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;
 
@@ -33,15 +33,15 @@ PHI as individually identifiable health information that is transmitted or maint
 
 PCI - ""cardholder data""  - note: unsure how we want to reference this - there is not a clean definition - more with how orgs protect through PCI DSS
 
-From GDPR: Ôpersonal dataÕ means any information relating to an identified or identifiable natural person (Ôdata subjectÕ); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person;",Access,SDA,,2
+From GDPR: Ôpersonal dataÕ means any information relating to an identified or identifiable natural person (Ôdata subjectÕ); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person;",Access,SDA,,2,1
 3.1,ID.SC-4,Does this supplier follow relevant industry standards?,"Dropdown: N/A, No, self-attestation, self-attestation with proof, self-attestation with third party assessment, conformity assessment","value=10;label=""no"" | value=7;label=""self-attestation"" | value=5;label=""self-attestation with proof"" | value=3;label=""self-attestation with third-party assessment"" | value=0;label=""conformity assessment"" | value=10;label=""I don't know""","IF no, RAISE 10
 IF self-attestation, RAISE 7
 IF self-attestation with proof, RAISE 5
 IF self attestation with third party assessment, RAISE 3
 IF conformity assessment, no change
-IF N/A, no change",,Assurance,,,
+IF N/A, no change",,Assurance,,,,1
 3.2,ID.RM-1,"Does this supplier operate in highly regulated industries or provides products/services to highly regulated industries (e.g., Financial services, Energy)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
-IF no, 10; ",,Assurance,,,
+IF no, 10; ",,Assurance,,,,1
 4.1,ID.GV-3,"Is the supplier owned, controlled, or influenced in full or in part by an entity of concern (e.g. foreign nation state, competitors)?","Scale: 1-5 where 1 is ""great concern"" and 5 is ""no concern at all""
 
 Include option ""I don't know""","value=10;label=""1 (great concern)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (no concern)"" | value=10;label=""I don't know""","IF 1 (great concern), RAISE 10
@@ -49,29 +49,29 @@ IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
 IF 5 (no concern), no change; ","Internal reference: ""state owned"" - A business or entity where the government or state has significant control through full, majority, or significant minority ownership
-",Assurance,,"This may include suppliers which are heaviliy dependent on one of your competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",
+",Assurance,,"This may include suppliers which are heaviliy dependent on one of your competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",,1
 5.1,ID.SC-3,"How sensitive is the supplier's ability to provide quality products/services to supply chain disruptions, both manmade and natural?","Scale: 1-5 where 1 is ""Very sensitive"" and 5 is ""Very robust""
 
 Include option ""I don't know""","value=10;label=""1 (very sensitive)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (very robust)"" | value=10;label=""I don't know""","IF 1 (very sensitive), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
-IF 5 (very robust), no change; ",,Assurance,,,
+IF 5 (very robust), no change; ",,Assurance,,,,1
 6.1,ID.GV-4,Has this supplier filled out a questionnaire to qualify for providing products or services to your company?,Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;
-",,Assurance,,,
+",,Assurance,,,,1
 6.2,ID.GV-4,Has your company verified the information provided by the supplier on their supplier questionnaire?,"Not verified (self-attestation), documentation review (self-attestation with proof), third party assessment, acquirer audit","value=10;label=""not provided"" | value=9;label=""not verified"" |  value=5;label=""doc review"" | value=3;label=""third-party audit"" | value=0;label=""acquirer audit"" | value=10;label=""I don't know""","IF not provided, RAISE 10
 IF not verified, RAISE 9
 IF doc review, RAISE 5
 IF third party audit, RAISE 3
 IF acquirer audit, no change; 
 
-",,Assurance,,,
+",,Assurance,,,,1
 6.3,ID.SC-3,Is your company able to influence this supplier's security practices through supplier agreements?,"Scale: 1-5 where 1 is ""not at all"" and 5 is ""yes, for all products and services""","value=10;label=""1 (not at all)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (yes, for all product)"" | value=10;label=""I don't know""","IF 1 (not at all), RAISE 10
 IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
-IF 5 (yes, for all product), no change; ",,Assurance,,,
+IF 5 (yes, for all product), no change; ",,Assurance,,,,1
 7.1,ID.SC-2,Does your company know this supplier's sub-suppliers?,Yes/No,"value=5;label=""No existing relationships"" | value=10;label=""No"" | value=5;label=""Some"" | value=0;label=""All"" | value=10;label=""I don't know""","IF yes, offer sub-supplier list import. RAISE 5 if there are no existing relationships. 
 IF no, RAISE 10
 
@@ -83,6 +83,6 @@ IF All, no change;
 
 ","V2 feature: ""yes"" invokes sub-supplier import. Tool should dynamically check whether relationships exist. If there is a relationship, positively impact risk score. Import not required for risk score benefit. No form available to fill out in v1.
 
-",Assurance,,,
+",Assurance,,,,1
 8.1,ID.SC-5,"Has the supplier provided your company with mitigation assurances (e.g. insurance, fallback partnerships with other vendors, etc)?",Yes/No,"value=0;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
-IF no, RAISE 10;",,Assurance,,,
+IF no, RAISE 10;",,Assurance,,,,1
