@@ -163,10 +163,12 @@ export function calculateItemRisk(
     });
 
     // normalize assurance
+    // invert it so that low scores are bad (no mitigations)
     const nval = NORMALIZED_VALUES[`${resourceType}_assurance`];
     perItemRisk[itemId].Assurance =
+      nval -
       (perItemRisk[itemId].Assurance / getMaxScore(questions, "Assurance")) *
-      nval;
+        nval;
 
     // normalize access
     Object.keys(perItemRisk[itemId].Access || {}).forEach(qkey => {

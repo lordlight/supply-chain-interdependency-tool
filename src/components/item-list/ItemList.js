@@ -650,7 +650,7 @@ class ItemList extends Component {
         sortType: "score.interdependence"
       },
       {
-        label: "Assurance",
+        label: "Assurance (%)",
         tooltip: assuranceTooltip,
         cssClass: classes.metricCol,
         sortType: "score.assurance"
