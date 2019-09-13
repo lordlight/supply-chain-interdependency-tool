@@ -20,6 +20,7 @@ createWindow = () => {
 		},
 		height: 860,
 		width: 1280,
+		icon: __dirname + '/64x64.png'
 	});
 
 	mainWindow.loadURL(

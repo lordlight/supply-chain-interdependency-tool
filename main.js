@@ -12,6 +12,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 860,
+		icon: __dirname + '/64x64.png',
     webPreferences: {
       nodeIntegration: true,
       preload: __dirname + '/preload.js'
