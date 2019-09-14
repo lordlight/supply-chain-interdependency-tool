@@ -44,7 +44,7 @@
     "dev": "react-scripts start",
     "build": "react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; cp -a ./assets/. ./build/assets/; NODE_OPTIONS=--max_old_space_size=4096 npm --prefix ./build install ./build",
     "start": "concurrently \"cross-env BROWSER=none react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity='MAYA Design, Inc.' --icon=assets/icons/mac/cscrm.icns",
+    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity=$OSX_SIGN_IDENTITY --icon=assets/icons/mac/cscrm.icns",
     "pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
     "pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
   },
