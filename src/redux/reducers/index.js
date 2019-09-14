@@ -230,7 +230,6 @@ function rootReducer(state = initialState, action) {
       p => !p._cscrm_active
     );
     return Object.assign({}, state, {
-      // suppliers: state.suppliers = action.payload.suppliers,
       suppliers: action.payload.suppliers.filter(s => !!s._cscrm_active),
       suppliersInactive: action.payload.suppliers.filter(s => !s._cscrm_active),
       products: action.payload.products.filter(p => !!p._cscrm_active),
@@ -302,9 +301,6 @@ function rootReducer(state = initialState, action) {
         ...state,
         projectsRisk: { ...state.projectsRisk, ...action.payload.itemsRisk }
       };
-      //   return Object.assign({}, state, {
-      //     projectsRisk: action.payload.itemsRisk
-      //   });
     }
   } else if (action.type === UPDATE_SCORES) {
     return { ...state, scores: action.payload };

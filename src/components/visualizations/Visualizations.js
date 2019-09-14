@@ -4,25 +4,11 @@ import Tab from "@material-ui/core/Tab";
 
 import {
   HierarchicalVisualization,
-  TreemapVisualization,
   CandlestickVisualization,
   ScatterplotsVisualization
 } from "./../../components";
 
 import { withStyles } from "@material-ui/core/styles";
-
-const mapState = state => ({
-  suppliers: state.suppliers,
-  products: state.products,
-  projects: state.projects,
-  assets: state.assets,
-  suppliersRisk: state.suppliersRisk,
-  productsRisk: state.productsRisk,
-  projectsRisk: state.projectsRisk,
-  scores: state.scores,
-  productQuestions: state.productQuestions,
-  supplierQuestions: state.supplierQuestions
-});
 
 const styles = theme => ({
   tabsRoot: {

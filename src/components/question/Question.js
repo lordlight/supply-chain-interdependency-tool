@@ -23,7 +23,6 @@ const styles = theme => ({
     position: "relative",
     border: "1px solid rgba(0, 0, 0, 0.54)",
     color: "rgba(0, 0, 0, 0.54)",
-    margin: "",
     fontSize: 17,
     width: "344px",
     height: "45px",

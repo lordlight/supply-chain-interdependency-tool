@@ -24,7 +24,6 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import {
-  // getQuestionResponseTimestamp,
   getNumQuestionsForResource,
   getLatestResponseForResource,
   ResourcesDesignators
@@ -139,9 +138,6 @@ const styles = theme => ({
     marginRight: -12,
     display: "inline-flex"
   },
-  table: {
-    // marginBottom: 96
-  },
   cell: {
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -159,13 +155,11 @@ const styles = theme => ({
     textTransform: "uppercase",
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
-    // borderRight: "2px solid #dcdcdc",
     paddingLeft: 12,
     paddingRight: 12,
     minWidth: 180
   },
   metricCol: {
-    // textTransform: "capitalize",
     backgroundColor: "#cbcbcb",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -175,15 +169,12 @@ const styles = theme => ({
     }
   },
   scoreCol: {
-    // textTransform: "capitalize",
     backgroundColor: "#dcdcdc",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
     paddingRight: 12
-    // minWidth: 89
   },
   questionCol: {
-    // textTransform: "capitalize",
     backgroundColor: "#ededed",
     borderRight: "2px solid #f8f8f8",
     paddingLeft: 12,
@@ -199,7 +190,6 @@ const styles = theme => ({
     textAlign: "right",
     paddingRight: 6,
     minWidth: 54
-    // width: "50%"
   },
   scoreBars: {
     height: 15,
@@ -302,7 +292,6 @@ class ItemList extends Component {
     let items = null;
     let questions = null;
     let responses = null;
-    // let riskVal = null;
     let riskSet = null;
     let scores = null;
     let impactTooltip = "Sort by impact";
@@ -321,7 +310,6 @@ class ItemList extends Component {
 
     if (type === "suppliers") {
       items = [...this.props.suppliers, ...this.props.suppliersInactive];
-      // riskVal = calculateTypeRiskFromItemsRisk(this.props.suppliersRisk);
       riskSet = this.props.suppliersRisk;
       questions = this.props.supplierQuestions;
       responses = this.props.supplierResponses;
@@ -428,7 +416,6 @@ class ItemList extends Component {
       );
     } else if (type === "products") {
       items = [...this.props.products, ...this.props.productsInactive];
-      // riskVal = calculateTypeRiskFromItemsRisk(this.props.productsRisk);
       riskSet = this.props.productsRisk;
       questions = this.props.productQuestions;
       responses = this.props.productResponses;
@@ -530,14 +517,10 @@ class ItemList extends Component {
         </div>
       );
     } else if (type === "projects") {
-      // items = [...this.props.projects, ...this.props.projectsInactive].filter(
-      //   proj => !!proj.parent
-      // );
       items = [
         ...this.props.projects.filter(proj => !!proj.parent),
         ...this.props.projectsInactive
       ];
-      // riskVal = calculateTypeRiskFromItemsRisk(this.props.projectsRisk);
       riskSet = this.props.projectsRisk;
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
@@ -638,7 +621,6 @@ class ItemList extends Component {
       },
       {
         label: "Impact",
-        // tooltip: "Sort by impact",
         tooltip: impactTooltip,
         cssClass: classes.metricCol,
         sortType: "score.impact"
@@ -721,7 +703,6 @@ class ItemList extends Component {
         responses[item.ID]
       ) {
         const itemScores = scores[item.ID] || {};
-        // itemScores.impact = -Infinity;
         listItem["score.impact"] = itemScores.impact || 0;
         listItem["score.interdependence"] = itemScores.interdependence || 0;
         listItem["score.assurance"] = itemScores.assurance || 0;
@@ -749,19 +730,6 @@ class ItemList extends Component {
           const score =
             normalizeFactor > 0 ? combinedScore / normalizeFactor : 0;
           listItem[MULTIPLES_OPTIONS.Access.fields.sort] = score;
-          // const fields = this.handleMultiples(
-          //   MULTIPLES_OPTIONS.Access.policy,
-          //   riskSet[item.ID].Access,
-          //   MULTIPLES_OPTIONS.Access.fields.display
-          // );
-          // Object.keys(ASSET_WEIGHTS).forEach(assetId => {
-          //   riskSet[item.ID].Access[assetId]
-          // })
-          // fields.forEach(entry => (listItem[entry[0]] = entry[1]));
-          // const scores = this.getScoresMaxSumAndAvg(
-          //   Object.values(riskSet[item.ID].Access)
-          // );
-          // listItem["score.access.max"] = scores.max;
         }
         if (hasDependency) {
           const fields = this.handleMultiples(
@@ -770,10 +738,6 @@ class ItemList extends Component {
             MULTIPLES_OPTIONS.Dependency.fields.display
           );
           fields.forEach(entry => (listItem[entry[0]] = entry[1]));
-          // const scores = this.getScoresMaxSumAndAvg(
-          //   Object.values(riskSet[item.ID].Dependency)
-          // );
-          // listItem["score.dependency.max"] = scores.max;
         }
 
         const numQuestions = getNumQuestionsForResource(item, questions);
@@ -782,11 +746,6 @@ class ItemList extends Component {
         const lastResponded = getLatestResponseForResource(
           responses[item.ID] || {}
         );
-        // Math.max(
-        //   ...Object.values(responses[item.ID] || {})
-        //     .map(val => getQuestionResponseTimestamp(val))
-        //     .filter(val => !!val)
-        // );
 
         listItem.age = now - lastResponded; // will be infinity if no responses
         listItem.action =
@@ -861,14 +820,7 @@ class ItemList extends Component {
       ].filter(Boolean);
       return row._cscrm_active ? (
         <TableRow key={row.ID}>
-          <TableCell
-            className={classes.lastOfCell}
-            // style={
-            //   i === 0 && selectedItem && selectedItem.ID === row.ID
-            //     ? { fontWeight: "bold", fontSize: 16 }
-            //     : null
-            // }
-          >
+          <TableCell className={classes.lastOfCell}>
             {selectedItem && selectedItem.ID === row.ID && (
               <span>&rArr;&nbsp;</span>
             )}

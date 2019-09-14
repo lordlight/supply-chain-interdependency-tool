@@ -223,9 +223,6 @@ export function computeImpacts(
     product: {},
     supplier: {}
   };
-  // const projectScores = {};
-  // const productScores = {};
-  // const supplierScores = {};
   projects.forEach(
     p =>
       (scores.project[p.ID] = {

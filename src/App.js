@@ -1,12 +1,7 @@
 import React, { Component } from "react";
 import clsx from "clsx";
 import "./App.css";
-import {
-  /*Breadcrumb,*/ Home,
-  ItemOverview,
-  /*QuestionList,*/ RiskGraph,
-  Visualizations
-} from "./components/";
+import { Home, ItemOverview, Visualizations } from "./components/";
 
 // Redux
 import { connect } from "react-redux";
@@ -65,8 +60,6 @@ import ChevronRight from "@material-ui/icons/ChevronRight";
 
 import { version, versiondate, fullname } from "../package.json";
 import About from "./imgs/about.png";
-import { getAll } from "@tweenjs/tween.js";
-// import About from "./components/about/About";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
 const electron = window.electron;
@@ -76,9 +69,6 @@ const ABOUT_HEIGHT = 480;
 const ABOUT_WIDTH = 960;
 
 const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true
-  },
   palette: {
     primary: {
       main: "#12659c"
@@ -91,6 +81,7 @@ const theme = createMuiTheme({
     doubleUnit: 16
   },
   typography: {
+    useNextVariants: true,
     fontFamily: '"Source Sans Pro"'
   }
 });
@@ -282,8 +273,6 @@ class App extends Component {
     if (diff.length > 0) {
       ipcRenderer.send("response-update", diff);
     }
-
-    // TODO: SJR see if there is a better place to do score recalculation...
 
     // could be other conditions that cause recalculate as well later...
     const recalculateScores = diff.length > 0;

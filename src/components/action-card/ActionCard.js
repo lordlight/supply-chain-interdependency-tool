@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 
 // Images
@@ -87,7 +86,7 @@ class ActionCard extends Component {
       <div>
         <Card className={classes.card}>
           <CardContent className={classes.content}>
-            <img src={tempImg} alt="Image" className={classes.img} />
+            <img src={tempImg} alt="" className={classes.img} />
             <Typography gutterBottom className={classes.title}>
               {title}
             </Typography>

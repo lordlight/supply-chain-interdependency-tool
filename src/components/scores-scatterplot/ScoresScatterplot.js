@@ -34,21 +34,6 @@ const VerticalLineLayer = ({ xScale, yScale }) => {
   );
 };
 
-// const HorizontalLineLayer = ({ nodes, xScale, yScale }) => {
-//   const midy = Math.max(...nodes.map(p => p.data.y)) / 2;
-
-//   return (
-//     <line
-//       x1={xScale(0)}
-//       x2={xScale(MAX_IMPACT_SCORE)}
-//       y1={yScale(midy)}
-//       y2={yScale(midy)}
-//       stroke="lightgray"
-//       strokeWidth="2"
-//     />
-//   );
-// };
-
 class ScoresScatterplot extends Component {
   getImpactColor = impactPct => {
     const colorIdx = Math.min(
@@ -167,7 +152,6 @@ class ScoresScatterplot extends Component {
             "grid",
             "axes",
             VerticalLineLayer,
-            // HorizontalLineLayer,
             "nodes",
             "markers",
             "mesh",

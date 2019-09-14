@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { ActionCard, TodosCard, TypeCard } from "../../components/";
+import { TodosCard, TypeCard } from "../../components/";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -56,13 +56,6 @@ class Home extends Component {
 
   render() {
     const { classes } = this.props;
-
-    // const testRecs = [
-    //   "Find new supplier for Product X",
-    //   "Improve supplier Y perimeter security",
-    //   "Get NIST CSF form to Supplier Z",
-    //   "Improve ZZZ for Supplier P"
-    // ];
 
     return (
       <div className={classes.root}>

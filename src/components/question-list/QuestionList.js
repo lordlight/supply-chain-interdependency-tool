@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import clsx from "clsx";
-
 import store from "../../redux/store";
 import { connect } from "react-redux";
 import {

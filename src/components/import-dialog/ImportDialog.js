@@ -11,7 +11,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import Link from "@material-ui/core/Link";
+// import Link from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
 
 // This only works when running electron or as an app (i.e. will not work in browser).
@@ -136,10 +136,10 @@ class ImportDialog extends Component {
   render() {
     const { classes } = this.props;
 
-    const formatHref = "javascript:;"; // TODO If this is to open in a browser, it will have to be handled by the main thread (I think)
-    const formatLink = (
-      <Link href={formatHref}>File format details/help...</Link>
-    );
+    // const formatHref = "javascript:;"; // TODO If this is to open in a browser, it will have to be handled by the main thread (I think)
+    // const formatLink = (
+    //   <Link href={formatHref}>File format details/help...</Link>
+    // );
 
     const os = window.navigator.userAgent;
     let fileText = "No file chosen";

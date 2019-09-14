@@ -30,8 +30,6 @@ import {
 
 import { TypeSummary } from "./../../components";
 
-import { getNumQuestionsForResource } from "../../utils/general-utils";
-
 const mapState = state => ({
   currentType: state.currentType,
   suppliers: state.suppliers,
@@ -64,17 +62,8 @@ const styles = theme => ({
     fontWeight: "regular",
     textTransform: "capitalize"
   },
-  // heading: {
-  //   fontSize: 25,
-  //   textTransform: "capitalize"
-  // },
-  // inactive: {
-  //   fontSize: 16,
-  //   color: "gray"
-  // },
   slider: {
     padding: "22px 0px"
-    // width: "90%"
   },
   thumb: {
     backgroundColor: "blue"
@@ -256,23 +245,17 @@ class QuestionStatusCard extends Component {
     const { classes } = this.props;
 
     const type = this.props.currentType;
-    let items, questions, responses;
+    let items, questions;
 
     if (type === "suppliers") {
       items = [...this.props.suppliers];
-      // itemsInactive = [...this.props.suppliersInactive];
       questions = this.props.supplierQuestions;
-      responses = this.props.supplierResponses;
     } else if (type === "products") {
       items = [...this.props.products];
-      // itemsInactive = [...this.props.productsInactive];
       questions = this.props.productQuestions;
-      responses = this.props.productResponses;
     } else if (type === "projects") {
       items = [...this.props.projects].filter(proj => !!proj.parent);
-      // itemsInactive = [...this.props.projectsInactive];
       questions = this.props.projectQuestions;
-      responses = this.props.projectResponses;
     }
 
     const hasAccess = questions.some(q => q["Type of question"] === "Access");
@@ -293,57 +276,13 @@ class QuestionStatusCard extends Component {
       hasAssurance && "Assurance"
     ].filter(Boolean);
 
-    // let numCompleted = 0,
-    //   numPartial = 0,
-    //   numZero = 0;
-
-    // items.forEach(item => {
-    //   let numResp = Object.keys(responses[item.ID] || []).length;
-    //   const numQuestions = getNumQuestionsForResource(item, questions);
-    //   if (numResp >= numQuestions) {
-    //     numCompleted += 1;
-    //   } else if (numResp > 0) {
-    //     numPartial += 1;
-    //   } else {
-    //     numZero += 1;
-    //   }
-    // });
-
     return (
       <Card className={classes.card}>
         <CardContent>
           <Typography gutterBottom className={classes.title}>
             {type.substring(0, type.length - 1)} question status
           </Typography>
-
           <TypeSummary currentType={type} />
-
-          {/* {itemsInactive.length > 0 ? (
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <Typography gutterBottom className={classes.heading}>
-                {items.length} {type}
-              </Typography>
-              <Typography gutterBottom className={classes.inactive}>
-                &nbsp;(+ {itemsInactive.length} inactive)
-              </Typography>
-              <Typography gutterBottom className={classes.heading}>
-                :
-              </Typography>
-            </div>
-          ) : (
-            <Typography gutterBottom className={classes.heading}>
-              {items.length} {type}:
-            </Typography>
-          )}
-          <Typography className={classes.complete} component="div">
-            {numCompleted} {type} with complete data
-          </Typography>
-          <Typography className={classes.partial} component="div">
-            {numPartial} {type} with partial data
-          </Typography>
-          <Typography className={classes.zero} component="div">
-            {numZero} {type} with no data
-          </Typography> */}
         </CardContent>
         <CardActions style={{ justifyContent: "flex-end" }}>
           {items.length === 0 ? (

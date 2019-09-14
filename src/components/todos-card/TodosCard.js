@@ -152,7 +152,6 @@ class TodosCard extends Component {
     const resourceDesignators = new ResourcesDesignators(preferences);
 
     const importItems = [
-      // [suppliers, "supplier"],
       [suppliers, resourceDesignators.get("supplier")],
       [products, resourceDesignators.get("product")],
       [projects, resourceDesignators.get("project")]
@@ -167,8 +166,6 @@ class TodosCard extends Component {
         supplierResponses,
         resourceDesignators.get("supplier"),
         resourceDesignators.getPlural("supplier")
-        // "supplier",
-        // "suppliers"
       ],
       [
         products,
@@ -176,8 +173,6 @@ class TodosCard extends Component {
         productResponses,
         resourceDesignators.get("product"),
         resourceDesignators.getPlural("product")
-        // "product",
-        // "products"
       ],
       [
         projects,
@@ -185,8 +180,6 @@ class TodosCard extends Component {
         projectResponses,
         resourceDesignators.get("project"),
         resourceDesignators.getPlural("project")
-        // "project",
-        // "projects"
       ]
     ]
       .map(entry => this.answerQuestionsTodoItem(...entry))

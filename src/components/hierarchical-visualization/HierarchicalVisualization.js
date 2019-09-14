@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import ReactDOMServer from "react-dom/server";
 import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
 import Graph from "react-graph-vis";
-import { ForceGraph2D } from "react-force-graph";
 
 import {
   MAX_IMPACT_SCORE,
@@ -58,7 +56,6 @@ const styles = theme => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between"
-    // maxWidth: 125
   },
   legendText: {
     maxWidth: 125,
@@ -75,7 +72,6 @@ const styles = theme => ({
   },
   scoreBars: {
     height: 15,
-    // display: "inline-block",
     backgroundColor: "#7f7f7f",
     verticalAlign: "middle"
   }
@@ -99,7 +95,6 @@ class HierarchicalVisualization extends Component {
   constructor(props) {
     super(props);
     this.rainbow = new Rainbow();
-    // this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
     const colorscheme = getColorScheme(props.preferences);
     this.rainbow.setSpectrum(...colorscheme);
     this.impact_colors = [...Array(101).keys()].map(
@@ -150,11 +145,6 @@ class HierarchicalVisualization extends Component {
       preferences["resources.designators"] !=
         prevPreferences["resource.designators"]
     ) {
-      // const colorscheme = getColorScheme(this.props.preferences);
-      // this.rainbow.setSpectrum(...colorscheme);
-      // this.impact_colors = [...Array(101).keys()].map(
-      //   i => `#${this.rainbow.colorAt(i)}`
-      // );
       this.nodePositions = this.network.getPositions();
       const scale = this.network.getScale();
       const position = this.network.getViewPosition();
@@ -377,7 +367,6 @@ class HierarchicalVisualization extends Component {
 
     const resourceDesignators = new ResourcesDesignators(preferences);
 
-    // const nodePositions = preferences["viz.hierarchical.nodes"] || {};
     const nodePositions = this.nodePositions;
 
     const organizations = props.projects.filter(p => !p.parent);
@@ -426,7 +415,6 @@ class HierarchicalVisualization extends Component {
         const value = interdependence / maxProjectInterdependence;
         const title = this.getEdgePopupContents(
           resourceDesignators.get("Project"),
-          // "Project",
           proj.Name,
           null,
           null,
@@ -454,9 +442,6 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
-          // const maxImpact = Math.max(
-          //   ...slmatches.map(m => m.score || 0)
-          // );
           const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
@@ -488,7 +473,6 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.projectId === prid);
-          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
@@ -498,10 +482,8 @@ class HierarchicalVisualization extends Component {
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
             resourceDesignators.get("Product"),
-            // "Product",
             prod.Name,
             resourceDesignators.get("Project"),
-            // "Project",
             (projectsMap[prid] || {}).Name,
             maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
@@ -523,14 +505,12 @@ class HierarchicalVisualization extends Component {
 
     const productToSupplierEdgeScores = products
       .map(prod => {
-        // const supId = prod["Supplier ID"];
         const supplierIds = getCellMultiples(prod["Supplier ID"] || "");
         const supplierEdges = supplierIds.map(supId => {
           const supplyLines =
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
@@ -548,8 +528,6 @@ class HierarchicalVisualization extends Component {
 
     const productToSupplierEdges = products
       .map(prod => {
-        // const supId = prod["Supplier ID"];
-
         const supplierIds = getCellMultiples(prod["Supplier ID"] || "");
         const supplierEdges = supplierIds.map(supId => {
           productEdgesSeen.add(prod.ID);
@@ -558,7 +536,6 @@ class HierarchicalVisualization extends Component {
             ((this.props.scores.product || {})[prod.ID] || {}).supplyLines ||
             [];
           const slmatches = supplyLines.filter(sl => sl.supplierId === supId);
-          // const maxImpact = Math.max(...slmatches.map(m => m.score || 0));
           const maxImpact = computeImpactFromSupplyLines(slmatches);
           const interdependence = slmatches.reduce(
             (acc, m) => acc + m.score,
@@ -568,10 +545,8 @@ class HierarchicalVisualization extends Component {
           const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
             resourceDesignators.get("Supplier"),
-            // "Supplier",
             (suppliersMap[supId] || {}).Name,
             resourceDesignators.get("Project"),
-            // "Product",
             prod.Name,
             maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
@@ -617,7 +592,6 @@ class HierarchicalVisualization extends Component {
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
         resourceDesignators.get("Project"),
-        // "Project",
         proj.Name,
         impact,
         interdependence,
@@ -670,7 +644,6 @@ class HierarchicalVisualization extends Component {
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
         resourceDesignators.get("Product"),
-        // "Product",
         prod.Name,
         impact,
         interdependence,
@@ -714,7 +687,6 @@ class HierarchicalVisualization extends Component {
       const assurance = itemScores.assurance || 0;
       const title = this.getNodePopupContents(
         resourceDesignators.get("Supplier"),
-        // "Supplier",
         sup.Name,
         impact,
         interdependence,
@@ -860,7 +832,6 @@ class HierarchicalVisualization extends Component {
 
   events = {
     doubleClick: props => {
-      // store.dispatch(updateNavState({ navState: value }));
       const target = props.nodes[0];
       if (target) {
         const elements = target.split("_", 2);
@@ -962,23 +933,9 @@ class HierarchicalVisualization extends Component {
           width: "calc(100% - 48px)",
           height: "calc(100% - 208px)",
           position: "fixed",
-          // display: "flex",
-          // flexDirection: "column",
-          // flex: "1 1",
           visibility: this.state.visible ? "visible" : "hidden"
         }}
       >
-        {/* <div
-          style={{
-            display: "flex",
-            position: "absolute",
-            width: "100%",
-            height: 120,
-            zIndex: 100,
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        > */}
         <div
           style={{
             position: "absolute",
@@ -987,18 +944,12 @@ class HierarchicalVisualization extends Component {
             borderWidth: 2,
             padding: 6,
             top: 12
-            // bottom: 6
-            // zIndex: 10000
           }}
         >
           {/* <Typography variant="h6">Legend</Typography> */}
           <div
             style={{
               display: "flex",
-              // borderStyle: "solid",
-              // borderColor: "lightgray",
-              // borderWidth: 2,
-              // padding: 6,
               backgroundColor: "#f8f8f8",
               alignItems: "center"
             }}
@@ -1095,11 +1046,7 @@ class HierarchicalVisualization extends Component {
           </div>
         </div>
         <div style={{ position: "absolute", zIndex: 100, right: 0 }}>
-          <Button
-            // variant="contained"
-            color="primary"
-            onClick={() => this.network.fit()}
-          >
+          <Button color="primary" onClick={() => this.network.fit()}>
             Re-center Chart
           </Button>
         </div>
@@ -1107,15 +1054,7 @@ class HierarchicalVisualization extends Component {
         <div
           style={{
             height: "100%"
-            // height: "calc(100% - 84px)"
           }}
-          // style={{
-          //   flex: "1 1 100%",
-          //   display: "flex",
-          //   flexDirecton: "column",
-          //   justifyContent: "center",
-          //   alignItems: "center"
-          // }}
         >
           <Graph
             graph={this.graph}

@@ -30,18 +30,6 @@ const ProjectNodeComponent = ({ node }) => {
       return "";
     }
   };
-  // const criticality = Math.max(Object.values(risk.Criticality || {})) || 10;
-  // const alarm = criticality => {
-  //   if (criticality >= 7.5) {
-  //     return "!!!";
-  //   } else if (criticality >= 5.0) {
-  //     return "!!";
-  //   } else if (criticality >= 2.5) {
-  //     return "!";
-  //   } else {
-  //     return "";
-  //   }
-  // };
   return (
     <Tooltip title={project.Name || ""}>
       <div>
@@ -50,12 +38,8 @@ const ProjectNodeComponent = ({ node }) => {
             width: project.parent ? 25 : 15,
             height: 15,
             borderRadius: project.parent ? 0 : "50%",
-            // backgroundImage: !project.parent
-            //   ? "linear-gradient(to bottom right, white, gray)"
-            //   : null,
             backgroundColor: project.parent ? "red" : "darkgray",
             border: !project.parent ? "1px solid gray" : 0,
-            // opacity: 0.1 + (criticality * 0.8) / 10,
             opacity: 0.1 + impact * 0.8,
             display: "inline-block"
           }}
@@ -66,7 +50,6 @@ const ProjectNodeComponent = ({ node }) => {
               fontSize: 14,
               fontWeight: "bold",
               color: "black",
-              //   opacity: 0.1 + (criticality * 0.8) / 10,
               letterSpacing: 2
             }}
           >
@@ -85,7 +68,6 @@ class ProjectsChart extends Component {
     const traverse = parent => {
       const node = {
         project: parent,
-        // projectRisk: this.props.projectsRisk[parent.ID]
         scores: projectScores[parent.ID] || {}
       };
       node.children = parent.children.map(child => traverse(child));
@@ -106,7 +88,6 @@ class ProjectsChart extends Component {
       <div
         style={{
           backgroundColor: "#dcdcdc",
-          // height: "100%",
           height: 194,
           display: "flex",
           alignItems: "center",

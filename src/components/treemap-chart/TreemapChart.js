@@ -1,14 +1,9 @@
 import React, { Component } from "react";
 import { ResponsiveTreeMap } from "@nivo/treemap";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
 import { getColorScheme } from "../../utils/general-utils";
 
-// import store from '../../redux/store';
 import { connect } from "react-redux";
 
 const Rainbow = require("rainbowvis.js");
@@ -41,7 +36,6 @@ class TreemapChart extends Component {
   constructor(props) {
     super(props);
     this.rainbow = new Rainbow();
-    // this.rainbow.setSpectrum("#DC143C", "gray", "#228B22");
     const colorscheme = getColorScheme(props.preferences);
     this.rainbow.setSpectrum(...colorscheme);
     this.impact_colors = [...Array(101).keys()].map(
@@ -112,7 +106,6 @@ class TreemapChart extends Component {
         value="interdependence"
         innerPadding={1}
         outerPadding={1}
-        // margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
         enableLabel={this.props.labels != null ? this.props.labels : true}
         label="name"
         labelSkipSize={12}
@@ -122,18 +115,10 @@ class TreemapChart extends Component {
             : "white"
         }
         borderColor={{ from: "color", modifiers: [["darker", 0.3]] }}
-        // labelTextColor={{ from: "color", modifiers: [["darker", 2.0]] }}
         labelTextColor="black"
         animate={true}
         motionStiffness={90}
         motionDamping={11}
-        // tooltip={({ id, value, color, label }) => {
-        //   return (
-        //     <strong>
-        //       {label || id}: {value}
-        //     </strong>
-        //   );
-        // }}
         tooltip={d => {
           return (
             <React.Fragment>
