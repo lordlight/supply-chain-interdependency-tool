@@ -687,7 +687,7 @@ class App extends Component {
           </DialogTitle>
           <DialogContent>
             <Typography variant="subtitle1" style={{ marginBottom: 12 }}>
-              Resource Designations
+              Resource Nomenclature
             </Typography>
             <DialogContentText style={{ marginBottom: 12 }}>
               Modify how resources are labeled in in the application. If no
@@ -695,17 +695,6 @@ class App extends Component {
               designation with an &quot;s&quot; appended.
             </DialogContentText>
             <Grid container direction="column" style={{ marginBottom: 12 }}>
-              {/* <Grid container direction="row" spacing={8}>
-                <Grid item xs={2}>
-                  Resource
-                </Grid>
-                <Grid item xs={5}>
-                  User-defined Designation
-                </Grid>
-                <Grid item xs={5}>
-                  Plural (optional)
-                </Grid>
-              </Grid> */}
               {[
                 ["Project", "project", "Projects", "projects"],
                 ["Product", "product", "Products", "products"],

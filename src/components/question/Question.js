@@ -15,7 +15,10 @@ import InfoIcon from "@material-ui/icons/Info";
 
 import Tooltip from "@material-ui/core/Tooltip";
 
-import { getQuestionResponse } from "../../utils/general-utils";
+import {
+  getQuestionResponse,
+  ResourcesDesignators
+} from "../../utils/general-utils";
 
 const styles = theme => ({
   input: {
@@ -46,7 +49,8 @@ const styles = theme => ({
 
 const mapState = state => ({
   currentType: state.currentType,
-  currentItem: state.currentItem
+  currentItem: state.currentItem,
+  preferences: state.preferences
 });
 
 class Question extends Component {
@@ -73,6 +77,79 @@ class Question extends Component {
         response += 1;
       }
     }
+
+    // ideally this should only be done on startup and when preferences are changed, rather than on each question render
+    const resourceDesignators = new ResourcesDesignators(
+      this.props.preferences
+    );
+    const designatorVariables = [
+      { name: "{Project}", value: resourceDesignators.get("Project") },
+      { name: "{project}", value: resourceDesignators.get("project") },
+      {
+        name: "{Projects}",
+        value: resourceDesignators.getPlural("Project")
+      },
+      {
+        name: "{projects}",
+        value: resourceDesignators.getPlural("project")
+      },
+      { name: "{Product}", value: resourceDesignators.get("Product") },
+      { name: "{product}", value: resourceDesignators.get("product") },
+      {
+        name: "{Products}",
+        value: resourceDesignators.getPlural("Product")
+      },
+      {
+        name: "{products}",
+        value: resourceDesignators.getPlural("product")
+      },
+      { name: "{Supplier}", value: resourceDesignators.get("Supplier") },
+      { name: "{supplier}", value: resourceDesignators.get("supplier") },
+      {
+        name: "{Suppliers}",
+        value: resourceDesignators.getPlural("Supplier")
+      },
+      {
+        name: "{suppliers}",
+        value: resourceDesignators.getPlural("supplier")
+      },
+      // special cases below
+      {
+        name: "{Product/Service}",
+        value: (() => {
+          const designator = resourceDesignators.get("Product");
+          return designator === "Product" ? "Product/Service" : designator;
+        })()
+      },
+      {
+        name: "{product/service}",
+        value: (() => {
+          const designator = resourceDesignators.get("product");
+          return designator === "product" ? "product/service" : designator;
+        })()
+      },
+      {
+        name: "{Products/Services}",
+        value: (() => {
+          const designator = resourceDesignators.getPlural("Product");
+          return designator === "Products" ? "Products/Services" : designator;
+        })()
+      },
+      {
+        name: "{products/services}",
+        value: (() => {
+          const designator = resourceDesignators.getPlural("product");
+          return designator === "products" ? "products/services" : designator;
+        })()
+      }
+    ];
+    let questionText = this.props.questionText;
+    let questionInfoText = this.props.question["Question Info Text"];
+    designatorVariables.forEach(m => {
+      const re = new RegExp(m.name, "g");
+      questionText = questionText.replace(re, m.value);
+      questionInfoText = questionInfoText.replace(re, m.value);
+    });
 
     return (
       <TableRow style={{ border: "none" }}>
@@ -106,11 +183,11 @@ class Question extends Component {
                 </IconButton>
               </Tooltip>
               <span style={{ verticalAlign: "middle", lineHeight: "normal" }}>
-                {this.props.questionText}
+                {questionText}
               </span>
-              {this.props.question["Question Info Text"] && (
+              {questionInfoText && (
                 <Tooltip
-                  title={this.props.question["Question Info Text"]}
+                  title={questionInfoText}
                   classes={{ tooltip: classes.tooltip }}
                 >
                   <IconButton

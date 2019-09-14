@@ -1,5 +1,5 @@
 ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Relation,Question Info Text,Weight
-1.2,ID.AM-5,How critical is this project to your company's mission/business?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1 (highly critical)"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10 (not critical at all)"" | value=100;label=""I don't know""","IF 1, RAISE 100
+1.2,ID.AM-5,How critical is this {project} to your company's mission/business?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1 (highly critical)"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10 (not critical at all)"" | value=100;label=""I don't know""","IF 1, RAISE 100
 IF 2, RAISE 90
 IF 3, RAISE 80
 IF 4, RAISE 70
