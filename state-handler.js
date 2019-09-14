@@ -229,8 +229,16 @@ saveSessionData = (event, type) => {
   }
 };
 
-const REQUIRED_IMPORT_FIELDS = {
+// required in import file header row
+const REQUIRED_IMPORT_HEADERS = {
   products: ["ID", "Name", "Supplier ID", "Project ID"],
+  suppliers: ["ID", "Name"],
+  projects: ["ID", "Level", "Name"]
+};
+
+// required fields for each data row in import file
+const REQUIRED_IMPORT_FIELDS = {
+  products: ["ID", "Name"],
   suppliers: ["ID", "Name"],
   projects: ["ID", "Level", "Name"]
 };
@@ -238,8 +246,8 @@ const REQUIRED_IMPORT_FIELDS = {
 validateImport = (data, type) => {
   // types of validation errors:
   // - empty import
-  // - imported data is not of correct type; does not have the fields required
-  // - all data has all required fields
+  // - imported data is not of correct type; does not have the headers required
+  // - all data has all required fields (subset of required headers)
   // - no duplicate IDs
   // - for product relations, no repeats
 
@@ -249,13 +257,13 @@ validateImport = (data, type) => {
   }
 
   // see if required fields even exist in file
-  const fieldsMissing = REQUIRED_IMPORT_FIELDS[type].filter(
+  const headersMissing = REQUIRED_IMPORT_HEADERS[type].filter(
     field => data[0][field] == undefined
   );
-  if (fieldsMissing.length > 0) {
+  if (headersMissing.length > 0) {
     return {
       success: false,
-      error: `Missing fields: ${fieldsMissing.join(", ")}`
+      error: `Missing in header row: ${headersMissing.join(", ")}`
     };
   }
 
