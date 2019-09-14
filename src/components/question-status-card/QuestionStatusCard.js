@@ -132,7 +132,7 @@ class QuestionStatusCard extends Component {
     const getRandomAnswer = (answers, skew) => {
       const answerVals = answers
         .map((a, i) => [a.val, i])
-        .sort((a, b) => a[0] - b[0]);
+        .sort((a, b) => b[0] - a[0]);
       const aidx = Math.min(
         Math.floor(Math.pow(Math.random(), skew) * answers.length),
         answers.length - 1
