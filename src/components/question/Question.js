@@ -82,74 +82,51 @@ class Question extends Component {
     const resourceDesignators = new ResourcesDesignators(
       this.props.preferences
     );
-    const designatorVariables = [
-      { name: "{Project}", value: resourceDesignators.get("Project") },
-      { name: "{project}", value: resourceDesignators.get("project") },
-      {
-        name: "{Projects}",
-        value: resourceDesignators.getPlural("Project")
-      },
-      {
-        name: "{projects}",
-        value: resourceDesignators.getPlural("project")
-      },
-      { name: "{Product}", value: resourceDesignators.get("Product") },
-      { name: "{product}", value: resourceDesignators.get("product") },
-      {
-        name: "{Products}",
-        value: resourceDesignators.getPlural("Product")
-      },
-      {
-        name: "{products}",
-        value: resourceDesignators.getPlural("product")
-      },
-      { name: "{Supplier}", value: resourceDesignators.get("Supplier") },
-      { name: "{supplier}", value: resourceDesignators.get("supplier") },
-      {
-        name: "{Suppliers}",
-        value: resourceDesignators.getPlural("Supplier")
-      },
-      {
-        name: "{suppliers}",
-        value: resourceDesignators.getPlural("supplier")
-      },
-      // special cases below
-      {
-        name: "{Product/Service}",
-        value: (() => {
-          const designator = resourceDesignators.get("Product");
-          return designator === "Product" ? "Product/Service" : designator;
-        })()
-      },
-      {
-        name: "{product/service}",
-        value: (() => {
-          const designator = resourceDesignators.get("product");
-          return designator === "product" ? "product/service" : designator;
-        })()
-      },
-      {
-        name: "{Products/Services}",
-        value: (() => {
-          const designator = resourceDesignators.getPlural("Product");
-          return designator === "Products" ? "Products/Services" : designator;
-        })()
-      },
-      {
-        name: "{products/services}",
-        value: (() => {
-          const designator = resourceDesignators.getPlural("product");
-          return designator === "products" ? "products/services" : designator;
-        })()
-      }
-    ];
+
+    // local mapping in order to better handle plurals and special cases
+    const designatorVariables = {
+      "{Project}": resourceDesignators.get("Project"),
+      "{project}": resourceDesignators.get("project"),
+      "{Projects}": resourceDesignators.getPlural("Project"),
+      "{projects}": resourceDesignators.getPlural("project"),
+      "{Product}": resourceDesignators.get("Product"),
+      "{product}": resourceDesignators.get("product"),
+      "{Products}": resourceDesignators.getPlural("Product"),
+      "{products}": resourceDesignators.getPlural("product"),
+      "{Supplier}": resourceDesignators.get("Supplier"),
+      "{supplier}": resourceDesignators.get("supplier"),
+      "{Suppliers}": resourceDesignators.getPlural("Supplier"),
+      "{suppliers}": resourceDesignators.getPlural("supplier"),
+      // special cases
+      "{Product/Service}": (() => {
+        const designator = resourceDesignators.get("Product");
+        return designator === "Product" ? "Product/Service" : designator;
+      })(),
+      "{product/service}": (() => {
+        const designator = resourceDesignators.get("product");
+        return designator === "product" ? "product/service" : designator;
+      })(),
+      "{Products/Services}": (() => {
+        const designator = resourceDesignators.getPlural("Product");
+        return designator === "Products" ? "Products/Services" : designator;
+      })(),
+      "{products/services}": (() => {
+        const designator = resourceDesignators.getPlural("product");
+        return designator === "products" ? "products/services" : designator;
+      })()
+    };
+
     let questionText = this.props.questionText;
     let questionInfoText = this.props.question["Question Info Text"];
-    designatorVariables.forEach(m => {
-      const re = new RegExp(m.name, "g");
-      questionText = questionText.replace(re, m.value);
-      questionInfoText = questionInfoText.replace(re, m.value);
+    const re = new RegExp(Object.keys(designatorVariables).join("|"), "g");
+    questionText = questionText.replace(re, match => {
+      console.log("MMMMMM", match);
+      return designatorVariables[match];
     });
+    questionInfoText = questionInfoText.replace(
+      re,
+      match => designatorVariables[match]
+    );
 
     return (
       <TableRow style={{ border: "none" }}>
