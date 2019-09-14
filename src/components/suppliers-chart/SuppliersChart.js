@@ -113,7 +113,7 @@ class SuppliersChart extends Component {
 
     const buckets = [0, 0, 0, 0, 0];
     Object.values(this.props.suppliersRisk)
-      .map(risk => risk.Assurance || 100)
+      .map(risk => risk.Assurance || 0)
       .forEach(score => {
         const bucket = Math.min(Math.floor(score / 20), 4);
         buckets[bucket]++;
