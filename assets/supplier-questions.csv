@@ -27,13 +27,13 @@ IF no, no change;
 
 ","NIST IR: Define regulated data and the types of regulated data.
 
-Personally Identifiable Information (PII). The term ÒPII,Ó as defined in OMB Memorandum M-07-1616 refers to information that can be used to distinguish or trace an individualÕs identity, either alone or when combined with other personal or identifying information that is linked or linkable to a specific individual. (GSA website)
+Personally Identifiable Information (PII). The term ï¿½PII,ï¿½ as defined in OMB Memorandum M-07-1616 refers to information that can be used to distinguish or trace an individualï¿½s identity, either alone or when combined with other personal or identifying information that is linked or linkable to a specific individual. (GSA website)
 
 PHI as individually identifiable health information that is transmitted or maintained in any form or medium (electronic, oral, or paper) by a covered entity or its business associates, excluding certain educational and employment records. (NIH Website)
 
 PCI - ""cardholder data""  - note: unsure how we want to reference this - there is not a clean definition - more with how orgs protect through PCI DSS
 
-From GDPR: Ôpersonal dataÕ means any information relating to an identified or identifiable natural person (Ôdata subjectÕ); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person;",Access,SDA,,2,1
+From GDPR: ï¿½personal dataï¿½ means any information relating to an identified or identifiable natural person (ï¿½data subjectï¿½); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person;",Access,SDA,,2,1
 3.1,ID.SC-4,Does this supplier follow relevant industry standards?,"Dropdown: N/A, No, self-attestation, self-attestation with proof, self-attestation with third party assessment, conformity assessment","value=10;label=""no"" | value=7;label=""self-attestation"" | value=5;label=""self-attestation with proof"" | value=3;label=""self-attestation with third-party assessment"" | value=0;label=""conformity assessment"" | value=10;label=""I don't know""","IF no, RAISE 10
 IF self-attestation, RAISE 7
 IF self-attestation with proof, RAISE 5
@@ -49,7 +49,7 @@ IF 2, RAISE 7
 IF 3, RAISE 5
 IF 4, RAISE 3
 IF 5 (no concern), no change; ","Internal reference: ""state owned"" - A business or entity where the government or state has significant control through full, majority, or significant minority ownership
-",Assurance,,"This may include suppliers which are heaviliy dependent on one of your competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",,1
+",Assurance,,"This may include suppliers which are heavily dependent on one of your competitors. It may also include suppliers directly or indirectly controlled by governments, whether by partial or full ownership or by aggressive domestic policy.",,1
 5.1,ID.SC-3,"How sensitive is the supplier's ability to provide quality products/services to supply chain disruptions, both manmade and natural?","Scale: 1-5 where 1 is ""Very sensitive"" and 5 is ""Very robust""
 
 Include option ""I don't know""","value=10;label=""1 (very sensitive)"" | value=7;label=""2"" |  value=5;label=""3"" | value=3;label=""4"" | value=0;label=""5 (very robust)"" | value=10;label=""I don't know""","IF 1 (very sensitive), RAISE 10
