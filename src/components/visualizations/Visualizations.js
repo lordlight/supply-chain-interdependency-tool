@@ -55,7 +55,6 @@ class Visualizations extends Component {
           onChange={this.handleVisualizationChange}
         >
           <Tab value="hierarchy" label="Hierarchy" />
-          {/* <Tab value="treemap" label="Tree Map" /> */}
           <Tab value="candlestick" label="Candlestick" />
           <Tab value="scatterplots" label="Scatterplots" />
         </Tabs>
@@ -64,11 +63,10 @@ class Visualizations extends Component {
         )}
         {this.state.visualization === "candlestick" && (
           <CandlestickVisualization />
-        )}{" "}
+        )}
         {this.state.visualization === "scatterplots" && (
           <ScatterplotsVisualization />
         )}
-        {/* {this.state.visualization === "treemap" && <TreemapVisualization />} */}
       </div>
     );
   }

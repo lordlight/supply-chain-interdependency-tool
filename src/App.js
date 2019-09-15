@@ -595,9 +595,6 @@ class App extends Component {
             <ListItem button onClick={this.handleAboutOpen}>
               <ListItemText primary="About..." />
             </ListItem>
-            {/* <ListItem button>
-              <ListItemText primary="Edit Question Weightings..." />
-            </ListItem> */}
             <ListItem button onClick={this.handlePreferencesDialogOpen}>
               <ListItemText primary="Preferences..." />
             </ListItem>
@@ -695,17 +692,6 @@ class App extends Component {
               designation with an &quot;s&quot; appended.
             </DialogContentText>
             <Grid container direction="column" style={{ marginBottom: 12 }}>
-              {/* <Grid container direction="row" spacing={8}>
-                <Grid item xs={2}>
-                  Resource
-                </Grid>
-                <Grid item xs={5}>
-                  User-defined Designation
-                </Grid>
-                <Grid item xs={5}>
-                  Plural (optional)
-                </Grid>
-              </Grid> */}
               {[
                 ["Project", "project", "Projects", "projects"],
                 ["Product", "product", "Products", "products"],

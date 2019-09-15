@@ -172,7 +172,7 @@ export function calculateItemRisk(
 
     // normalize access
     Object.keys(perItemRisk[itemId].Access || {}).forEach(qkey => {
-      const [_, assetId] = qkey.split("|");
+      const assetId = qkey.split("|")[1];
       const nval = NORMALIZED_VALUES[`${resourceType}_access`];
       const maxAccess = getMaxAccessScore(questions, assetId);
       perItemRisk[itemId].Access[qkey] =

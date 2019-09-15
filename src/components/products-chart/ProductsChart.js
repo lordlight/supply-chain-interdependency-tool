@@ -39,7 +39,7 @@ class ProductsChart extends Component {
 
   getCellTooltip = (row, col, buckets) => {
     const count = buckets[row][col];
-    const label = count == 1 ? this.label : this.labelPlural;
+    const label = count === 1 ? this.label : this.labelPlural;
     return `${count} ${label}`;
   };
 

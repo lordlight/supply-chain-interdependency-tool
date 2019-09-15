@@ -955,17 +955,6 @@ class ItemList extends Component {
             {`Please import ${type} data.`}
           </Typography>
         )}
-        {/* <Snackbar
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }}
-                    open={true}
-                    ContentProps={{
-                        'aria-describedby': 'message-id',
-                    }}
-                    message={<span id="message-id">Current {type} questionnaire score: {riskVal.toFixed(1)}</span>}
-                /> */}
       </div>
     );
   }
