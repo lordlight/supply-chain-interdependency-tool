@@ -105,16 +105,18 @@ const QUESTION_TYPES = ["Access", "Criticality", "Dependency", "Assurance"];
 class QuestionStatusCard extends Component {
   constructor(props) {
     super(props);
+    const qrandomState = {};
+    QUESTION_TYPES.forEach(qt => {
+      qrandomState[`answerChance.${qt}`] = 70;
+      qrandomState[`responseSkew.${qt}`] = 50;
+    });
     this.state = {
       dialogOpen: false,
       importDialogOpen: false,
       answerChance: 70,
-      responseSkew: 50
+      responseSkew: 50,
+      ...qrandomState
     };
-    QUESTION_TYPES.forEach(qt => {
-      this.state[`answerChance.${qt}`] = 70;
-      this.state[`responseSkew.${qt}`] = 50;
-    });
   }
 
   componentDidUpdate = prevProps => {

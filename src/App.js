@@ -595,9 +595,6 @@ class App extends Component {
             <ListItem button onClick={this.handleAboutOpen}>
               <ListItemText primary="About..." />
             </ListItem>
-            {/* <ListItem button>
-              <ListItemText primary="Edit Question Weightings..." />
-            </ListItem> */}
             <ListItem button onClick={this.handlePreferencesDialogOpen}>
               <ListItemText primary="Preferences..." />
             </ListItem>

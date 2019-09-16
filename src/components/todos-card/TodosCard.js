@@ -99,14 +99,14 @@ class TodosCard extends Component {
     resourcesLabel,
     resourcesLabelPlural
   ) => {
-    let numCompleted = 0,
+    let // numCompleted = 0,
       numPartial = 0,
       numZero = 0;
     resources.forEach(item => {
       let numResp = Object.keys(responses[item.ID] || []).length;
       const numQuestions = getNumQuestionsForResource(item, questions);
       if (numResp >= numQuestions) {
-        numCompleted += 1;
+        // numCompleted += 1;
       } else if (numResp > 0) {
         numPartial += 1;
       } else {

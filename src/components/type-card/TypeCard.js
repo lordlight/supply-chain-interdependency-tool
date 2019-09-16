@@ -87,13 +87,15 @@ class TypeCard extends Component {
     store.dispatch(updateNavState({ navState: type }));
   };
 
-  render() {
-    const { classes } = this.props;
-
-    if (this.props.importState === null) {
-      this.state.open = false;
+  componentDidUpdate = (prevProps, prevState) => {
+    if (this.props.importState === null && prevProps.importState != null) {
+      this.setState({ open: false });
       store.dispatch(updateImportFile({ importFile: null }));
     }
+  };
+
+  render() {
+    const { classes } = this.props;
 
     return (
       <div>
@@ -102,25 +104,7 @@ class TypeCard extends Component {
           {this.props.type === "products" && <ProductsChart />}
           {this.props.type === "projects" && <ProjectsChart />}
           <CardContent>
-            {/* <Typography gutterBottom className={classes.title}>
-              {this.props.type}
-            </Typography>
-            <Typography gutterBottom className={classes.heading}>
-              {this.props.items.length > 0
-                ? this.props.items.length + " " + this.props.type
-                : "No " + this.props.type + " provided"}
-            </Typography> */}
-
             <TypeSummary currentType={this.props.type} />
-
-            {/* <Typography
-              className={classes.desc}
-              color="textSecondary"
-              component="p"
-            >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Typography> */}
           </CardContent>
           <CardActions>
             <Button

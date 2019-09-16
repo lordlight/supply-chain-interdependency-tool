@@ -66,7 +66,6 @@ class Home extends Component {
           items={this.props.projects.filter(proj => !!proj.parent)}
         />
         <TodosCard />
-        {/* <ActionCard type="recommendations" items={testRecs} title="Cyber Supply Chain Risk" plural="Recommendations"/> */}
       </div>
     );
   }

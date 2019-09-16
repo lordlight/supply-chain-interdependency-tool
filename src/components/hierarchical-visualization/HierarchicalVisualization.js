@@ -141,8 +141,8 @@ class HierarchicalVisualization extends Component {
     const preferences = (this.props || {}).preferences || {};
     const prevPreferences = (prevProps || {}).preferences || {};
     if (
-      preferences["viz.colorscheme"] != prevPreferences["viz.colorscheme"] ||
-      preferences["resources.designators"] !=
+      preferences["viz.colorscheme"] !== prevPreferences["viz.colorscheme"] ||
+      preferences["resources.designators"] !==
         prevPreferences["resource.designators"]
     ) {
       this.nodePositions = this.network.getPositions();
@@ -173,7 +173,7 @@ class HierarchicalVisualization extends Component {
     interdependence = interdependence !== -Infinity ? interdependence || 0 : 0;
     maxInterdependence =
       maxInterdependence !== -Infinity ? maxInterdependence || 0 : 0;
-    assurance = assurance != -Infinity ? assurance || 0 : 0;
+    assurance = assurance !== -Infinity ? assurance || 0 : 0;
 
     return ReactDOMServer.renderToString(
       <div>
@@ -198,7 +198,6 @@ class HierarchicalVisualization extends Component {
           <Typography style={{ marginRight: 6 }}>Impact</Typography>
           <div style={{ display: "flex" }}>
             <Typography style={{ marginRight: 6 }}>
-              {/* {impact.toFixed(1)} */}
               {Math.round(impact)}
             </Typography>
             <div className={classes.scoreBarsContainer}>
@@ -221,7 +220,6 @@ class HierarchicalVisualization extends Component {
           <Typography style={{ marginRight: 6 }}>Interdependence</Typography>
           <div style={{ display: "flex" }}>
             <Typography style={{ marginRight: 6 }}>
-              {/* {interdependence.toFixed(1)} */}
               {Math.round(interdependence)}
             </Typography>
             <div className={classes.scoreBarsContainer}>
@@ -244,7 +242,6 @@ class HierarchicalVisualization extends Component {
           <Typography style={{ marginRight: 6 }}>Assurance</Typography>
           <div style={{ display: "flex" }}>
             <Typography style={{ marginRight: 6 }}>
-              {/* {assurance.toFixed(1)} */}
               {Math.round(assurance)}
             </Typography>
             <div className={classes.scoreBarsContainer}>
@@ -313,7 +310,6 @@ class HierarchicalVisualization extends Component {
           <Typography style={{ marginRight: 6 }}>Impact</Typography>
           <div style={{ display: "flex" }}>
             <Typography style={{ marginRight: 6 }}>
-              {/* {impact.toFixed(1)} */}
               {Math.round(impact)}
             </Typography>
             <div className={classes.scoreBarsContainer}>
@@ -336,7 +332,6 @@ class HierarchicalVisualization extends Component {
           <Typography style={{ marginRight: 6 }}>Interdependence</Typography>
           <div style={{ display: "flex" }}>
             <Typography style={{ marginRight: 6 }}>
-              {/* {interdependence.toFixed(1)} */}
               {Math.round(interdependence)}
             </Typography>
             <div className={classes.scoreBarsContainer}>
@@ -578,11 +573,6 @@ class HierarchicalVisualization extends Component {
         proj => (resourceScores[proj.ID] || {}).interdependence
       ) || 0)
     );
-    let maxAssurance = Math.max(
-      ...(activeProjects.map(
-        proj => (resourceScores[proj.ID] || {}).assurance
-      ) || 0)
-    );
     const projectNodes = activeProjects.map(proj => {
       const itemScores = resourceScores[proj.ID] || {};
       const impact =
@@ -628,11 +618,6 @@ class HierarchicalVisualization extends Component {
     maxInterdependence = Math.max(
       ...(activeProducts.map(
         prod => (resourceScores[prod.ID] || {}).interdependence
-      ) || 0)
-    );
-    maxAssurance = Math.max(
-      ...(activeProducts.map(
-        prod => (resourceScores[prod.ID] || {}).assurance
       ) || 0)
     );
     const productNodes = activeProducts.map(prod => {
@@ -946,7 +931,6 @@ class HierarchicalVisualization extends Component {
             top: 12
           }}
         >
-          {/* <Typography variant="h6">Legend</Typography> */}
           <div
             style={{
               display: "flex",
@@ -1050,7 +1034,6 @@ class HierarchicalVisualization extends Component {
             Re-center Chart
           </Button>
         </div>
-        {/* </div> */}
         <div
           style={{
             height: "100%"

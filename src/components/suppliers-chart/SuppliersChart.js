@@ -62,7 +62,7 @@ class SuppliersChart extends Component {
         callbacks: {
           label: tooltipItem =>
             `${tooltipItem.value} ${
-              tooltipItem.value == 1
+              tooltipItem.value === 1 || tooltipItem.value === "1"
                 ? resourceDesignators.get("Supplier")
                 : resourceDesignators.getPlural("Supplier")
             }`,
