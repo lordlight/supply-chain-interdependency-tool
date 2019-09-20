@@ -1,6 +1,8 @@
 {
   "name": "CSCRM",
-  "version": "0.2.0",
+  "fullname": "Cyber Supply Chain Risk Management (CSCRM) Interdependency Tool",
+  "version": "1.0.0",
+  "versiondate": "5 September 2019",
   "private": true,
   "homepage": "./",
   "main": "main.js",
