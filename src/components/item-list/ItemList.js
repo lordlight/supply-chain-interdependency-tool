@@ -358,7 +358,9 @@ class ItemList extends Component {
             The interdependence score is the sum of all supply line scores in
             which the {supplierLabel} participates (a supply line is one{" "}
             {supplierLabel} supplying one {productLabel} for one {projectLabel}
-            ).
+            ). It is best understood in relation to the {supplierLabel}’s Impact
+            Score and to the Interdependence Scores of similar{" "}
+            {supplierLabelPlural}.
           </div>
           <br></br>
           <div>
@@ -464,7 +466,9 @@ class ItemList extends Component {
             involve the {productLabel} (if there are multiple{" "}
             {supplierLabelPlural} for this {productLabel} or the {productLabel}{" "}
             is used in multiple {projectLabelPlural}, those are separate supply
-            lines).
+            lines). It is best understood in relation to the {productLabel}’s
+            Impact Score and to the Interdependence Scores of similar{" "}
+            {productLabelPlural}.
           </div>
           <br></br>
           <div>
@@ -564,7 +568,9 @@ class ItemList extends Component {
           <div>
             The interdependence score is the sum of all supply line scores that
             lead to the {projectLabel} (all {productLabelPlural} and{" "}
-            {supplierLabelPlural} connected to this {projectLabel}).
+            {supplierLabelPlural} connected to this {projectLabel}). It is best
+            understood in relation to the {projectLabel}’s Impact Score and to
+            the Interdependence Scores of similar {projectLabelPlural}.
           </div>
           <br></br>
           <div>
@@ -612,9 +618,21 @@ class ItemList extends Component {
       q => q["Type of question"] === "Dependency"
     );
 
+    let typeLabel;
+    let typeLabelPlural;
+    if (type === "suppliers") {
+      typeLabel = supplierLabel;
+      typeLabelPlural = supplierLabelPlural;
+    } else if (type === "products") {
+      typeLabel = productLabel;
+      typeLabelPlural = productLabelPlural;
+    } else if (type === "projects") {
+      typeLabel = projectLabel;
+      typeLabelPlural = projectLabelPlural;
+    }
     const headerDetails = [
       {
-        label: resourceDesignators.get(type.substring(0, type.length - 1)),
+        label: typeLabel,
         tooltip: "Sort by name",
         cssClass: classes.titleCol,
         sortType: "Name"
@@ -638,19 +656,19 @@ class ItemList extends Component {
         sortType: "score.assurance"
       },
       hasCriticality && {
-        label: MULTIPLES_OPTIONS.Criticality.fields.label,
+        label: `Criticality (${typeLabel})`,
         tooltip: criticalityTooltip,
         cssClass: classes.scoreCol,
         sortType: MULTIPLES_OPTIONS.Criticality.fields.sort
       },
       hasAccess && {
-        label: MULTIPLES_OPTIONS.Access.fields.label,
+        label: `Access (${typeLabel})`,
         tooltip: accessTooltip,
         cssClass: classes.scoreCol,
         sortType: MULTIPLES_OPTIONS.Access.fields.sort
       },
       hasDependency && {
-        label: MULTIPLES_OPTIONS.Dependency.fields.label,
+        label: `Dependency (${typeLabel})`,
         tooltip: dependencyTooltip,
         cssClass: classes.scoreCol,
         sortType: MULTIPLES_OPTIONS.Dependency.fields.sort
