@@ -53,7 +53,7 @@ const resourcePaths = [
 // Load any previuosly generated session data.
 loadSessionData = () => {
   const appPath = app.getPath("appData") + "/" + app.getName();
-  // If the CSCRM app folder does not exist, create it.
+  // If the C-SCRM app folder does not exist, create it.
   if (!fs.existsSync(appPath)) {
     fs.mkdirSync(appPath);
   }
@@ -180,7 +180,7 @@ loadJSONFileContents = (path, itemType) => {
 
 saveSessionData = (event, type) => {
   const appPath = app.getPath("appData") + "/" + app.getName();
-  // If the CSCRM app folder does not exist, create it.
+  // If the C-SCRM app folder does not exist, create it.
   if (!fs.existsSync(appPath)) {
     fs.mkdirSync(appPath);
   }

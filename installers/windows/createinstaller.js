@@ -15,14 +15,14 @@ function getInstallerConfig() {
   const outPath = path.join(rootPath, "dist");
 
   return Promise.resolve({
-    appDirectory: path.join(outPath, "CSCRM-win32-x64/"),
+    appDirectory: path.join(outPath, "C-SCRM-win32-x64/"),
     authors: "NIST",
     noMsi: true,
-    outputDirectory: path.join(outPath, "CSCRM-win32-x64"),
-    exe: "CSCRM.exe",
-    setupExe: "CSCRMInstaller.exe",
+    outputDirectory: path.join(outPath, "C-SCRM-win32-x64"),
+    exe: "C-SCRM.exe",
+    setupExe: "C-SCRMInstaller.exe",
     description:
-      "Cyber Supply Chain Risk Management (CSCRM) Interdependency Tool",
+      "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
     setupIcon: path.join(rootPath, "assets", "icons", "win", "cscrm.ico"),
     loadingGif: path.join(
       rootPath,

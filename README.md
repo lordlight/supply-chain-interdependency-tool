@@ -40,28 +40,28 @@ Builds the React app and places it in the /build folder.
 
 ### `npm pack-macos`
 
-Packages the built React app into a MacOS app, placing it in the /dist/CSCRM-darwin-x64 folder with the name CSCRM.app.
+Packages the built React app into a MacOS app, placing it in the /dist/C-SCRM-darwin-x64 folder with the name C-SCRM.app.
 
 **This must be run from a Mac with Xcode Command Line Tools installed. It also signs the code, otherwise users cannot open the app.
 
 Make sure to run `npm run build` prior to running this script.
 
-To change the name of the app, see the "scripts": {"pack-macos"} and change "CSCRM" to the desired app name.
+To change the name of the app, see the "scripts": {"pack-macos"} and change "C-SCRM" to the desired app name.
 
 ### `npm pack-win`
 
-Packages the built React app into a Windows exe, placing it in the /dist/CSCRM-win32-x64 folder with the name CSCRM.exe.
+Packages the built React app into a Windows exe, placing it in the /dist/C-SCRM-win32-x64 folder with the name C-SCRM.exe.
 
 Make sure to run `npm run build` prior to running this script.
 
 If developing, or building, on MacOS, install [Wine](https://www.davidbaumgold.com/tutorials/wine-mac/).
 
-To change the name of the app, see the "scripts": {"pack-win"} and change "CSCRM" to the desired app name.
+To change the name of the app, see the "scripts": {"pack-win"} and change "C-SCRM" to the desired app name.
 
 ### `npm pack-linux`
 
-Packages the built React app into Linux executable, placing it in the /dist/CSCRM-linux-x64 folder with the name CSCRM.exe.
+Packages the built React app into Linux executable, placing it in the /dist/C-SCRM-linux-x64 folder with the name C-SCRM.exe.
 
 Make sure to run `npm run build` prior to running this script.
 
-To change the name of the app, see the "scripts": {"pack-win"} and change "CSCRM" to the desired app name.
+To change the name of the app, see the "scripts": {"pack-win"} and change "C-SCRM" to the desired app name.

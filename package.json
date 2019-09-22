@@ -1,6 +1,6 @@
 {
-  "name": "CSCRM",
-  "fullname": "Cyber Supply Chain Risk Management (CSCRM) Interdependency Tool",
+  "name": "C-SCRM",
+  "fullname": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "version": "1.0.0",
   "versiondate": "5 September 2019",
   "private": true,
@@ -17,7 +17,6 @@
     "clsx": "^1.0.4",
     "csv-parse": "^4.4.0",
     "csv-parser": "^2.2.0",
-    "d3": "^5.9.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-is-dev": "^1.0.1",
     "electron-store": "^4.0.0",
@@ -28,7 +27,6 @@
     "react-chartjs-2": "^2.7.6",
     "react-dev-utils": "^8.0.0",
     "react-dom": "^16.8.5",
-    "react-force-graph": "^1.21.1",
     "react-graph-vis": "^1.0.2",
     "react-orgchart": "^1.0.5",
     "react-plotly.js": "^2.3.0",
@@ -45,12 +43,12 @@
     "dev": "react-scripts start",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 react-scripts build ; cp ./dist-package.json ./build/package.json; cp ./main.js ./build/main.js; cp ./preload.js ./build/preload.js; cp ./state-handler.js ./build/state-handler.js; cp -a ./assets/. ./build/assets/; cp -a ./installers/. ./build/installers/; NODE_OPTIONS=--max_old_space_size=4096 npm --prefix ./build install ./build",
     "start": "concurrently \"cross-env BROWSER=none NODE_OPTIONS=--max_old_space_size=4096 react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-    "pack-macos": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity=$OSX_SIGN_IDENTITY --icon=assets/icons/mac/cscrm.icns",
-    "pack-macos-nosign": "electron-packager ./build CSCRM --out=./dist --platform=darwin --arch=x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
-    "create-installer-mac": "electron-installer-dmg ./dist/CSCRM-darwin-x64/CSCRM.app CSCRM --out=dist/CSCRM-darwin-x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
-    "pack-win": "electron-packager ./build CSCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
+    "pack-macos": "electron-packager ./build C-SCRM --out=./dist --platform=darwin --arch=x64 --overwrite --osx-sign.identity=$OSX_SIGN_IDENTITY --icon=assets/icons/mac/cscrm.icns",
+    "pack-macos-nosign": "electron-packager ./build C-SCRM --out=./dist --platform=darwin --arch=x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
+    "create-installer-mac": "electron-installer-dmg ./dist/C-SCRM-darwin-x64/C-SCRM.app C-SCRM --out=dist/C-SCRM-darwin-x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
+    "pack-win": "electron-packager ./build C-SCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
     "create-installer-win": "node installers/windows/createinstaller.js",
-    "pack-linux": "electron-packager ./build CSCRM --out=./dist --platform=linux --arch=x64 --overwrite"
+    "pack-linux": "electron-packager ./build C-SCRM --out=./dist --platform=linux --arch=x64 --overwrite"
   },
   "eslintConfig": {
     "extends": "react-app"
