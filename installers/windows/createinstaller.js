@@ -20,7 +20,7 @@ function getInstallerConfig() {
     noMsi: true,
     outputDirectory: path.join(outPath, "C-SCRM-win32-x64"),
     exe: "C-SCRM.exe",
-    setupExe: "C-SCRMInstaller.exe",
+    setupExe: "C-SCRM-Installer.exe",
     description:
       "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
     setupIcon: path.join(rootPath, "assets", "icons", "win", "cscrm.ico"),
