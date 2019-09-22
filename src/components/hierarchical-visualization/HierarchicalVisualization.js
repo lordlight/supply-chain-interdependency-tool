@@ -541,7 +541,7 @@ class HierarchicalVisualization extends Component {
           const title = this.getEdgePopupContents(
             resourceDesignators.get("Supplier"),
             (suppliersMap[supId] || {}).Name,
-            resourceDesignators.get("Project"),
+            resourceDesignators.get("Product"),
             prod.Name,
             maxImpact !== -Infinity ? maxImpact : 0,
             interdependence,
