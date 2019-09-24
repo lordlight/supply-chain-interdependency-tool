@@ -2,7 +2,7 @@
   "name": "C-SCRM",
   "fullname": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "version": "1.0.0",
-  "versiondate": "5 September 2019",
+  "versiondate": "30 September 2019",
   "private": true,
   "homepage": "./",
   "main": "main.js",
