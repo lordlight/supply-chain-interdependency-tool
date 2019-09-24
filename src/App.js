@@ -684,7 +684,7 @@ class App extends Component {
           </DialogTitle>
           <DialogContent>
             <Typography variant="subtitle1" style={{ marginBottom: 12 }}>
-              Resource Designations
+              Resource Nomenclature
             </Typography>
             <DialogContentText style={{ marginBottom: 12 }}>
               Modify how resources are labeled in in the application. If no

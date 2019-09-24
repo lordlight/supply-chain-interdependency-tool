@@ -103,7 +103,7 @@ class CandlestickVisualization extends Component {
                   showticklabels: true,
                   type: "category",
                   tickfont: {
-                    size: 8
+                    size: 10
                   }
                 },
                 yaxis: {

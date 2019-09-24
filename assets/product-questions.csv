@@ -1,5 +1,5 @@
 ID,NIST CSF,Question,Type of answer,Answers,Logic,Notes,Type of question,Asset ID,Relation,Question Info Text,Version,Weight
-1.2,ID.AM-5,What is the criticality of this product/service to the project [Project ID]?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1 (highly critical)"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10 (not critical at all)"" | value=100;label=""I don't know""","IF 1, RAISE 100
+1.2,ID.AM-5,What is the criticality of this {product/service} to the {project} [Project ID]?,"Scale of 1-10 where 1 is ""Highly critical"" and 10 is ""not critical at all,"" plus an ""I don't know"" option","value=100;label=""1 (highly critical)"" | value=90;label=""2"" | value=80;label=""3"" | value=70;label=""4"" | value=60;label=""5"" | value=50;label=""6"" | value=40;label=""7"" | value=30;label=""8"" | value=20;label=""9"" | value=10;label=""10 (not critical at all)"" | value=100;label=""I don't know""","IF 1, RAISE 100
 IF 2, RAISE 90
 IF 3, RAISE 80
 IF 4, RAISE 70
@@ -12,39 +12,39 @@ IF 10, RAISE 10;","NIST IR: Baseline criticality has been defined for the produc
 
 NEW: Be sure to highlight that this overlaps, but does not perfectly map, to NISTIR 8179
 
-CONSIDER ADDING: Add feature to calc final criticality and spit back to user. Possible V2.",Criticality,,Project ID,Baseline criticality has been defined for the product which can be traced back to the objectives of the program and the goals of the organization.  Reference NISTIR 8179.,,1
-2.1,DE.CM-6,Is this product or service connected to or a part of your company's systems/networks?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+CONSIDER ADDING: Add feature to calc final criticality and spit back to user. Possible V2.",Criticality,,Project ID,Baseline criticality has been defined for the {product} which can be traced back to the objectives of the program and the goals of the organization.  Reference NISTIR 8179.,,1
+2.1,DE.CM-6,Is this {product/service} connected to or a part of your company's systems/networks?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;",,Access,ICTA,,,,1
-2.2,PR.AC-7,Is this product or service connected to or a part of a product or service that your company provides to customers?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+2.2,PR.AC-7,Is this {product/service} connected to or a part of a product or service that your company provides to customers?,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;",,Access,PA,,,,1
-2.3,PR.AC-7,"Does this product or service process or store regulated data (e.g., PII, PHI, PCI, etc.) or your company's sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+2.3,PR.AC-7,"Does this {product/service} process or store regulated data (e.g., PII, PHI, PCI, etc.) or your company's sensitive information (e.g., intellectual property, financial data, internal processes, etc.)?",Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;",,Access,SDA,,,,1
-3.1,ID.SC-2,What is the supplier's ([Supplier ID]) market share for this particular product/service?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
+3.1,ID.SC-2,What is the {supplier}'s ([Supplier ID]) market share for this particular {product/service}?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
 IF 25-50, RAISE 5
 IF 50-75, RAISE 2
 IF 75-100, no change","Dave's Bubble: highlight the scope of the question
 
 There will need to be a behind the scenes calculation if there are multiple products per supplier that impacts supplier risk.  We don't need to ask the question but risk needs to be calculated.
 
-Percentage of the industry or market that a supplier controls for a specific product or service.  ",Dependency,,Supplier ID,The supplier's market share may impact your dependence on this particular supplier.,,1
-3.2,ID.SC-2,What percent of the supplier's ([Supplier ID]) sales of this product/service does your company consume?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
+Percentage of the industry or market that a supplier controls for a specific product or service.  ",Dependency,,Supplier ID,The {supplier}'s market share may impact your dependence on this particular {supplier}.,,1
+3.2,ID.SC-2,What percent of the {supplier}'s ([Supplier ID]) sales of this {product/service} does your company consume?,"100%, 50%-75%+, 25%-50%, under 25% with ""I don't know"" option ","value=10;label=""< 25%"" | value=5;label=""25 - 50%"" | value=2;label=""50 - 75%"" | value=0;label=""75 - 100%"" | value=10;label=""I don't know""","IF <25, RAISE 10
 IF 25-50, RAISE 5
 IF 50-75, RAISE 2
 IF 75-100, no change
 
 ",,Dependency,,Supplier ID,,,1
-3.3,ID.SC-2,Would switching to an alternative supplier constitute significant cost or effort for your company?  ,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
+3.3,ID.SC-2,Would switching to an alternative {supplier} constitute significant cost or effort for your company?  ,Yes/No,"value=10;label=""Yes"" | value=0;label=""No"" | value=10;label=""I don't know""","IF yes, RAISE 10
 IF no, no change;","Dave's Bubble: building the capability in-house would count
 
-Switching to alternative product/service would include developing the product/service in house.",Dependency,,,Alternative product/service suppliers would include developing the product/service in-house.,,1
-3.4,ID.SC-2,Does your company have an existing relationship with another supplier for this product/service?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
+Switching to alternative product/service would include developing the product/service in house.",Dependency,,,Alternative {product/service} {suppliers} would include developing the {product/service} in-house.,,1
+3.4,ID.SC-2,Does your company have an existing relationship with another {supplier} for this {product/service}?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10;
 
 ",,Dependency,,,,,1
-4.1,ID.SC-2,"How confident is your company that they will be able to obtain quality products/services regardless of major supply chain disruptions, both manmade and natural?","Scale of 1 to 5 where 5 is ""low confidence"" and 1 is ""high confidence"" and an ""I don't know"" option","value=10;label=""1 (low confidence)"" | value=7;label=""2"" |  value=5;label=""3"" | value=4;label=""4"" | value=0;label=""5 (high confidence)"" | value=10;label=""I don't know""","IF 1 (low confidence), RAISE 10
+4.1,ID.SC-2,"How confident is your company that they will be able to obtain quality {products/services} regardless of major supply chain disruptions, both manmade and natural?","Scale of 1 to 5 where 5 is ""low confidence"" and 1 is ""high confidence"" and an ""I don't know"" option","value=10;label=""1 (low confidence)"" | value=7;label=""2"" |  value=5;label=""3"" | value=2;label=""4"" | value=0;label=""5 (high confidence)"" | value=10;label=""I don't know""","IF 1 (low confidence), RAISE 10
 IF 2, RAISE 7 
 IF 3, RAISE 5
 IF 4, RAISE 2
 IF 5 (high confidence), no change;","Dave's Bubble: Give examples from the news, such as tsunamis impacting hard drive costs.",Dependency,,,"Examples of major supply chain disruptions include natural disasters such as hurricanes, floods, and wildfires. For instance, global hard drive availability was impacted by a 2011 monsoon in central Thailand. Manmade events include theft, regulation,  geo-political instability, and ransomware.",,1
-5.1,ID.SC-3,Does your company maintain a reserve of this product/service?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
+5.1,ID.SC-3,Does your company maintain a reserve of this {product/service}?,Yes/No,"value=00;label=""Yes"" | value=10;label=""No"" | value=10;label=""I don't know""","IF yes, no change
 IF no, RAISE 10",,Dependency,,,,,1
