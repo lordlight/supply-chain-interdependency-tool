@@ -424,7 +424,7 @@ class HierarchicalVisualization extends Component {
           title,
           value,
           color: {
-            color: "gray"
+            color: "aaaaaa"
             // color: impactColor
           }
         };
@@ -491,7 +491,7 @@ class HierarchicalVisualization extends Component {
             title,
             value,
             color: {
-              color: "gray"
+              color: "aaaaaa"
               // color: impactColor
             }
           };
@@ -555,7 +555,7 @@ class HierarchicalVisualization extends Component {
             title,
             value,
             color: {
-              color: "gray"
+              color: "aaaaaa"
               // color: impactColor
             }
           };
