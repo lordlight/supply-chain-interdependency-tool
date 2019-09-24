@@ -770,9 +770,6 @@ class HierarchicalVisualization extends Component {
     },
     nodes: {
       scaling: {
-        label: {
-          enabled: true
-        },
         min: 16,
         max: 120
       }
