@@ -21,7 +21,7 @@ let isDev = require("electron-is-dev");
 
 let mainWindow;
 
-createWindow = () => {
+const createWindow = () => {
   mainWindow = new BrowserWindow({
     backgroundColor: "#F7F7F7",
     minWidth: 880,
@@ -77,7 +77,7 @@ createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-generateMenu = () => {
+const generateMenu = () => {
   const template = [
     {
       label: "File",

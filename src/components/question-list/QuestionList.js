@@ -124,7 +124,7 @@ class QuestionList extends Component {
   };
 
   isDirty = () => {
-    let responses = null;
+    let responses = [];
     if (this.props.currentType === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (this.props.currentType === "products") {
@@ -146,7 +146,7 @@ class QuestionList extends Component {
   };
 
   handleSave = () => {
-    let responses = null;
+    let responses = [];
     if (this.props.currentType === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (this.props.currentType === "products") {
@@ -203,7 +203,7 @@ class QuestionList extends Component {
     let item = this.props.currentItem;
 
     // Get responses for the given
-    let responses = null;
+    let responses = [];
     if (type === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (type === "products") {
@@ -218,7 +218,7 @@ class QuestionList extends Component {
     }
 
     // Get the relevant questions and assign the relevant risk item
-    let questions = null; //, riskVal = null;
+    let questions = []; //, riskVal = null;
     if (type === "suppliers") {
       questions = this.props.supplierQuestions;
       //riskVal = this.props.suppliersRisk[item.ID];

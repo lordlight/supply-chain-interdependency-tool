@@ -37,7 +37,7 @@ class List extends Component {
             list = this.props.projects;
         }
 
-        if (list < 1){
+        if (list === null || list.length === 0){
             return null;
         }
 

@@ -847,7 +847,7 @@ class HierarchicalVisualization extends Component {
           this.selected.add(n);
           const descendents = new Set();
           this.getNodeDescendents(n, descendents);
-          descendents.forEach(n => this.selected.add(n));
+          descendents.forEach(d => this.selected.add(d));
         }
       });
       this.network.selectNodes(Array.from(this.selected));
@@ -859,7 +859,7 @@ class HierarchicalVisualization extends Component {
           this.selected.delete(n);
           const descendents = new Set();
           this.getNodeDescendents(n, descendents);
-          descendents.forEach(n => this.selected.delete(n));
+          descendents.forEach(d => this.selected.delete(d));
         }
       });
       this.network.selectNodes(Array.from(this.selected));

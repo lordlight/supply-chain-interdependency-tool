@@ -56,9 +56,9 @@ class ProductsChart extends Component {
     this.labelPlural = resourceDesignators.getPlural("Product");
 
     let maxInterdependence = Math.max(
-      ...(products.map(
-        prod => (productScores[prod.ID] || {}).interdependence
-      ) || 0)
+      ...products.map(
+        prod => (productScores[prod.ID] || {}).interdependence || 0
+      )
     );
     products.forEach(prod => {
       const scores = productScores[prod.ID] || {};

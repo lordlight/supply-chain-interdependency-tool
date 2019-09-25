@@ -283,8 +283,8 @@ export function computeImpacts(
         };
         dependencyScoreEntries.push(adscoreEntry);
       });
-      Object.entries(assetRisks).forEach(entry => {
-        const [assetId, assetScores] = entry;
+      Object.entries(assetRisks).forEach(asentry => {
+        const [assetId, assetScores] = asentry;
         const crit =
           (Object.entries(assetScores.Criticality || {})[0] || [])[1] || 0;
         let score = 0;
