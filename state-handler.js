@@ -12,7 +12,7 @@ const { parse } = require("json2csv");
 const stripBom = require("strip-bom"); // Needed because fs has no encoding, like utf-8-sig in python, for files with BOM (byte order mark)
 const stripBomStream = require("strip-bom-stream");
 
-mutableData = () => {
+let mutableData = () => {
   return {
     suppliers: [],
     products: [],
@@ -91,7 +91,7 @@ loadSessionData = () => {
   createCorrespondingResponses();
 };
 
-convertAnswers = () => {
+const convertAnswers = () => {
   let questionGroups = [
     sessionData.supplierQuestions,
     sessionData.productQuestions,
@@ -102,8 +102,8 @@ convertAnswers = () => {
     group.forEach(question => {
       if (question.hasOwnProperty("Answers")) {
         let answers = [];
-        let answerString = question.Answers.trim();
-        let splitAnswers = answerString.split(" | ");
+        let allAnswersString = question.Answers.trim();
+        let splitAnswers = allAnswersString.split(" | ");
 
         splitAnswers.forEach(answerString => {
           let splitAns = answerString.split(";");
@@ -122,7 +122,7 @@ convertAnswers = () => {
   });
 };
 
-createCorrespondingResponses = () => {
+const createCorrespondingResponses = () => {
   let responseGroups = [
     {
       itemList: sessionData.suppliers,
@@ -141,7 +141,7 @@ createCorrespondingResponses = () => {
   });
 };
 
-loadCSVFileContents = (path, itemType, cb) => {
+const loadCSVFileContents = (path, itemType, cb) => {
   let itemData = [];
   if (fs.existsSync(path)) {
     try {
@@ -162,7 +162,7 @@ loadCSVFileContents = (path, itemType, cb) => {
   }
 };
 
-loadJSONFileContents = (path, itemType) => {
+const loadJSONFileContents = (path, itemType) => {
   if (fs.existsSync(path)) {
     try {
       let data = JSON.parse(fs.readFileSync(path));
@@ -178,7 +178,7 @@ loadJSONFileContents = (path, itemType) => {
   }
 };
 
-saveSessionData = (event, type) => {
+const saveSessionData = (event, type) => {
   const appPath = app.getPath("appData") + "/" + app.getName();
   // If the C-SCRM app folder does not exist, create it.
   if (!fs.existsSync(appPath)) {
@@ -243,7 +243,7 @@ const REQUIRED_IMPORT_FIELDS = {
   projects: ["ID", "Level", "Name"]
 };
 
-validateImport = (data, type) => {
+const validateImport = (data, type) => {
   // types of validation errors:
   // - empty import
   // - imported data is not of correct type; does not have the headers required
@@ -306,7 +306,7 @@ validateImport = (data, type) => {
       const row = data[i];
       for (let j = 0; j < relationFields.length; j++) {
         const field = relationFields[j];
-        relations = row[field].split(";");
+        let relations = row[field].split(";");
         // for product relations, check no duplicates
         if (relations.length !== new Set(relations).size) {
           return {
@@ -328,7 +328,7 @@ validateImport = (data, type) => {
   return { success: true };
 };
 
-updateSessionData = (data, type, keepInactive = false) => {
+const updateSessionData = (data, type, keepInactive = false) => {
   if (sessionData.hasOwnProperty(type)) {
     if (keepInactive) {
       const updated = data.map(d => {

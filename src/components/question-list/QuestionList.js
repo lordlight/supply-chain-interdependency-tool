@@ -27,7 +27,12 @@ import { getQuestionResponse } from "../../utils/general-utils";
 
 const styles = theme => ({
   questionList: {
-    padding: "32px 8px 80px 44px"
+    padding: "8px 8px 80px 44px"
+  },
+  helperBlurb: {
+    padding: "8px 8px 8px 44px",
+    fontStyle: "italic",
+    color: "rgba(0, 0, 0, 0.54)"
   },
   details: {
     padding: "32px 8px 64px 44px"
@@ -124,7 +129,7 @@ class QuestionList extends Component {
   };
 
   isDirty = () => {
-    let responses = null;
+    let responses = [];
     if (this.props.currentType === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (this.props.currentType === "products") {
@@ -146,7 +151,7 @@ class QuestionList extends Component {
   };
 
   handleSave = () => {
-    let responses = null;
+    let responses = [];
     if (this.props.currentType === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (this.props.currentType === "products") {
@@ -203,7 +208,7 @@ class QuestionList extends Component {
     let item = this.props.currentItem;
 
     // Get responses for the given
-    let responses = null;
+    let responses = [];
     if (type === "suppliers") {
       responses = this.props.supplierResponses;
     } else if (type === "products") {
@@ -218,7 +223,7 @@ class QuestionList extends Component {
     }
 
     // Get the relevant questions and assign the relevant risk item
-    let questions = null; //, riskVal = null;
+    let questions = []; //, riskVal = null;
     if (type === "suppliers") {
       questions = this.props.supplierQuestions;
       //riskVal = this.props.suppliersRisk[item.ID];
@@ -398,6 +403,12 @@ class QuestionList extends Component {
       <React.Fragment>
         <div className={classes.details}>{details}</div>
         <Divider />
+        <Typography variant="body2" className={classes.helperBlurb}>
+          Answer each question to the best of your organization's knowledge.
+          Questions that have no answer yet are marked with a blue bookmark. If
+          the answer is unknown, choose "I don't know." Unanswered questions and
+          "don't know" answers are scored as worst-case responses.
+        </Typography>
         <div className={classes.questionList}>
           {accessRows.length > 0 && (
             <React.Fragment>

@@ -120,7 +120,7 @@ class QuestionStatusCard extends Component {
   }
 
   componentDidUpdate = prevProps => {
-    if ((this.props.importState == null) & (prevProps.importState != null)) {
+    if ((this.props.importState == null) && (prevProps.importState != null)) {
       this.setState({ importDialogOpen: false });
       store.dispatch(updateImportFile({ importFile: null }));
     }
@@ -158,7 +158,7 @@ class QuestionStatusCard extends Component {
       questions = this.props.projectQuestions;
       responses = this.props.projectResponses;
     }
-    items.forEach(i => {
+    (items || []).forEach(i => {
       const itemId = i.ID;
       responses = { ...(responses[itemId] || {}) };
       questions.forEach(q => {
@@ -173,7 +173,7 @@ class QuestionStatusCard extends Component {
         if (qtype === "Access") {
           const assetVal = q["Asset ID"];
           if (assetVal) {
-            const assetIds = (assetVal || "").split(";").filter(v => !!v);
+            const assetIds = assetVal.split(";").filter(v => !!v);
             assetIds.forEach(aid => {
               const qid = `${q.ID}|${aid}`;
               if (Math.random() < answerChance) {
@@ -247,7 +247,7 @@ class QuestionStatusCard extends Component {
     const { classes } = this.props;
 
     const type = this.props.currentType;
-    let items, questions;
+    let items = [], questions = [];
 
     if (type === "suppliers") {
       items = [...this.props.suppliers];

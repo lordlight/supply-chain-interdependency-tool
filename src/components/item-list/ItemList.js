@@ -289,8 +289,8 @@ class ItemList extends Component {
       );
     }
 
-    let items = null;
-    let questions = null;
+    let items = [];
+    let questions = [];
     let responses = null;
     let riskSet = null;
     let scores = null;
@@ -619,16 +619,16 @@ class ItemList extends Component {
     );
 
     let typeLabel;
-    let typeLabelPlural;
+    // let typeLabelPlural;
     if (type === "suppliers") {
       typeLabel = supplierLabel;
-      typeLabelPlural = supplierLabelPlural;
+      // typeLabelPlural = supplierLabelPlural;
     } else if (type === "products") {
       typeLabel = productLabel;
-      typeLabelPlural = productLabelPlural;
+      // typeLabelPlural = productLabelPlural;
     } else if (type === "projects") {
       typeLabel = projectLabel;
-      typeLabelPlural = projectLabelPlural;
+      // typeLabelPlural = projectLabelPlural;
     }
     const headerDetails = [
       {
@@ -894,11 +894,11 @@ class ItemList extends Component {
             />
           </TableCell>
 
-          {scoreValues.map((val, i) => (
+          {scoreValues.map((val, j) => (
             <TableCell
-              key={i}
+              key={j}
               className={
-                i === scoreValues.length - 1 ? classes.lastOfCell : classes.cell
+                j === scoreValues.length - 1 ? classes.lastOfCell : classes.cell
               }
             >
               {val}
@@ -944,8 +944,8 @@ class ItemList extends Component {
           <TableCell />
           <TableCell />
           <TableCell />
-          {scoreValues.map((val, i) => (
-            <TableCell key={i}></TableCell>
+          {scoreValues.map((val, j) => (
+            <TableCell key={j}></TableCell>
           ))}
           <TableCell />
           <TableCell />

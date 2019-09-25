@@ -120,7 +120,6 @@ class Question extends Component {
     let questionInfoText = this.props.question["Question Info Text"];
     const re = new RegExp(Object.keys(designatorVariables).join("|"), "g");
     questionText = questionText.replace(re, match => {
-      console.log("MMMMMM", match);
       return designatorVariables[match];
     });
     questionInfoText = questionInfoText.replace(

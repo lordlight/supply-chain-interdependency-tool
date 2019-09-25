@@ -45,7 +45,7 @@ class TypeSummary extends Component {
     const resourceDesignators = new ResourcesDesignators(preferences);
 
     const type = this.props.currentType;
-    let items, itemsInactive, questions, responses, typeDisplay;
+    let items = [], itemsInactive = [], questions, responses, typeDisplay;
 
     if (type === "suppliers") {
       items = [...this.props.suppliers];

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
-import { line } from "d3-shape";
 import { Typography } from "@material-ui/core";
 
 import { MAX_IMPACT_SCORE } from "../../utils/risk-calculations";
