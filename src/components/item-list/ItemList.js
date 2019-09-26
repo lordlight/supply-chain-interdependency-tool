@@ -318,7 +318,7 @@ class ItemList extends Component {
         <div>
           <div>
             The impact score indicates the highest negative potential impact if
-            the {supplierLabel} fails. Scored between 1 and 100, where 100 is
+            the {supplierLabel} fails. Scored between 0 and 100, where 100 is
             catastrophic failure for the organization.
           </div>
           <br></br>
@@ -533,7 +533,7 @@ class ItemList extends Component {
         <div>
           <div>
             The impact score indicates the highest negative potential impact if
-            the {projectLabel} fails. Scored between 1 and 100, where 100 is
+            the {projectLabel} fails. Scored between 0 and 100, where 100 is
             catastrophic failure for the organization.
           </div>
           <br></br>
