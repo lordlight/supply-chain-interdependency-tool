@@ -59,14 +59,14 @@ export class ResourcesDesignators {
 }
 
 export const AVAILABLE_COLORSCHEMES = {
-  "Brown-White-Green (colorblind-safe)": ["#5AB4AC", "#F5F5F5", "#D8B365"],
-  "Pink-White-Green (colorblind-safe)": ["#A1D76A", "#F7F7F7", "#E9A3C9"],
-  "Purple-White-Green (colorblind-safe)": ["#7FBF7B", "#F7F7F7", "#AF8DC3"],
+  "Green-White-Brown (colorblind-safe)": ["#D8B365", "#F5F5F5", "#5AB4AC"],
+  "Green-White-Pink (colorblind-safe)": ["#E9A3C9", "#F7F7F7", "#A1D76A"],
+  "Green-White-Purple (colorblind-safe)": ["#AF8DC3", "#F7F7F7", "#7FBF7B"],
   "Purple-Grey-Orange (colorblind-safe)": ["#F1A340", "#F7F7F7", "#998EC3"],
-  "Red-White-Blue (colorblind-safe)": ["#67A9CF", "#F7F7F7", "#EF8A62"],
-  "Red-Yellow-Blue (colorblind-safe)": ["#91BFDB", "#FFFFBF", "#FC8D59"]
+  "Blue-White-Red (colorblind-safe)": ["#EF8A62", "#F7F7F7", "#67A9CF"],
+  "Blue-Yellow-Red (colorblind-safe)": ["#FC8D59", "#FFFFBF", "#91BFDB"]
 };
-export const DEFAULT_COLORSCHEME = "Brown-White-Green (colorblind-safe)";
+export const DEFAULT_COLORSCHEME = "Green-White-Brown (colorblind-safe)";
 
 export function getColorScheme(preferences) {
   const colorscheme =
