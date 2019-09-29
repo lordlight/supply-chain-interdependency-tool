@@ -1,6 +1,8 @@
 {
   "name": "C-SCRM",
+  "description": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "fullname": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
+  "author": "NIST",
   "version": "1.0.0",
   "versiondate": "30 September 2019",
   "private": true,
@@ -48,7 +50,8 @@
     "create-installer-mac": "electron-installer-dmg ./dist/C-SCRM-darwin-x64/C-SCRM.app C-SCRM --out=dist/C-SCRM-darwin-x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
     "pack-win": "electron-packager ./build C-SCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
     "create-installer-win": "node installers/windows/createinstaller.js",
-    "pack-linux": "electron-packager ./build C-SCRM --out=./dist --platform=linux --arch=x64 --overwrite"
+    "pack-linux": "electron-packager ./build C-SCRM --out=./dist --platform=linux --arch=x64 --overwrite --icon=assets/icons/png/1024x1024.png",
+    "create-installer-debian": "electron-installer-debian --src dist/C-SCRM-linux-x64/ --dest dist/C-SCRM-linux-x64/ --arch amd64 --config debian.json"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -64,6 +67,7 @@
     "cross-env": "^5.2.0",
     "electron": "^4.1.4",
     "electron-builder": "^20.39.0",
+    "electron-installer-debian": "^2.0.1",
     "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^13.1.1",
     "electron-winstaller": "^4.0.0",
