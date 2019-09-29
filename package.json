@@ -61,11 +61,11 @@
     "start": "concurrently \"cross-env BROWSER=none NODE_OPTIONS=--max_old_space_size=4096 react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
     "pack-macos": "electron-packager ./build C-SCRM --out=./dist --platform=darwin --arch=x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
     "sign-macos": "electron-osx-sign --identity=\"$OSX_SIGN_IDENTITY\" dist/C-SCRM-darwin-x64/C-SCRM.app",
-    "create-installer-mac": "electron-installer-dmg ./dist/C-SCRM-darwin-x64/C-SCRM.app C-SCRM --out=dist/installers/mac/C-SCRM-darwin-x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
+    "create-installer-mac": "electron-installer-dmg ./dist/C-SCRM-darwin-x64/C-SCRM.app C-SCRM --out=dist/installers/mac/ --overwrite --icon=assets/icons/mac/cscrm.icns",
     "pack-win": "electron-packager ./build C-SCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
     "create-installer-win": "build --pd ./dist/C-SCRM-win32-x64 -w",
     "pack-linux": "electron-packager ./build C-SCRM --out=./dist --platform=linux --arch=x64 --overwrite --icon=assets/icons/png/1024x1024.png",
-    "create-installer-debian": "electron-installer-debian --src dist/C-SCRM-linux-x64/ --dest dist/installers/debian/C-SCRM-linux-x64/ --arch amd64 --config debian.json"
+    "create-installer-debian": "electron-installer-debian --src dist/C-SCRM-linux-x64/ --dest dist/installers/debian/ --arch amd64 --config debian.json"
   },
   "eslintConfig": {
     "extends": "react-app"
