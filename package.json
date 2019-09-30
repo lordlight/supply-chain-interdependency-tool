@@ -3,6 +3,7 @@
   "description": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "fullname": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "author": "NIST",
+  "license": "NIST",
   "version": "1.0.0",
   "versiondate": "30 September 2019",
   "private": true,
@@ -45,8 +46,11 @@
     "appId": "gov.nist.c-scrm",
     "productName": "C-SCRM",
     "directories": {
-      "output": "./dist/installers/${os}"
+      "buildResources": ".",
+      "output": "./dist/installers/${os}",
+      "app": "build"
     },
+    "extends": null,
     "win": {
       "target": [
         "nsis"
@@ -62,10 +66,10 @@
     "pack-macos": "electron-packager ./build C-SCRM --out=./dist --platform=darwin --arch=x64 --overwrite --icon=assets/icons/mac/cscrm.icns",
     "sign-macos": "electron-osx-sign --identity=\"$OSX_SIGN_IDENTITY\" dist/C-SCRM-darwin-x64/C-SCRM.app",
     "create-installer-mac": "electron-installer-dmg ./dist/C-SCRM-darwin-x64/C-SCRM.app C-SCRM --out=dist/installers/mac/ --overwrite --icon=assets/icons/mac/cscrm.icns",
-    "pack-win": "electron-packager ./build C-SCRM --out=./dist --platform=win32 --arch=x64 --overwrite --icon=assets/icons/win/cscrm.ico",
-    "create-installer-win": "build --pd ./dist/C-SCRM-win32-x64 -w",
+    "create-installer-win": "build -w",
     "pack-linux": "electron-packager ./build C-SCRM --out=./dist --platform=linux --arch=x64 --overwrite --icon=assets/icons/png/1024x1024.png",
-    "create-installer-debian": "electron-installer-debian --src dist/C-SCRM-linux-x64/ --dest dist/installers/debian/ --arch amd64 --config debian.json"
+    "create-installer-debian": "electron-installer-debian --src dist/C-SCRM-linux-x64/ --dest dist/installers/debian/ --arch amd64 --config debian.json",
+    "create-archive-linux": "mkdir -p ./dist/archives/linux; tar -C ./dist -cvzf ./dist/archives/linux/c-scrm_1.0.0.tar.gz ./C-SCRM-linux-x64"
   },
   "eslintConfig": {
     "extends": "react-app"
