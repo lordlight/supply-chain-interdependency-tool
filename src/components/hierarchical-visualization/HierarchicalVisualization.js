@@ -406,7 +406,6 @@ class HierarchicalVisualization extends Component {
         const impact =
           itemScores.impact !== -Infinity ? itemScores.impact || 0 : 0;
         const assurance = itemScores.assurance || 0;
-        const impactColor = getImpactColor(impact / MAX_IMPACT_SCORE);
         const value = interdependence / maxProjectInterdependence;
         const title = this.getEdgePopupContents(
           resourceDesignators.get("Project"),
@@ -475,7 +474,6 @@ class HierarchicalVisualization extends Component {
             0
           );
           const value = interdependence / maxProjectToProductInterdependence;
-          const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
             resourceDesignators.get("Product"),
             prod.Name,
@@ -539,7 +537,6 @@ class HierarchicalVisualization extends Component {
             0
           );
           const value = interdependence / maxProductToSupplierInterdependence;
-          const impactColor = getImpactColor(maxImpact / MAX_IMPACT_SCORE);
           const title = this.getEdgePopupContents(
             resourceDesignators.get("Supplier"),
             (suppliersMap[supId] || {}).Name,

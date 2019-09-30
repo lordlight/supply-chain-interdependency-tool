@@ -12,7 +12,7 @@ The tool has been run and tested on MacOS and Windows. It has also been run on t
 
 The development and build process can be run on Mac OSX or Linux. Building on Windows has not been attempted. You will need at least 4GB of memory to run the development environment or to build the application.
 
-Signing of the Mac OSX application will need to be done on a Mac. Signing of the Windows app is possible on the Mac, and should be possible on Linux, but this has not been attempted.
+Signing of the Mac OSX application will need to be done on a Mac. Signing of the Windows app is possible on the Mac. It also can be done on Ubuntu Linux 18.04 LTS, but first you must install the required **libcurl3** package (`sudo apt install libcurl3 libcurl-openssl1.0-dev`). It should also be possible on other Linux releases, but this has not been attempted.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

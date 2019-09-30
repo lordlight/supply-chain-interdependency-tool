@@ -3,11 +3,14 @@
   "description": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "fullname": "Cyber Supply Chain Risk Management (C-SCRM) Interdependency Tool",
   "author": "NIST",
-  "license": "NIST",
+  "license": "SEE LICENSE IN LICENSE.md",
   "version": "1.0.0",
   "versiondate": "30 September 2019",
-  "private": true,
-  "homepage": "./",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usnistgov/supply-chain-interdependency-tool"
+  },
+  "homepage": "https://github.com/usnistgov/supply-chain-interdependency-tool",
   "main": "public/electron.js",
   "dependencies": {
     "@material-ui/core": "^3.9.2",
