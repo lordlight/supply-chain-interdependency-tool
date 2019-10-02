@@ -6,11 +6,7 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "version": "1.0.0",
   "versiondate": "30 September 2019",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/usnistgov/supply-chain-interdependency-tool"
-  },
-  "homepage": "https://github.com/usnistgov/supply-chain-interdependency-tool",
+  "homepage": "./",
   "main": "public/electron.js",
   "dependencies": {
     "@material-ui/core": "^3.9.2",
